@@ -1,0 +1,128 @@
+<!-- Файл confirm.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Подтверждение</title>
+  <style>
+   #ImportIn {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #ImportOut {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #ExportIn {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #ExportOut {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #TransitIn {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #TransitOut {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #ExportEmpty {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #OtherEmpty {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #UnloadReid {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+   #LoadingReid {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+   #UnloadPort {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+   #LoadingPort {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+  </style>
+    <style type="text/css">
+       TABLE {
+        border-collapse: collapse; /* Убираем двойные линии между ячейками */
+        width: 300px; /* Ширина таблицы */
+        border: 5px double #000; /* Рамка вокруг таблицы */
+       }
+       TH, TD {
+        border: 1px solid black; /* Параметры рамки */
+        text-align: center; /* Выравнивание по центру */
+        padding: 4px; /* Поля вокруг текста */
+       }
+       TH {
+        background: blue; /* Цвет фона ячейки */
+        color: white; /* Цвет текста */
+        height: 40px; /* Высота ячеек */
+        vertical-align: top; /* Выравнивание по краю */
+        padding: 0; /* Убираем поля вокруг текста */
+       }
+    </style>
+</head>
+<body>
+    <h1>Проверьте или введите данные</h1>
+    <form method="post">
+        {% csrf_token %}
+        <ul>
+            <table border="1" width="30%" cellpadding="5">
+                <tr>
+                    <th>Заголовок</th>
+                    <th>в т.ч. импорт Прибыло</th>
+                    <th>в т.ч. импорт Убыло</th>
+                    <th>в т.ч. экспорт Прибыло</th>
+                    <th>в т.ч. экспорт Убыло</th>
+                    <th>в т.ч. транзит Прибыло</th>
+                    <th>в т.ч. транзит Убыло</th>
+                    <th>в т.ч. экспорт порожние</th>
+                    <th>в т.ч. прочие порожние</th>
+                    <th>На рейде в ожидании Выгрузки</th>
+                    <th>На рейде в ожидании Погрузки</th>
+                    <th>На подходах к порту для Выгрузки</th>
+                    <th>На подходах к порту для Погрузки</th>
+                </tr>
+                <tr>
+                    <td>Данные</td>
+                    <td><input value={{ImportIn}} id ="ImportIn" name = "ImportIn" ></td>
+                    <td><input value={{ImportOut}} id ="ImportOut" name = "ImportOut" ></td>
+                    <td><input value={{ExportIn}} id ="ExportIn" name = "ExportIn" ></td>
+                    <td><input value={{ExportOut}} id ="ExportOut" name = "ExportOut" ></td>
+                    <td><input value={{TransitIn}} id ="TransitIn" name = "TransitIn" ></td>
+                    <td><input value={{TransitOut}} id ="TransitOut" name = "TransitOut" ></td>
+                    <td><input value={{ExportEmpty}} id ="ExportEmpty" name = "ExportEmpty" ></td>
+                    <td><input value={{OtherEmpty}} id ="OtherEmpty" name = "OtherEmpty" ></td>
+                    <td><input value={{UnloadReid}} id ="UnloadReid" name = "UnloadReid" ></td>
+                    <td><input value={{LoadingReid}} id ="LoadingReid" name = "LoadingReid" ></td>
+                    <td><input value={{UnloadPort}} id ="UnloadPort" name = "UnloadPort" ></td>
+                    <td><input value={{LoadingPort}} id ="LoadingPort" name = "LoadingPort" ></td>
+                </tr>
+              </table>
+        </ul>
+        * Данные отличные от числовых автоматически превращаются в нули!
+        <br>
+            <input type="submit" value="Отправить" width="80" height="40">
+    </form>
+</body>
+<br>
+<div id="badges1">
+  <a href="/home">
+    <img src="https://img.shields.io/badge/%D0%9E%D1%82%D0%BC%D0%B5%D0%BD%D0%B0-white?style=plastic" width="82" height="25" alt="LinkedIn Badge"/>
+  </a>
+</div>
+<h3>Техподдержка:</h3>
+Тел: +7(495) 411-77-59, доб.2011
+<br>
+Моб: +7(925) 161-76-09
+<br>
+Email: eosed@rosmorport.ru
+<br>
+Email2: v.maklashov@rosmorport.ru
+<br>
+<div id="badges3">
+  <a href="https://t.me/VsevolodMaklashov">
+    <img src="https://img.shields.io/badge/Telegram-blue?style=for-the-badge&logo=Telegram&logoColor=white" alt="LinkedIn Badge"/>
+  </a>
+</div>
+</html>
