@@ -23,7 +23,7 @@ DAYDELTA = dt.timedelta(days=1,
                            weeks=0)
 
 def connection():
-    s = 'localhost'
+    s = '10.100.32.202'
     d = 'postgres'
     u = 'admin'
     p = 'root'
