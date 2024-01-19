@@ -478,18 +478,19 @@ def download(request):
             #
 
             cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 ",)
+                           f"SUM(db_importout) AS importoutsum,"
+                           f"SUM(db_exportin) AS exportinsum,"
+                           f"SUM(db_exportout) AS exportoutsum,"
+                           f"SUM(db_transitin) AS transitinsum,"
+                           f"SUM(db_transitout) AS transitoutsum,"
+                           f"SUM(db_exportempty) AS exportemptysum,"
+                           f"SUM(db_otherempty) AS otheremptysum,"
+                           f"SUM(db_unloadreid) AS unloadreidsum,"
+                           f"SUM(db_loadingreid) AS loadingreidsum,"
+                           f"SUM(db_lunloadport) AS lunloadportsum,"
+                           f"SUM(db_loadingport) AS loadingportsum "
+                           f"FROM firstapp_datatable3 "
+                           f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
             UserAlldata = cursor.fetchall()
             ws[f'A6'] = date
             ws[f'B6'] = 'ALLSUMM'
