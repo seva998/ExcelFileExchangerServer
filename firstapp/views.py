@@ -363,19 +363,13 @@ def download(request):
             else:
                 ws.column_dimensions[openpyxl.utils.get_column_letter(i + 1)].width = len(column) + 1
         try:
-            conn = connection()
-            cursor = conn.cursor()
+
             #admin_id = 2
 
             #
             # TestUser1
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 1")
-            User1data = cursor.fetchall()
-            if User1data == []:
-                User1data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+            User1data = getUserInfoFromDB(1,date)
 
             ws[f'A2'] = date
             ws[f'B2'] = 'TestUser1'
@@ -396,11 +390,8 @@ def download(request):
             # TestUser2
             #
 
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 3")
-            User2data = cursor.fetchall()
-            if User2data == []:
-                User2data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+            User2data = getUserInfoFromDB(3,date)
+
             ws[f'A3'] = date
             ws[f'B3'] = 'TestUser2'
             ws[f'C3'] = User2data[0][3]
@@ -419,12 +410,8 @@ def download(request):
             #
             # TestUser3 massive query
             #
+            User3data = getUserInfoFromDB(7,date)
 
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 7")
-            User3data = cursor.fetchall()
-            if User3data == []:
-                User3data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
             ws[f'A4'] = date
             ws[f'B4'] = 'TestUser3'
             ws[f'C4'] = User3data[0][3]
@@ -443,22 +430,7 @@ def download(request):
             #
             # Сумма по всем пользователям за дату
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date,'%Y-%m-%d').strftime('%Y%m%d')}'",)
-            UserAlldatafordate = cursor.fetchall()
+            UserAlldatafordate = getDataTableForDate(date)
             ws[f'A5'] = date
             ws[f'B5'] = 'DAYSUMM'
             ws[f'C5'] = UserAlldatafordate[0][0]
@@ -476,21 +448,7 @@ def download(request):
             #
             # Сумма по всем пользователям за всё время
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 ",)
-            UserAlldata = cursor.fetchall()
+            UserAlldata = getDataTableForAllTime(date)
             ws[f'A6'] = date
             ws[f'B6'] = 'ALLSUMM'
             ws[f'C6'] = UserAlldata[0][0]
@@ -505,35 +463,8 @@ def download(request):
             ws[f'L6'] = UserAlldata[0][9]
             ws[f'M6'] = UserAlldata[0][10]
             ws[f'N6'] = UserAlldata[0][11]
-
-            conn.close()
         except:
             pass
-
-        # for i, j in enumerate(DataTable3.objects.filter(date= params.get('date1'))):
-        #     ws[f'A{i + 2}'] = j.date
-        #
-        #     #GET USERNAME FOR TABLE
-        #     if j.db_userid == 1:
-        #         ws[f'B{i + 2}'] = 'TestUser1'
-        #     elif j.db_userid == 2:
-        #         ws[f'B{i + 2}'] = 'admin'
-        #     elif j.db_userid == 3:
-        #         ws[f'B{i + 2}'] = 'TestUser2'
-        #     elif j.db_userid == 7:
-        #         ws[f'B{i + 2}'] = 'TestUser7'
-        #     ws[f'C{i + 2}'] = j.db_importin
-        #     ws[f'D{i + 2}'] = j.db_importout
-        #     ws[f'E{i + 2}'] = j.db_exportin
-        #     ws[f'F{i + 2}'] = j.db_exportout
-        #     ws[f'G{i + 2}'] = j.db_transitin
-        #     ws[f'H{i + 2}'] = j.db_transitout
-        #     ws[f'I{i + 2}'] = j.db_exportempty
-        #     ws[f'J{i + 2}'] = j.db_otherempty
-        #     ws[f'K{i + 2}'] = j.db_unloadreid
-        #     ws[f'L{i + 2}'] = j.db_loadingreid
-        #     ws[f'M{i + 2}'] = j.db_lunloadport
-        #     ws[f'N{i + 2}'] = j.db_loadingport
         set_border(ws, 'A1:N6')
         bytes_io = BytesIO()
         wb.save(bytes_io)
@@ -548,81 +479,26 @@ def dataset(request):
         date = params.get('date1')
         print(date)
         try:
-            conn = connection()
-            cursor = conn.cursor()
-            #admin_id = 2
-
             #
             # TestUser1
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 1")
-            User1data = cursor.fetchall()
-            if User1data == []:
-                User1data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
-
+            User1data = getUserInfoFromDB(1,date)
             #
             # TestUser2
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 3")
-            User2data = cursor.fetchall()
-            if User2data == []:
-                User2data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
-
+            User2data = getUserInfoFromDB(3,date)
             #
             # TestUser3 massive query
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 7")
-            User3data = cursor.fetchall()
-            if User3data == []:
-                User3data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
-
+            User3data = getUserInfoFromDB(7,date)
             #
             # Сумма по всем пользователям за дату
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date,'%Y-%m-%d').strftime('%Y%m%d')}'",)
-            UserAlldatafordate = cursor.fetchall()
-
+            UserAlldatafordate = getDataTableForDate(date)
             #
             # Сумма по всем пользователям за всё время
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 "
-                           f"WHERE date <= '{dt.datetime.strptime(date,'%Y-%m-%d').strftime('%Y%m%d')}'",)
-            UserAlldata = cursor.fetchall()
-
-            conn.close()
+            UserAlldata = getDataTableForAllTime(date)
         except:
             return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
@@ -696,6 +572,7 @@ def dataset(request):
     else:
         return redirect('home')
 
+
 def datepick(request):
     if request.user.id == 2:
         if request.method == 'POST':
@@ -713,3 +590,68 @@ def set_border(ws, cell_range):
     for row in ws[cell_range]:
         for cell in row:
             cell.border = openpyxl.styles.Border(top=thin, left=thin, right=thin, bottom=thin)
+
+
+def getUserInfoFromDB(userid,date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser1
+    #
+    cursor.execute(f"SELECT * FROM firstapp_datatable3 "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+    conn.close()
+    return User1data
+
+
+def getDataTableForDate(date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
+                   f"SUM(db_importout) AS importoutsum,"
+                   f"SUM(db_exportin) AS exportinsum,"
+                   f"SUM(db_exportout) AS exportoutsum,"
+                   f"SUM(db_transitin) AS transitinsum,"
+                   f"SUM(db_transitout) AS transitoutsum,"
+                   f"SUM(db_exportempty) AS exportemptysum,"
+                   f"SUM(db_otherempty) AS otheremptysum,"
+                   f"SUM(db_unloadreid) AS unloadreidsum,"
+                   f"SUM(db_loadingreid) AS loadingreidsum,"
+                   f"SUM(db_lunloadport) AS lunloadportsum,"
+                   f"SUM(db_loadingport) AS loadingportsum "
+                   f"FROM firstapp_datatable3 "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+
+def getDataTableForAllTime(date):
+    #
+    # Сумма по всем пользователям за всё время
+    #
+    conn = connection()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
+                   f"SUM(db_importout) AS importoutsum,"
+                   f"SUM(db_exportin) AS exportinsum,"
+                   f"SUM(db_exportout) AS exportoutsum,"
+                   f"SUM(db_transitin) AS transitinsum,"
+                   f"SUM(db_transitout) AS transitoutsum,"
+                   f"SUM(db_exportempty) AS exportemptysum,"
+                   f"SUM(db_otherempty) AS otheremptysum,"
+                   f"SUM(db_unloadreid) AS unloadreidsum,"
+                   f"SUM(db_loadingreid) AS loadingreidsum,"
+                   f"SUM(db_lunloadport) AS lunloadportsum,"
+                   f"SUM(db_loadingport) AS loadingportsum "
+                   f"FROM firstapp_datatable3 "
+                   f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
+    result = cursor.fetchall()
+    conn.close()
+    return result
