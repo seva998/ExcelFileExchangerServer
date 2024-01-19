@@ -110,6 +110,7 @@ def register(request):
         return render(request, 'register.html')
     else:
         return redirect('login')
+    ####
 
 def user_login(request):
     if request.method == 'POST':
@@ -321,7 +322,6 @@ def success(request):
                                                 'UnloadPort': UnloadPort[0],
                                                 'LoadingPort': LoadingPort[0],
                                                 'user': request.user})
-
 
 def NanCheck(i):
     try:
