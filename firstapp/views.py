@@ -322,6 +322,7 @@ def success(request):
                                                 'LoadingPort': LoadingPort[0],
                                                 'user': request.user})
 
+
 def NanCheck(i):
     try:
         float(i)
