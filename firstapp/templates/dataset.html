@@ -41,83 +41,38 @@
             </tr>
             <tr>
                 <td>TestUser1 за {{date}}</td>
-                <td>{{ImportIn1}}</td>
-                <td>{{ImportOut1}}</td>
-                <td>{{ExportIn1}}</td>
-                <td>{{ExportOut1}}</td>
-                <td>{{TransitIn1}}</td>
-                <td>{{TransitOut1}}</td>
-                <td>{{ExportEmpty1}}</td>
-                <td>{{OtherEmpty1}}</td>
-                <td>{{UnloadReid1}}</td>
-                <td>{{LoadingReid1}}</td>
-                <td>{{UnloadPort1}}</td>
-                <td>{{LoadingPort1}}</td>
+                {% for item in User1data %}
+                    <td>{{ item }}</td>
+                {% endfor %}
             </tr>
             <tr>
                 <td>TestUser2 за {{date}}</td>
-                <td>{{ImportIn2}}</td>
-                <td>{{ImportOut2}}</td>
-                <td>{{ExportIn2}}</td>
-                <td>{{ExportOut2}}</td>
-                <td>{{TransitIn2}}</td>
-                <td>{{TransitOut2}}</td>
-                <td>{{ExportEmpty2}}</td>
-                <td>{{OtherEmpty2}}</td>
-                <td>{{UnloadReid2}}</td>
-                <td>{{LoadingReid2}}</td>
-                <td>{{UnloadPort2}}</td>
-                <td>{{LoadingPort2}}</td>
+                {% for item in User2data %}
+                    <td>{{ item }}</td>
+                {% endfor %}
             </tr>
             <tr>
                 <td>TestUser3 за {{date}}</td>
-                <td>{{ImportIn3}}</td>
-                <td>{{ImportOut3}}</td>
-                <td>{{ExportIn3}}</td>
-                <td>{{ExportOut3}}</td>
-                <td>{{TransitIn3}}</td>
-                <td>{{TransitOut3}}</td>
-                <td>{{ExportEmpty3}}</td>
-                <td>{{OtherEmpty3}}</td>
-                <td>{{UnloadReid3}}</td>
-                <td>{{LoadingReid3}}</td>
-                <td>{{UnloadPort3}}</td>
-                <td>{{LoadingPort3}}</td>
+                {% for item in User3data %}
+                    <td>{{ item }}</td>
+                {% endfor %}
             </tr>
             <tr>
-                <td>Сумма за {{date}}</td>
-                <td>{{ImportIn}}</td>
-                <td>{{ImportOut}}</td>
-                <td>{{ExportIn}}</td>
-                <td>{{ExportOut}}</td>
-                <td>{{TransitIn}}</td>
-                <td>{{TransitOut}}</td>
-                <td>{{ExportEmpty}}</td>
-                <td>{{OtherEmpty}}</td>
-                <td>{{UnloadReid}}</td>
-                <td>{{LoadingReid}}</td>
-                <td>{{UnloadPort}}</td>
-                <td>{{LoadingPort}}</td>
+                <td>UserAlldatafordate за {{date}}</td>
+                {% for item in UserAlldatafordate %}
+                    <td>{{ item }}</td>
+                {% endfor %}
             </tr>
             <tr>
-                <td>Сумма за Всё время (До указанной даты)</td>
-                <td>{{ImportInAllTime}}</td>
-                <td>{{ImportOutAllTime}}</td>
-                <td>{{ExportInAllTime}}</td>
-                <td>{{ExportOutAllTime}}</td>
-                <td>{{TransitInAllTime}}</td>
-                <td>{{TransitOutAllTime}}</td>
-                <td>{{ExportEmptyAllTime}}</td>
-                <td>{{OtherEmptyAllTime}}</td>
-                <td>{{UnloadReidAllTime}}</td>
-                <td>{{LoadingReidAllTime}}</td>
-                <td>{{UnloadPortAllTime}}</td>
-                <td>{{LoadingPortAllTime}}</td>
+                <td>UserAlldata за {{date}}</td>
+                {% for item in UserAlldata %}
+                    <td>{{ item }}</td>
+                {% endfor %}
             </tr>
           </table>
     </ul>
 <br>
-<div id="badges3">
+<div id="badges4">
   <a href="/download">
     <img src="https://img.shields.io/badge/%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20%20Excel%20%20%D1%84%D0%B0%D0%B9%D0%BB-green" width="200" height="40" alt="LinkedIn Badge"/>
   </a>
