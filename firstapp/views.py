@@ -33,7 +33,7 @@ def connection():
 @login_required(login_url='')
 def home(request):
     #В данном случае ID админа 2, но рекомендуется использовать 1, и первым пользователем создавать именно админа.
-    if request.user.id != 2:
+    if request.user.id != 1:
         if request.method == 'POST':
             file = request.FILES.get('file')
             if file is not None:
@@ -95,7 +95,7 @@ def home(request):
         return render(request, 'admin.html')
 
 def register(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         if request.method == 'POST':
             try:
                 username = request.POST['username']
@@ -336,7 +336,7 @@ def NanCheck(i):
 ###File download realization
 @csrf_exempt
 def download(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         wb = openpyxl.Workbook()
         ws = wb.active
         params = request.session.get('parameters', {})
@@ -369,7 +369,7 @@ def download(request):
             #
             # TestUser1
             #
-            User1data = getUserInfoFromDB(1,date)
+            User1data = getUserInfoFromDB(2,date)
 
             ws[f'A2'] = date
             ws[f'B2'] = 'TestUser1'
@@ -410,7 +410,7 @@ def download(request):
             #
             # TestUser3 massive query
             #
-            User3data = getUserInfoFromDB(7,date)
+            User3data = getUserInfoFromDB(4,date)
 
             ws[f'A4'] = date
             ws[f'B4'] = 'TestUser3'
@@ -426,7 +426,6 @@ def download(request):
             ws[f'L4'] = User3data[0][12]
             ws[f'M4'] = User3data[0][13]
             ws[f'N4'] = User3data[0][14]
-
             #
             # Сумма по всем пользователям за дату
             #
@@ -469,12 +468,12 @@ def download(request):
         bytes_io = BytesIO()
         wb.save(bytes_io)
         bytes_io.seek(0)
-        return FileResponse(bytes_io, as_attachment=True, filename=(date +'.xslx'))
+        return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xslx'))
     else:
         return redirect('home')
 
 def dataset(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         params = request.session.get('parameters', {})
         date = params.get('date1')
         print(date)
@@ -482,7 +481,7 @@ def dataset(request):
             #
             # TestUser1
             #
-            User1data = getUserInfoFromDB(1,date)
+            User1data = getUserInfoFromDB(2,date)
             #
             # TestUser2
             #
@@ -490,7 +489,7 @@ def dataset(request):
             #
             # TestUser3 massive query
             #
-            User3data = getUserInfoFromDB(7,date)
+            User3data = getUserInfoFromDB(4,date)
             #
             # Сумма по всем пользователям за дату
             #
@@ -574,7 +573,7 @@ def dataset(request):
 
 
 def datepick(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         if request.method == 'POST':
             date1 = request.POST['date1']
             request.session['parameters'] = {'date1': date1}
@@ -596,7 +595,7 @@ def getUserInfoFromDB(userid,date):
     conn = connection()
     cursor = conn.cursor()
     #
-    # TestUser1
+    # TestUser
     #
     cursor.execute(f"SELECT * FROM firstapp_datatable3 "
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
