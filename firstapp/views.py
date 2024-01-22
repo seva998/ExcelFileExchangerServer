@@ -229,20 +229,37 @@ def confirm(request):
             # Создайте URL-адрес перенаправления с этим session ID
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
-        return render(request, 'confirm.html', {
-            'ImportIn': 0,
-            'ImportOut': 0,
-            'ExportIn': 0,
-            'ExportOut': 0,
-            'TransitIn': 0,
-            'TransitOut': 0,
-            'ExportEmpty': 0,
-            'OtherEmpty': 0,
-            'UnloadReid': 0,
-            'LoadingReid': 0,
-            'UnloadPort': 0,
-            'LoadingPort': 0,
-        })
+        Userdata = getUserInfoFromDB(request.user.id , (dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d'))
+        try:
+            return render(request, 'confirm.html', {
+                'ImportIn': Userdata[0][3],
+                'ImportOut': Userdata[0][4],
+                'ExportIn': Userdata[0][5],
+                'ExportOut': Userdata[0][6],
+                'TransitIn': Userdata[0][7],
+                'TransitOut': Userdata[0][8],
+                'ExportEmpty': Userdata[0][9],
+                'OtherEmpty': Userdata[0][10],
+                'UnloadReid': Userdata[0][11],
+                'LoadingReid': Userdata[0][12],
+                'UnloadPort': Userdata[0][13],
+                'LoadingPort': Userdata[0][14],
+            })
+        except:
+            return render(request, 'confirm.html', {
+                'ImportIn': 0,
+                'ImportOut': 0,
+                'ExportIn': 0,
+                'ExportOut': 0,
+                'TransitIn': 0,
+                'TransitOut': 0,
+                'ExportEmpty': 0,
+                'OtherEmpty': 0,
+                'UnloadReid': 0,
+                'LoadingReid': 0,
+                'UnloadPort': 0,
+                'LoadingPort': 0,
+            })
 
 
 def success(request):
@@ -337,54 +354,30 @@ def NanCheck(i):
 @csrf_exempt
 def download(request):
     if request.user.id == 1:
-        wb = openpyxl.Workbook()
-        ws = wb.active
+        wb = openpyxl.load_workbook('./Test.xlsx')
+        ws = wb.get_sheet_by_name('Шаблон1')
         params = request.session.get('parameters', {})
         date = params.get('date1')
-        columns = ['Дата',
-                   'Имя пользователя',
-                   'в т.ч. импорт Прибыло',
-                   'в т.ч. импорт Убыло',
-                   'в т.ч. экспорт Прибыло',
-                   'в т.ч. экспорт Убыло',
-                   'в т.ч. транзит Прибыло',
-                   'в т.ч. транзит Убыло',
-                   'в т.ч. экспорт порожние',
-                   'в т.ч. прочие порожние',
-                   'На рейде в ожидании Выгрузки',
-                   'На рейде в ожидании Погрузки',
-                   'На подходах к порту для Выгрузки',
-                   'На подходах к порту для Погрузки']
-        for i, column in enumerate(columns):
-            ws[f'{get_column_letter(i + 1)}1'] = column
-            ws[f'{get_column_letter(i + 1)}1'].fill  = openpyxl.styles.PatternFill('solid', fgColor='000066CC')
-            if i == 0:
-                ws.column_dimensions[openpyxl.utils.get_column_letter(i+1)].width = len(column) + 8
-            else:
-                ws.column_dimensions[openpyxl.utils.get_column_letter(i + 1)].width = len(column) + 1
         try:
-
             #admin_id = 2
-
             #
             # TestUser1
             #
             User1data = getUserInfoFromDB(2,date)
-
-            ws[f'A2'] = date
-            ws[f'B2'] = 'TestUser1'
-            ws[f'C2'] = User1data[0][3]
-            ws[f'D2'] = User1data[0][4]
-            ws[f'E2'] = User1data[0][5]
-            ws[f'F2'] = User1data[0][6]
-            ws[f'G2'] = User1data[0][7]
-            ws[f'H2'] = User1data[0][8]
-            ws[f'I2'] = User1data[0][9]
-            ws[f'J2'] = User1data[0][10]
-            ws[f'K2'] = User1data[0][11]
-            ws[f'L2'] = User1data[0][12]
-            ws[f'M2'] = User1data[0][13]
-            ws[f'N2'] = User1data[0][14]
+            #ws[f'A2'] = date
+            ws[f'A4'] = 'TestUser1'
+            ws[f'B4'] = User1data[0][3]
+            ws[f'C4'] = User1data[0][4]
+            ws[f'D4'] = User1data[0][5]
+            ws[f'E4'] = User1data[0][6]
+            ws[f'F4'] = User1data[0][7]
+            ws[f'G4'] = User1data[0][8]
+            ws[f'H4'] = User1data[0][9]
+            ws[f'I4'] = User1data[0][10]
+            ws[f'J4'] = User1data[0][11]
+            ws[f'K4'] = User1data[0][12]
+            ws[f'L4'] = User1data[0][13]
+            ws[f'M4'] = User1data[0][14]
 
             #
             # TestUser2
@@ -392,79 +385,78 @@ def download(request):
 
             User2data = getUserInfoFromDB(3,date)
 
-            ws[f'A3'] = date
-            ws[f'B3'] = 'TestUser2'
-            ws[f'C3'] = User2data[0][3]
-            ws[f'D3'] = User2data[0][4]
-            ws[f'E3'] = User2data[0][5]
-            ws[f'F3'] = User2data[0][6]
-            ws[f'G3'] = User2data[0][7]
-            ws[f'H3'] = User2data[0][8]
-            ws[f'I3'] = User2data[0][9]
-            ws[f'J3'] = User2data[0][10]
-            ws[f'K3'] = User2data[0][11]
-            ws[f'L3'] = User2data[0][12]
-            ws[f'M3'] = User2data[0][13]
-            ws[f'N3'] = User2data[0][14]
+            #ws[f'A3'] = date
+            ws[f'A5'] = 'TestUser1'
+            ws[f'B5'] = User2data[0][3]
+            ws[f'C5'] = User2data[0][4]
+            ws[f'D5'] = User2data[0][5]
+            ws[f'E5'] = User2data[0][6]
+            ws[f'F5'] = User2data[0][7]
+            ws[f'G5'] = User2data[0][8]
+            ws[f'H5'] = User2data[0][9]
+            ws[f'I5'] = User2data[0][10]
+            ws[f'J5'] = User2data[0][11]
+            ws[f'K5'] = User2data[0][12]
+            ws[f'L5'] = User2data[0][13]
+            ws[f'M5'] = User2data[0][14]
 
             #
             # TestUser3 massive query
             #
             User3data = getUserInfoFromDB(4,date)
 
-            ws[f'A4'] = date
-            ws[f'B4'] = 'TestUser3'
-            ws[f'C4'] = User3data[0][3]
-            ws[f'D4'] = User3data[0][4]
-            ws[f'E4'] = User3data[0][5]
-            ws[f'F4'] = User3data[0][6]
-            ws[f'G4'] = User3data[0][7]
-            ws[f'H4'] = User3data[0][8]
-            ws[f'I4'] = User3data[0][9]
-            ws[f'J4'] = User3data[0][10]
-            ws[f'K4'] = User3data[0][11]
-            ws[f'L4'] = User3data[0][12]
-            ws[f'M4'] = User3data[0][13]
-            ws[f'N4'] = User3data[0][14]
+            #ws[f'A4'] = date
+            ws[f'A6'] = 'TestUser1'
+            ws[f'B6'] = User2data[0][3]
+            ws[f'C6'] = User2data[0][4]
+            ws[f'D6'] = User2data[0][5]
+            ws[f'E6'] = User2data[0][6]
+            ws[f'F6'] = User2data[0][7]
+            ws[f'G6'] = User2data[0][8]
+            ws[f'H6'] = User2data[0][9]
+            ws[f'I6'] = User2data[0][10]
+            ws[f'J6'] = User2data[0][11]
+            ws[f'K6'] = User2data[0][12]
+            ws[f'L6'] = User2data[0][13]
+            ws[f'M6'] = User2data[0][14]
             #
             # Сумма по всем пользователям за дату
             #
             UserAlldatafordate = getDataTableForDate(date)
-            ws[f'A5'] = date
-            ws[f'B5'] = 'DAYSUMM'
-            ws[f'C5'] = UserAlldatafordate[0][0]
-            ws[f'D5'] = UserAlldatafordate[0][1]
-            ws[f'E5'] = UserAlldatafordate[0][2]
-            ws[f'F5'] = UserAlldatafordate[0][3]
-            ws[f'G5'] = UserAlldatafordate[0][4]
-            ws[f'H5'] = UserAlldatafordate[0][5]
-            ws[f'I5'] = UserAlldatafordate[0][6]
-            ws[f'J5'] = UserAlldatafordate[0][7]
-            ws[f'K5'] = UserAlldatafordate[0][8]
-            ws[f'L5'] = UserAlldatafordate[0][9]
-            ws[f'M5'] = UserAlldatafordate[0][10]
-            ws[f'N5'] = UserAlldatafordate[0][11]
+            #ws[f'A5'] = date
+            ws[f'A7'] = 'TestUser1'
+            ws[f'B7'] = UserAlldatafordate[0][0]
+            ws[f'C7'] = UserAlldatafordate[0][1]
+            ws[f'D7'] = UserAlldatafordate[0][2]
+            ws[f'E7'] = UserAlldatafordate[0][3]
+            ws[f'F7'] = UserAlldatafordate[0][4]
+            ws[f'G7'] = UserAlldatafordate[0][5]
+            ws[f'H7'] = UserAlldatafordate[0][6]
+            ws[f'I7'] = UserAlldatafordate[0][7]
+            ws[f'J7'] = UserAlldatafordate[0][8]
+            ws[f'K7'] = UserAlldatafordate[0][9]
+            ws[f'L7'] = UserAlldatafordate[0][10]
+            ws[f'M7'] = UserAlldatafordate[0][11]
             #
             # Сумма по всем пользователям за всё время
             #
             UserAlldata = getDataTableForAllTime(date)
-            ws[f'A6'] = date
-            ws[f'B6'] = 'ALLSUMM'
-            ws[f'C6'] = UserAlldata[0][0]
-            ws[f'D6'] = UserAlldata[0][1]
-            ws[f'E6'] = UserAlldata[0][2]
-            ws[f'F6'] = UserAlldata[0][3]
-            ws[f'G6'] = UserAlldata[0][4]
-            ws[f'H6'] = UserAlldata[0][5]
-            ws[f'I6'] = UserAlldata[0][6]
-            ws[f'J6'] = UserAlldata[0][7]
-            ws[f'K6'] = UserAlldata[0][8]
-            ws[f'L6'] = UserAlldata[0][9]
-            ws[f'M6'] = UserAlldata[0][10]
-            ws[f'N6'] = UserAlldata[0][11]
+            #ws[f'A6'] = date
+            ws[f'A8'] = 'TestUser1'
+            ws[f'B8'] = UserAlldata[0][0]
+            ws[f'C8'] = UserAlldata[0][1]
+            ws[f'D8'] = UserAlldata[0][2]
+            ws[f'E8'] = UserAlldata[0][3]
+            ws[f'F8'] = UserAlldata[0][4]
+            ws[f'G8'] = UserAlldata[0][5]
+            ws[f'H8'] = UserAlldata[0][6]
+            ws[f'I8'] = UserAlldata[0][7]
+            ws[f'J8'] = UserAlldata[0][8]
+            ws[f'K8'] = UserAlldata[0][9]
+            ws[f'L8'] = UserAlldata[0][10]
+            ws[f'M8'] = UserAlldata[0][11]
         except:
             pass
-        set_border(ws, 'A1:N6')
         bytes_io = BytesIO()
         wb.save(bytes_io)
         bytes_io.seek(0)
