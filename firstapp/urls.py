@@ -9,6 +9,6 @@ urlpatterns = [
     path('confirm/', views.confirm, name='confirm'),
     path('success/', views.success, name='success'),
     path('dataset/', views.dataset, name = 'dataset'),
-    path('datepick/', views.datepick, name = 'datepick'),
+    path('datepick_admin/', views.datepick_admin, name = 'datepick_admin'),
     re_path('download/', views.download, name='download'),
 ]
