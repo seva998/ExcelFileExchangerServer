@@ -138,6 +138,7 @@ def confirm(request):
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
+        date2 = params.get('date2')
         ImportIn = params.get('ImportIn')
         ImportOut = params.get('ImportOut')
         ExportIn = params.get('ExportIn')
@@ -151,6 +152,7 @@ def confirm(request):
         UnloadPort = params.get('UnloadPort')
         LoadingPort = params.get('LoadingPort')
         if request.method == 'POST':
+            date2 = [request.POST['date2']]
             ImportIn = [request.POST['ImportIn']]
             ImportOut = [request.POST['ImportOut']]
             ExportIn = [request.POST['ExportIn']]
@@ -164,6 +166,7 @@ def confirm(request):
             UnloadPort = [request.POST['UnloadPort']]
             LoadingPort = [request.POST['LoadingPort']]
             request.session['parameters'] = {
+                'date2' : date2,
                 'ImportIn': ImportIn,
                 'ImportOut': ImportOut,
                 'ExportIn': ExportIn,
@@ -180,6 +183,7 @@ def confirm(request):
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
         return render(request, 'confirm.html', {
+                                                        'date2': date2[0],
                                                         'ImportIn': ImportIn[0],
                                                         'ImportOut': ImportOut[0],
                                                         'ExportIn': ExportIn[0],
@@ -195,6 +199,7 @@ def confirm(request):
         })
     else:
         if request.method == 'POST':
+            date2 = [request.POST['date2']],
             ImportIn = [request.POST['ImportIn']]
             ImportOut = [request.POST['ImportOut']]
             ExportIn = [request.POST['ExportIn']]
@@ -208,6 +213,7 @@ def confirm(request):
             UnloadPort = [request.POST['UnloadPort']]
             LoadingPort = [request.POST['LoadingPort']]
             request.session['parameters'] = {
+                'date2': date2,
                 'ImportIn': ImportIn,
                 'ImportOut': ImportOut,
                 'ExportIn': ExportIn,
@@ -232,6 +238,7 @@ def confirm(request):
         try:
             Userdata = getUserInfoFromDB(request.user.id , (dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d'))
             return render(request, 'confirm.html', {
+                'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ImportIn': Userdata[0][3],
                 'ImportOut': Userdata[0][4],
                 'ExportIn': Userdata[0][5],
@@ -268,6 +275,7 @@ def success(request):
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
+        date2 = params.get('date2')
         ImportIn = params.get('ImportIn')
         ImportOut = params.get('ImportOut')
         ExportIn = params.get('ExportIn')
@@ -293,7 +301,7 @@ def success(request):
         UnloadPort[0] = NanCheck(UnloadPort[0])
         LoadingPort[0] = NanCheck(LoadingPort[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DataTable3.objects.filter(date = dt.datetime.now()-DAYDELTA, db_userid = request.user.id).update(
+        DataItem = DataTable3.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
                 db_importin=float(ImportIn[0]),
                 db_importout=float(ImportOut[0]),
                 db_exportin=float(ExportIn[0]),
@@ -309,7 +317,7 @@ def success(request):
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DataTable3.objects.create(date = dt.datetime.now()-DAYDELTA,
+            DataTable3.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
                                           db_userid = request.user.id,
                                           db_importin= float(ImportIn[0]),
                                           db_importout = float(ImportOut[0]),
@@ -326,6 +334,7 @@ def success(request):
                                           )
 
         return render(request, 'success.html', {
+                                                'date2': date2[0][0],
                                                 'ImportIn': ImportIn[0],
                                                 'ImportOut': ImportOut[0],
                                                 'ExportIn': ExportIn[0],
@@ -564,14 +573,14 @@ def dataset(request):
         return redirect('home')
 
 
-def datepick(request):
+def datepick_admin(request):
     if request.user.id == 1:
         if request.method == 'POST':
             date1 = request.POST['date1']
             request.session['parameters'] = {'date1': date1}
             return redirect(dataset)
         print(dt.datetime.now().strftime('%Y-%m-%d'))
-        return render(request, 'datepick.html' , {'currentdate':(dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d')})
+        return render(request, 'datepick_admin.html' , {'currentdate':(dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d')})
     else:
         return redirect('home')
 

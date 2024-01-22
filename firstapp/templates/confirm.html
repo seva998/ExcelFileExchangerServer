@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <title>Подтверждение</title>
   <style>
+   #date2 {
+    width: 100px; /* Ширина поля в пикселах */
+   }
    #ImportIn {
     width: 50px; /* Ширина поля в пикселах */
    }
@@ -70,6 +73,7 @@
             <table border="1" width="30%" cellpadding="5">
                 <tr>
                     <th>Заголовок</th>
+                    <th>date2</th>
                     <th>в т.ч. импорт Прибыло</th>
                     <th>в т.ч. импорт Убыло</th>
                     <th>в т.ч. экспорт Прибыло</th>
@@ -85,6 +89,7 @@
                 </tr>
                 <tr>
                     <td>Данные</td>
+                    <td><input type="date" value={{date2}} id ="date2" name = "date2" ></td>
                     <td><input value={{ImportIn}} id ="ImportIn" name = "ImportIn" ></td>
                     <td><input value={{ImportOut}} id ="ImportOut" name = "ImportOut" ></td>
                     <td><input value={{ExportIn}} id ="ExportIn" name = "ExportIn" ></td>
