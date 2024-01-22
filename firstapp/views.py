@@ -229,8 +229,8 @@ def confirm(request):
             # Создайте URL-адрес перенаправления с этим session ID
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
-        Userdata = getUserInfoFromDB(request.user.id , (dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d'))
         try:
+            Userdata = getUserInfoFromDB(request.user.id , (dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d'))
             return render(request, 'confirm.html', {
                 'ImportIn': Userdata[0][3],
                 'ImportOut': Userdata[0][4],
