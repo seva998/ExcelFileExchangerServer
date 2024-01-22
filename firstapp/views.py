@@ -138,7 +138,6 @@ def confirm(request):
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
-        date2 = params.get('date2')
         ImportIn = params.get('ImportIn')
         ImportOut = params.get('ImportOut')
         ExportIn = params.get('ExportIn')
@@ -152,7 +151,7 @@ def confirm(request):
         UnloadPort = params.get('UnloadPort')
         LoadingPort = params.get('LoadingPort')
         if request.method == 'POST':
-            date2 = [request.POST['date2']]
+            date2 = [[request.POST['date2']]]
             ImportIn = [request.POST['ImportIn']]
             ImportOut = [request.POST['ImportOut']]
             ExportIn = [request.POST['ExportIn']]
@@ -183,7 +182,7 @@ def confirm(request):
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
         return render(request, 'confirm.html', {
-                                                        'date2': date2[0],
+                                                        'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
                                                         'ImportIn': ImportIn[0],
                                                         'ImportOut': ImportOut[0],
                                                         'ExportIn': ExportIn[0],
@@ -239,18 +238,18 @@ def confirm(request):
             Userdata = getUserInfoFromDB(request.user.id , (dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d'))
             return render(request, 'confirm.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'ImportIn': Userdata[0][3],
-                'ImportOut': Userdata[0][4],
-                'ExportIn': Userdata[0][5],
-                'ExportOut': Userdata[0][6],
-                'TransitIn': Userdata[0][7],
-                'TransitOut': Userdata[0][8],
-                'ExportEmpty': Userdata[0][9],
-                'OtherEmpty': Userdata[0][10],
-                'UnloadReid': Userdata[0][11],
-                'LoadingReid': Userdata[0][12],
-                'UnloadPort': Userdata[0][13],
-                'LoadingPort': Userdata[0][14],
+                'ImportIn': Userdata[0][0],
+                'ImportOut': Userdata[0][1],
+                'ExportIn': Userdata[0][2],
+                'ExportOut': Userdata[0][3],
+                'TransitIn': Userdata[0][4],
+                'TransitOut': Userdata[0][5],
+                'ExportEmpty': Userdata[0][6],
+                'OtherEmpty': Userdata[0][7],
+                'UnloadReid': Userdata[0][8],
+                'LoadingReid': Userdata[0][9],
+                'UnloadPort': Userdata[0][10],
+                'LoadingPort': Userdata[0][11],
             })
         except:
             return render(request, 'confirm.html', {
@@ -276,6 +275,7 @@ def success(request):
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         date2 = params.get('date2')
+        print(date2)
         ImportIn = params.get('ImportIn')
         ImportOut = params.get('ImportOut')
         ExportIn = params.get('ExportIn')
@@ -375,18 +375,18 @@ def download(request):
             User1data = getUserInfoFromDB(2,date)
             #ws[f'A2'] = date
             ws[f'A4'] = 'TestUser1'
-            ws[f'B4'] = User1data[0][3]
-            ws[f'C4'] = User1data[0][4]
-            ws[f'D4'] = User1data[0][5]
-            ws[f'E4'] = User1data[0][6]
-            ws[f'F4'] = User1data[0][7]
-            ws[f'G4'] = User1data[0][8]
-            ws[f'H4'] = User1data[0][9]
-            ws[f'I4'] = User1data[0][10]
-            ws[f'J4'] = User1data[0][11]
-            ws[f'K4'] = User1data[0][12]
-            ws[f'L4'] = User1data[0][13]
-            ws[f'M4'] = User1data[0][14]
+            ws[f'B4'] = User1data[0][0]
+            ws[f'C4'] = User1data[0][1]
+            ws[f'D4'] = User1data[0][2]
+            ws[f'E4'] = User1data[0][3]
+            ws[f'F4'] = User1data[0][4]
+            ws[f'G4'] = User1data[0][5]
+            ws[f'H4'] = User1data[0][6]
+            ws[f'I4'] = User1data[0][7]
+            ws[f'J4'] = User1data[0][8]
+            ws[f'K4'] = User1data[0][9]
+            ws[f'L4'] = User1data[0][10]
+            ws[f'M4'] = User1data[0][11]
 
             #
             # TestUser2
@@ -396,18 +396,18 @@ def download(request):
 
             #ws[f'A3'] = date
             ws[f'A5'] = 'TestUser1'
-            ws[f'B5'] = User2data[0][3]
-            ws[f'C5'] = User2data[0][4]
-            ws[f'D5'] = User2data[0][5]
-            ws[f'E5'] = User2data[0][6]
-            ws[f'F5'] = User2data[0][7]
-            ws[f'G5'] = User2data[0][8]
-            ws[f'H5'] = User2data[0][9]
-            ws[f'I5'] = User2data[0][10]
-            ws[f'J5'] = User2data[0][11]
-            ws[f'K5'] = User2data[0][12]
-            ws[f'L5'] = User2data[0][13]
-            ws[f'M5'] = User2data[0][14]
+            ws[f'B5'] = User2data[0][0]
+            ws[f'C5'] = User2data[0][1]
+            ws[f'D5'] = User2data[0][2]
+            ws[f'E5'] = User2data[0][3]
+            ws[f'F5'] = User2data[0][4]
+            ws[f'G5'] = User2data[0][5]
+            ws[f'H5'] = User2data[0][6]
+            ws[f'I5'] = User2data[0][7]
+            ws[f'J5'] = User2data[0][8]
+            ws[f'K5'] = User2data[0][9]
+            ws[f'L5'] = User2data[0][10]
+            ws[f'M5'] = User2data[0][11]
 
             #
             # TestUser3 massive query
@@ -416,18 +416,18 @@ def download(request):
 
             #ws[f'A4'] = date
             ws[f'A6'] = 'TestUser1'
-            ws[f'B6'] = User2data[0][3]
-            ws[f'C6'] = User2data[0][4]
-            ws[f'D6'] = User2data[0][5]
-            ws[f'E6'] = User2data[0][6]
-            ws[f'F6'] = User2data[0][7]
-            ws[f'G6'] = User2data[0][8]
-            ws[f'H6'] = User2data[0][9]
-            ws[f'I6'] = User2data[0][10]
-            ws[f'J6'] = User2data[0][11]
-            ws[f'K6'] = User2data[0][12]
-            ws[f'L6'] = User2data[0][13]
-            ws[f'M6'] = User2data[0][14]
+            ws[f'B6'] = User2data[0][0]
+            ws[f'C6'] = User2data[0][1]
+            ws[f'D6'] = User2data[0][2]
+            ws[f'E6'] = User2data[0][3]
+            ws[f'F6'] = User2data[0][4]
+            ws[f'G6'] = User2data[0][5]
+            ws[f'H6'] = User2data[0][6]
+            ws[f'I6'] = User2data[0][7]
+            ws[f'J6'] = User2data[0][8]
+            ws[f'K6'] = User2data[0][9]
+            ws[f'L6'] = User2data[0][10]
+            ws[f'M6'] = User2data[0][11]
             #
             # Сумма по всем пользователям за дату
             #
@@ -477,7 +477,6 @@ def dataset(request):
     if request.user.id == 1:
         params = request.session.get('parameters', {})
         date = params.get('date1')
-        print(date)
         try:
             #
             # TestUser1
@@ -503,70 +502,15 @@ def dataset(request):
             return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
                                                     'date' : (dt.datetime.strptime(date,'%Y-%m-%d').strftime('%d.%m.%Y.')),
-                                                    'ImportIn': UserAlldatafordate[0][0],
-                                                    'ImportOut': UserAlldatafordate[0][1],
-                                                    'ExportIn': UserAlldatafordate[0][2],
-                                                    'ExportOut': UserAlldatafordate[0][3],
-                                                    'TransitIn': UserAlldatafordate[0][4],
-                                                    'TransitOut': UserAlldatafordate[0][5],
-                                                    'ExportEmpty': UserAlldatafordate[0][6],
-                                                    'OtherEmpty': UserAlldatafordate[0][7],
-                                                    'UnloadReid': UserAlldatafordate[0][8],
-                                                    'LoadingReid': UserAlldatafordate[0][9],
-                                                    'UnloadPort': UserAlldatafordate[0][10],
-                                                    'LoadingPort': UserAlldatafordate[0][11],
+                                                    'UserAlldatafordate': UserAlldatafordate[0],
 
-                                                    'ImportIn1': User1data[0][3],
-                                                    'ImportOut1': User1data[0][4],
-                                                    'ExportIn1': User1data[0][5],
-                                                    'ExportOut1': User1data[0][6],
-                                                    'TransitIn1': User1data[0][7],
-                                                    'TransitOut1': User1data[0][8],
-                                                    'ExportEmpty1': User1data[0][9],
-                                                    'OtherEmpty1': User1data[0][10],
-                                                    'UnloadReid1': User1data[0][11],
-                                                    'LoadingReid1': User1data[0][12],
-                                                    'UnloadPort1': User1data[0][13],
-                                                    'LoadingPort1': User1data[0][14],
+                                                    'User1data' : User1data[0],
 
-                                                    'ImportIn2': User2data[0][3],
-                                                    'ImportOut2': User2data[0][4],
-                                                    'ExportIn2': User2data[0][5],
-                                                    'ExportOut2': User2data[0][6],
-                                                    'TransitIn2': User2data[0][7],
-                                                    'TransitOut2': User2data[0][8],
-                                                    'ExportEmpty2': User2data[0][9],
-                                                    'OtherEmpty2': User2data[0][10],
-                                                    'UnloadReid2': User2data[0][11],
-                                                    'LoadingReid2': User2data[0][12],
-                                                    'UnloadPort2': User2data[0][13],
-                                                    'LoadingPort2': User2data[0][14],
+                                                    'User2data' : User2data[0],
 
-                                                    'ImportIn3': User3data[0][3],
-                                                    'ImportOut3': User3data[0][4],
-                                                    'ExportIn3': User3data[0][5],
-                                                    'ExportOut3': User3data[0][6],
-                                                    'TransitIn3': User3data[0][7],
-                                                    'TransitOut3': User3data[0][8],
-                                                    'ExportEmpty3': User3data[0][9],
-                                                    'OtherEmpty3': User3data[0][10],
-                                                    'UnloadReid3': User3data[0][11],
-                                                    'LoadingReid3': User3data[0][12],
-                                                    'UnloadPort3': User3data[0][13],
-                                                    'LoadingPort3': User3data[0][14],
+                                                    'User3data' : User3data[0],
 
-                                                    'ImportInAllTime': UserAlldata[0][0],
-                                                    'ImportOutAllTime': UserAlldata[0][1],
-                                                    'ExportInAllTime': UserAlldata[0][2],
-                                                    'ExportOutAllTime': UserAlldata[0][3],
-                                                    'TransitInAllTime': UserAlldata[0][4],
-                                                    'TransitOutAllTime': UserAlldata[0][5],
-                                                    'ExportEmptyAllTime': UserAlldata[0][6],
-                                                    'OtherEmptyAllTime': UserAlldata[0][7],
-                                                    'UnloadReidAllTime': UserAlldata[0][8],
-                                                    'LoadingReidAllTime': UserAlldata[0][9],
-                                                    'UnloadPortAllTime': UserAlldata[0][10],
-                                                    'LoadingPortAllTime': UserAlldata[0][11],
+                                                    'UserAlldata': UserAlldata[0],
 
                                                     'user': request.user})
     else:
@@ -579,7 +523,6 @@ def datepick_admin(request):
             date1 = request.POST['date1']
             request.session['parameters'] = {'date1': date1}
             return redirect(dataset)
-        print(dt.datetime.now().strftime('%Y-%m-%d'))
         return render(request, 'datepick_admin.html' , {'currentdate':(dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d')})
     else:
         return redirect('home')
@@ -598,11 +541,23 @@ def getUserInfoFromDB(userid,date):
     #
     # TestUser
     #
-    cursor.execute(f"SELECT * FROM firstapp_datatable3 "
+    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
+                   f"SUM(db_importout) AS importoutsum,"
+                   f"SUM(db_exportin) AS exportinsum,"
+                   f"SUM(db_exportout) AS exportoutsum,"
+                   f"SUM(db_transitin) AS transitinsum,"
+                   f"SUM(db_transitout) AS transitoutsum,"
+                   f"SUM(db_exportempty) AS exportemptysum,"
+                   f"SUM(db_otherempty) AS otheremptysum,"
+                   f"SUM(db_unloadreid) AS unloadreidsum,"
+                   f"SUM(db_loadingreid) AS loadingreidsum,"
+                   f"SUM(db_lunloadport) AS lunloadportsum,"
+                   f"SUM(db_loadingport) AS loadingportsum "
+                   f"FROM firstapp_datatable3 "
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
     User1data = cursor.fetchall()
     if User1data == []:
-        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
     conn.close()
     return User1data
 
