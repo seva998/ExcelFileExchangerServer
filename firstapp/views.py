@@ -1,4 +1,4 @@
-# Файл views.py
+# $09; views.py
 import psycopg2
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
@@ -32,8 +32,8 @@ def connection():
 
 @login_required(login_url='')
 def home(request):
-    #В данном случае ID админа 2, но рекомендуется использовать 1, и первым пользователем создавать именно админа.
-    if request.user.id != 2:
+    # 40==>< A;CG05 ID 04<8=0 2, => @5:><5=4C5BAO 8A?>;L7>20BL 1, 8 ?5@2K< ?>;L7>20B5;5< A>74020BL 8<5==> 04<8=0.
+    if request.user.id != 1:
         if request.method == 'POST':
             file = request.FILES.get('file')
             if file is not None:
@@ -41,26 +41,26 @@ def home(request):
                     fs = FileSystemStorage()
                     filename = fs.save(file.name, file)
                     try:
-                        # Чтение xlsx файла
+                        # 'B5=85 xlsx D09;0
                         df = pd.read_excel(fs.path(filename))
-                        # Игнорирование первых трёх строк
+                        # 3=>@8@>20=85 ?5@2KE B@QE AB@>:
                         df = df.iloc[2:]
-                        # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
-                        ImportIn = df.iloc[:, 0].tolist()                     # в т.ч. импорт Прибыло
-                        ImportOut = df.iloc[:, 1].tolist()                    # в т.ч. импорт Убыло
-                        ExportIn = df.iloc[:, 2].tolist()                     # в т.ч. экспорт Прибыло
-                        ExportOut = df.iloc[:, 3].tolist()                    # в т.ч. экспорт Убыло
-                        TransitIn = df.iloc[:, 4].tolist()                    # в т.ч. транзит Прибыло
-                        TransitOut = df.iloc[:, 5].tolist()                   # в т.ч. транзит Убыло
-                        ExportEmpty = df.iloc[:, 6].tolist()                  # в т.ч. экспорт порожние
-                        OtherEmpty = df.iloc[:, 7].tolist()                   # в т.ч. прочие порожние
-                        UnloadReid = df.iloc[:, 8].tolist()                   # На рейде в ожидании Выгрузки
-                        LoadingReid = df.iloc[:, 9].tolist()                  # На рейде в ожидании Погрузки
-                        UnloadPort = df.iloc[:, 10].tolist()                  # На подходах к порту для Выгрузки
-                        LoadingPort = df.iloc[:, 11].tolist()                 # На подходах к порту для Погрузки
+                        # @5>1@07>20=85 DataFrame 2 A?8A:8 AB>;1F>2 ( 40;L=59H5< 4;O =>2KE AB>;1F>2 B01;8FK A>74020BL =>2K5 ?>;O 2 B01;8F5 , 0 B0:65 4>102;OBL =865 2 ?5@5<5==K5)
+                        ImportIn = df.iloc[:, 0].tolist()                     # 2 B.G. 8<?>@B @81K;>
+                        ImportOut = df.iloc[:, 1].tolist()                    # 2 B.G. 8<?>@B #1K;>
+                        ExportIn = df.iloc[:, 2].tolist()                     # 2 B.G. M:A?>@B @81K;>
+                        ExportOut = df.iloc[:, 3].tolist()                    # 2 B.G. M:A?>@B #1K;>
+                        TransitIn = df.iloc[:, 4].tolist()                    # 2 B.G. B@0=78B @81K;>
+                        TransitOut = df.iloc[:, 5].tolist()                   # 2 B.G. B@0=78B #1K;>
+                        ExportEmpty = df.iloc[:, 6].tolist()                  # 2 B.G. M:A?>@B ?>@>6=85
+                        OtherEmpty = df.iloc[:, 7].tolist()                   # 2 B.G. ?@>G85 ?>@>6=85
+                        UnloadReid = df.iloc[:, 8].tolist()                   # 0 @5945 2 >6840=88 K3@C7:8
+                        LoadingReid = df.iloc[:, 9].tolist()                  # 0 @5945 2 >6840=88 >3@C7:8
+                        UnloadPort = df.iloc[:, 10].tolist()                  # 0 ?>4E>40E : ?>@BC 4;O K3@C7:8
+                        LoadingPort = df.iloc[:, 11].tolist()                 # 0 ?>4E>40E : ?>@BC 4;O >3@C7:8
                         fs.delete(filename)
 
-                        # Дальнейшая обработка данных
+                        # 0;L=59H0O >1@01>B:0 40==KE
                         request.session['parameters'] = {
                                                             'ImportIn': ImportIn,
                                                             'ImportOut': ImportOut,
@@ -75,19 +75,19 @@ def home(request):
                                                             'UnloadPort': UnloadPort,
                                                             'LoadingPort': LoadingPort
                                                             }
-                        # Сохраните сессию, чтобы сгенерировать сессионный ключ
+                        # !>E@0=8B5 A5AA8N, GB>1K A35=5@8@>20BL A5AA8>==K9 :;NG
                         request.session.save()
 
-                        # Получить текущий session ID
+                        # >;CG8BL B5:CI89 session ID
                         session_id = request.session.session_key
-                        # Создайте URL-адрес перенаправления с этим session ID
+                        # !>7409B5 URL-04@5A ?5@5=0?@02;5=8O A MB8< session ID
                         redirect_url = f'/confirm/?session_id={session_id}'
                         return redirect(redirect_url)
                     except:
                         fs.delete(filename)
-                        return render(request, 'error.html', {'ErrorText' : 'Ошибка выгрузки данных'})
+                        return render(request, 'error.html', {'ErrorText' : 'H81:0 2K3@C7:8 40==KE'})
                 else:
-                    return render(request, 'error.html', {'ErrorText' : 'Неверный формат файла'})
+                    return render(request, 'error.html', {'ErrorText' : '525@=K9 D>@<0B D09;0'})
             else:
                 return redirect('confirm')
         return render(request, 'home.html')
@@ -95,13 +95,13 @@ def home(request):
         return render(request, 'admin.html')
 
 def register(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         if request.method == 'POST':
             try:
                 username = request.POST['username']
                 password = request.POST['password']
 
-                # Создание нового пользователя
+                # !>740=85 =>2>3> ?>;L7>20B5;O
                 user = User.objects.create_user(username=username, password=password)
                 user.save()
                 return redirect('login')
@@ -117,7 +117,7 @@ def user_login(request):
         username = request.POST['username']
         password = request.POST['password']
 
-        # Проверка введенных данных
+        # @>25@:0 22545==KE 40==KE
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
@@ -127,7 +127,7 @@ def user_login(request):
     return render(request, 'login.html')
 
 def user_logout(request):
-    # Выход пользователя
+    # KE>4 ?>;L7>20B5;O
     logout(request)
     return redirect('home')
 
@@ -135,7 +135,7 @@ def user_logout(request):
 def confirm(request):
     session_id = request.GET.get('session_id')
     if session_id:
-        # Используйте session_id, чтобы вручную загрузить сеанс
+        # A?>;L7C9B5 session_id, GB>1K 2@CG=CN 703@C78BL A50=A
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         ImportIn = params.get('ImportIn')
@@ -221,12 +221,12 @@ def confirm(request):
                 'UnloadPort': UnloadPort,
                 'LoadingPort': LoadingPort
             }
-            # Сохраните сессию, чтобы сгенерировать сессионный ключ
+            # !>E@0=8B5 A5AA8N, GB>1K A35=5@8@>20BL A5AA8>==K9 :;NG
             request.session.save()
 
-            # Получить текущий session ID
+            # >;CG8BL B5:CI89 session ID
             session_id = request.session.session_key
-            # Создайте URL-адрес перенаправления с этим session ID
+            # !>7409B5 URL-04@5A ?5@5=0?@02;5=8O A MB8< session ID
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
         return render(request, 'confirm.html', {
@@ -248,7 +248,7 @@ def confirm(request):
 def success(request):
     session_id = request.GET.get('session_id')
     if session_id:
-        # Используйте session_id, чтобы вручную загрузить сеанс
+        # A?>;L7C9B5 session_id, GB>1K 2@CG=CN 703@C78BL A50=A
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         ImportIn = params.get('ImportIn')
@@ -275,7 +275,7 @@ def success(request):
         LoadingReid[0] = NanCheck(LoadingReid[0])
         UnloadPort[0] = NanCheck(UnloadPort[0])
         LoadingPort[0] = NanCheck(LoadingPort[0])
-        # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
+        # 5@570?8AL 40==KE 70 ?@54K4CI89 45=L, ?@8 A>2?045=88 40BK 8 ID ?>;L7>20B5;O.
         DataItem = DataTable3.objects.filter(date = dt.datetime.now()-DAYDELTA, db_userid = request.user.id).update(
                 db_importin=float(ImportIn[0]),
                 db_importout=float(ImportOut[0]),
@@ -290,7 +290,7 @@ def success(request):
                 db_lunloadport=float(UnloadPort[0]),
                 db_loadingport=float(LoadingPort[0])
             )
-        # Запись новых данных, если ID пользователя и дата не совпадают.
+        # 0?8AL =>2KE 40==KE, 5A;8 ID ?>;L7>20B5;O 8 40B0 =5 A>2?040NB.
         if DataItem == 0:
             DataTable3.objects.create(date = dt.datetime.now()-DAYDELTA,
                                           db_userid = request.user.id,
@@ -336,25 +336,25 @@ def NanCheck(i):
 ###File download realization
 @csrf_exempt
 def download(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         wb = openpyxl.Workbook()
         ws = wb.active
         params = request.session.get('parameters', {})
         date = params.get('date1')
-        columns = ['Дата',
-                   'Имя пользователя',
-                   'в т.ч. импорт Прибыло',
-                   'в т.ч. импорт Убыло',
-                   'в т.ч. экспорт Прибыло',
-                   'в т.ч. экспорт Убыло',
-                   'в т.ч. транзит Прибыло',
-                   'в т.ч. транзит Убыло',
-                   'в т.ч. экспорт порожние',
-                   'в т.ч. прочие порожние',
-                   'На рейде в ожидании Выгрузки',
-                   'На рейде в ожидании Погрузки',
-                   'На подходах к порту для Выгрузки',
-                   'На подходах к порту для Погрузки']
+        columns = ['0B0',
+                   '<O ?>;L7>20B5;O',
+                   '2 B.G. 8<?>@B @81K;>',
+                   '2 B.G. 8<?>@B #1K;>',
+                   '2 B.G. M:A?>@B @81K;>',
+                   '2 B.G. M:A?>@B #1K;>',
+                   '2 B.G. B@0=78B @81K;>',
+                   '2 B.G. B@0=78B #1K;>',
+                   '2 B.G. M:A?>@B ?>@>6=85',
+                   '2 B.G. ?@>G85 ?>@>6=85',
+                   '0 @5945 2 >6840=88 K3@C7:8',
+                   '0 @5945 2 >6840=88 >3@C7:8',
+                   '0 ?>4E>40E : ?>@BC 4;O K3@C7:8',
+                   '0 ?>4E>40E : ?>@BC 4;O >3@C7:8']
         for i, column in enumerate(columns):
             ws[f'{get_column_letter(i + 1)}1'] = column
             ws[f'{get_column_letter(i + 1)}1'].fill  = openpyxl.styles.PatternFill('solid', fgColor='000066CC')
@@ -363,19 +363,13 @@ def download(request):
             else:
                 ws.column_dimensions[openpyxl.utils.get_column_letter(i + 1)].width = len(column) + 1
         try:
-            conn = connection()
-            cursor = conn.cursor()
+
             #admin_id = 2
 
             #
             # TestUser1
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 1")
-            User1data = cursor.fetchall()
-            if User1data == []:
-                User1data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+            User1data = getUserInfoFromDB(2,date)
 
             ws[f'A2'] = date
             ws[f'B2'] = 'TestUser1'
@@ -396,11 +390,8 @@ def download(request):
             # TestUser2
             #
 
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 3")
-            User2data = cursor.fetchall()
-            if User2data == []:
-                User2data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+            User2data = getUserInfoFromDB(3,date)
+
             ws[f'A3'] = date
             ws[f'B3'] = 'TestUser2'
             ws[f'C3'] = User2data[0][3]
@@ -419,12 +410,8 @@ def download(request):
             #
             # TestUser3 massive query
             #
+            User3data = getUserInfoFromDB(4,date)
 
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 7")
-            User3data = cursor.fetchall()
-            if User3data == []:
-                User3data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
             ws[f'A4'] = date
             ws[f'B4'] = 'TestUser3'
             ws[f'C4'] = User3data[0][3]
@@ -439,26 +426,10 @@ def download(request):
             ws[f'L4'] = User3data[0][12]
             ws[f'M4'] = User3data[0][13]
             ws[f'N4'] = User3data[0][14]
-
             #
-            # Сумма по всем пользователям за дату
+            # !C<<0 ?> 2A5< ?>;L7>20B5;O< 70 40BC
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 "
-                            f"WHERE date = '{dt.datetime.strptime(date,'%Y-%m-%d').strftime('%Y%m%d')}'",)
-            UserAlldatafordate = cursor.fetchall()
+            UserAlldatafordate = getDataTableForDate(date)
             ws[f'A5'] = date
             ws[f'B5'] = 'DAYSUMM'
             ws[f'C5'] = UserAlldatafordate[0][0]
@@ -474,24 +445,9 @@ def download(request):
             ws[f'M5'] = UserAlldatafordate[0][10]
             ws[f'N5'] = UserAlldatafordate[0][11]
             #
-            # Сумма по всем пользователям за всё время
+            # !C<<0 ?> 2A5< ?>;L7>20B5;O< 70 2AQ 2@5<O
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                           f"SUM(db_importout) AS importoutsum,"
-                           f"SUM(db_exportin) AS exportinsum,"
-                           f"SUM(db_exportout) AS exportoutsum,"
-                           f"SUM(db_transitin) AS transitinsum,"
-                           f"SUM(db_transitout) AS transitoutsum,"
-                           f"SUM(db_exportempty) AS exportemptysum,"
-                           f"SUM(db_otherempty) AS otheremptysum,"
-                           f"SUM(db_unloadreid) AS unloadreidsum,"
-                           f"SUM(db_loadingreid) AS loadingreidsum,"
-                           f"SUM(db_lunloadport) AS lunloadportsum,"
-                           f"SUM(db_loadingport) AS loadingportsum "
-                           f"FROM firstapp_datatable3 "
-                           f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
-            UserAlldata = cursor.fetchall()
+            UserAlldata = getDataTableForAllTime(date)
             ws[f'A6'] = date
             ws[f'B6'] = 'ALLSUMM'
             ws[f'C6'] = UserAlldata[0][0]
@@ -506,126 +462,44 @@ def download(request):
             ws[f'L6'] = UserAlldata[0][9]
             ws[f'M6'] = UserAlldata[0][10]
             ws[f'N6'] = UserAlldata[0][11]
-
-            conn.close()
         except:
             pass
-
-        # for i, j in enumerate(DataTable3.objects.filter(date= params.get('date1'))):
-        #     ws[f'A{i + 2}'] = j.date
-        #
-        #     #GET USERNAME FOR TABLE
-        #     if j.db_userid == 1:
-        #         ws[f'B{i + 2}'] = 'TestUser1'
-        #     elif j.db_userid == 2:
-        #         ws[f'B{i + 2}'] = 'admin'
-        #     elif j.db_userid == 3:
-        #         ws[f'B{i + 2}'] = 'TestUser2'
-        #     elif j.db_userid == 7:
-        #         ws[f'B{i + 2}'] = 'TestUser7'
-        #     ws[f'C{i + 2}'] = j.db_importin
-        #     ws[f'D{i + 2}'] = j.db_importout
-        #     ws[f'E{i + 2}'] = j.db_exportin
-        #     ws[f'F{i + 2}'] = j.db_exportout
-        #     ws[f'G{i + 2}'] = j.db_transitin
-        #     ws[f'H{i + 2}'] = j.db_transitout
-        #     ws[f'I{i + 2}'] = j.db_exportempty
-        #     ws[f'J{i + 2}'] = j.db_otherempty
-        #     ws[f'K{i + 2}'] = j.db_unloadreid
-        #     ws[f'L{i + 2}'] = j.db_loadingreid
-        #     ws[f'M{i + 2}'] = j.db_lunloadport
-        #     ws[f'N{i + 2}'] = j.db_loadingport
         set_border(ws, 'A1:N6')
         bytes_io = BytesIO()
         wb.save(bytes_io)
         bytes_io.seek(0)
-        return FileResponse(bytes_io, as_attachment=True, filename=(date +'.xslx'))
+        return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xslx'))
     else:
         return redirect('home')
 
 def dataset(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         params = request.session.get('parameters', {})
         date = params.get('date1')
         print(date)
         try:
-            conn = connection()
-            cursor = conn.cursor()
-            #admin_id = 2
-
             #
             # TestUser1
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 1")
-            User1data = cursor.fetchall()
-            if User1data == []:
-                User1data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
-
+            User1data = getUserInfoFromDB(2,date)
             #
             # TestUser2
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 3")
-            User2data = cursor.fetchall()
-            if User2data == []:
-                User2data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
-
+            User2data = getUserInfoFromDB(3,date)
             #
             # TestUser3 massive query
             #
-
-            cursor.execute(f"SELECT * FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = 7")
-            User3data = cursor.fetchall()
-            if User3data == []:
-                User3data = [(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
-
+            User3data = getUserInfoFromDB(4,date)
             #
-            # Сумма по всем пользователям за дату
+            # !C<<0 ?> 2A5< ?>;L7>20B5;O< 70 40BC
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 "
-                           f"WHERE date = '{dt.datetime.strptime(date,'%Y-%m-%d').strftime('%Y%m%d')}'",)
-            UserAlldatafordate = cursor.fetchall()
-
+            UserAlldatafordate = getDataTableForDate(date)
             #
-            # Сумма по всем пользователям за всё время
+            # !C<<0 ?> 2A5< ?>;L7>20B5;O< 70 2AQ 2@5<O
             #
-
-            cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                            f"SUM(db_importout) AS importoutsum,"
-                            f"SUM(db_exportin) AS exportinsum,"
-                            f"SUM(db_exportout) AS exportoutsum,"
-                            f"SUM(db_transitin) AS transitinsum,"
-                            f"SUM(db_transitout) AS transitoutsum,"
-                            f"SUM(db_exportempty) AS exportemptysum,"
-                            f"SUM(db_otherempty) AS otheremptysum,"
-                            f"SUM(db_unloadreid) AS unloadreidsum,"
-                            f"SUM(db_loadingreid) AS loadingreidsum,"
-                            f"SUM(db_lunloadport) AS lunloadportsum,"
-                            f"SUM(db_loadingport) AS loadingportsum "
-                            f"FROM firstapp_datatable3 "
-                           f"WHERE date <= '{dt.datetime.strptime(date,'%Y-%m-%d').strftime('%Y%m%d')}'",)
-            UserAlldata = cursor.fetchall()
-
-            conn.close()
+            UserAlldata = getDataTableForAllTime(date)
         except:
-            return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
+            return render(request, 'error.html', {'ErrorText' : 'H81:0 >B>1@065=8O 40==KE'})
         return render(request, 'dataset.html', {
                                                     'date' : (dt.datetime.strptime(date,'%Y-%m-%d').strftime('%d.%m.%Y.')),
                                                     'ImportIn': UserAlldatafordate[0][0],
@@ -697,8 +571,9 @@ def dataset(request):
     else:
         return redirect('home')
 
+
 def datepick(request):
-    if request.user.id == 2:
+    if request.user.id == 1:
         if request.method == 'POST':
             date1 = request.POST['date1']
             request.session['parameters'] = {'date1': date1}
@@ -714,3 +589,68 @@ def set_border(ws, cell_range):
     for row in ws[cell_range]:
         for cell in row:
             cell.border = openpyxl.styles.Border(top=thin, left=thin, right=thin, bottom=thin)
+
+
+def getUserInfoFromDB(userid,date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser
+    #
+    cursor.execute(f"SELECT * FROM firstapp_datatable3 "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+    conn.close()
+    return User1data
+
+
+def getDataTableForDate(date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # !C<<0 ?> 2A5< ?>;L7>20B5;O< 70 40BC
+    #
+    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
+                   f"SUM(db_importout) AS importoutsum,"
+                   f"SUM(db_exportin) AS exportinsum,"
+                   f"SUM(db_exportout) AS exportoutsum,"
+                   f"SUM(db_transitin) AS transitinsum,"
+                   f"SUM(db_transitout) AS transitoutsum,"
+                   f"SUM(db_exportempty) AS exportemptysum,"
+                   f"SUM(db_otherempty) AS otheremptysum,"
+                   f"SUM(db_unloadreid) AS unloadreidsum,"
+                   f"SUM(db_loadingreid) AS loadingreidsum,"
+                   f"SUM(db_lunloadport) AS lunloadportsum,"
+                   f"SUM(db_loadingport) AS loadingportsum "
+                   f"FROM firstapp_datatable3 "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+
+def getDataTableForAllTime(date):
+    #
+    # !C<<0 ?> 2A5< ?>;L7>20B5;O< 70 2AQ 2@5<O
+    #
+    conn = connection()
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
+                   f"SUM(db_importout) AS importoutsum,"
+                   f"SUM(db_exportin) AS exportinsum,"
+                   f"SUM(db_exportout) AS exportoutsum,"
+                   f"SUM(db_transitin) AS transitinsum,"
+                   f"SUM(db_transitout) AS transitoutsum,"
+                   f"SUM(db_exportempty) AS exportemptysum,"
+                   f"SUM(db_otherempty) AS otheremptysum,"
+                   f"SUM(db_unloadreid) AS unloadreidsum,"
+                   f"SUM(db_loadingreid) AS loadingreidsum,"
+                   f"SUM(db_lunloadport) AS lunloadportsum,"
+                   f"SUM(db_loadingport) AS loadingportsum "
+                   f"FROM firstapp_datatable3 "
+                   f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
+    result = cursor.fetchall()
+    conn.close()
+    return result
