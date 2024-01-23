@@ -7,13 +7,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.backends.db import SessionStore
+
+from .database_requests import getDataTableForAllTime, getUserInfoFromDB, getDataTableForDate
 from .models import DataTable3
 import datetime as dt
-from openpyxl.utils import get_column_letter
-from django.views.decorators.csrf import csrf_exempt
 import openpyxl
-from io import BytesIO, StringIO
-from django.http import HttpResponse, FileResponse
+from io import BytesIO
+from django.http import FileResponse
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
                            microseconds=0,
@@ -22,13 +22,6 @@ DAYDELTA = dt.timedelta(days=1,
                            hours=0,
                            weeks=0)
 
-def connection():
-    s = '10.100.32.202'
-    d = 'postgres'
-    u = 'admin'
-    p = 'root'
-    conn = psycopg2.connect(host=s, user=u, password=p, database=d, port='6101')
-    return conn
 
 @login_required(login_url='')
 def home(request):
@@ -94,6 +87,7 @@ def home(request):
     else:
         return render(request, 'admin.html')
 
+@login_required(login_url='')
 def register(request):
     if request.user.id == 1:
         if request.method == 'POST':
@@ -235,7 +229,7 @@ def confirm(request):
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            Userdata = getUserInfoFromDB(request.user.id , (dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d'))
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
             return render(request, 'confirm.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ImportIn': Userdata[0][0],
@@ -267,7 +261,7 @@ def confirm(request):
                 'LoadingPort': 0,
             })
 
-
+@login_required(login_url='')
 def success(request):
     session_id = request.GET.get('session_id')
     if session_id:
@@ -360,7 +354,7 @@ def NanCheck(i):
     return i
 
 ###File download realization
-@csrf_exempt
+@login_required(login_url='')
 def download(request):
     if request.user.id == 1:
         wb = openpyxl.load_workbook('./Test.xlsx')
@@ -372,7 +366,7 @@ def download(request):
             #
             # TestUser1
             #
-            User1data = getUserInfoFromDB(2,date)
+            User1data = getUserInfoFromDB(2, date)
             #ws[f'A2'] = date
             ws[f'A4'] = 'TestUser1'
             ws[f'B4'] = User1data[0][0]
@@ -392,7 +386,7 @@ def download(request):
             # TestUser2
             #
 
-            User2data = getUserInfoFromDB(3,date)
+            User2data = getUserInfoFromDB(3, date)
 
             #ws[f'A3'] = date
             ws[f'A5'] = 'TestUser1'
@@ -412,7 +406,7 @@ def download(request):
             #
             # TestUser3 massive query
             #
-            User3data = getUserInfoFromDB(4,date)
+            User3data = getUserInfoFromDB(4, date)
 
             #ws[f'A4'] = date
             ws[f'A6'] = 'TestUser1'
@@ -473,6 +467,7 @@ def download(request):
     else:
         return redirect('home')
 
+@login_required(login_url='')
 def dataset(request):
     if request.user.id == 1:
         params = request.session.get('parameters', {})
@@ -481,15 +476,15 @@ def dataset(request):
             #
             # TestUser1
             #
-            User1data = getUserInfoFromDB(2,date)
+            User1data = getUserInfoFromDB(2, date)
             #
             # TestUser2
             #
-            User2data = getUserInfoFromDB(3,date)
+            User2data = getUserInfoFromDB(3, date)
             #
             # TestUser3 massive query
             #
-            User3data = getUserInfoFromDB(4,date)
+            User3data = getUserInfoFromDB(4, date)
             #
             # Сумма по всем пользователям за дату
             #
@@ -516,7 +511,7 @@ def dataset(request):
     else:
         return redirect('home')
 
-
+@login_required(login_url='')
 def datepick_admin(request):
     if request.user.id == 1:
         if request.method == 'POST':
@@ -533,80 +528,3 @@ def set_border(ws, cell_range):
     for row in ws[cell_range]:
         for cell in row:
             cell.border = openpyxl.styles.Border(top=thin, left=thin, right=thin, bottom=thin)
-
-
-def getUserInfoFromDB(userid,date):
-    conn = connection()
-    cursor = conn.cursor()
-    #
-    # TestUser
-    #
-    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                   f"SUM(db_importout) AS importoutsum,"
-                   f"SUM(db_exportin) AS exportinsum,"
-                   f"SUM(db_exportout) AS exportoutsum,"
-                   f"SUM(db_transitin) AS transitinsum,"
-                   f"SUM(db_transitout) AS transitoutsum,"
-                   f"SUM(db_exportempty) AS exportemptysum,"
-                   f"SUM(db_otherempty) AS otheremptysum,"
-                   f"SUM(db_unloadreid) AS unloadreidsum,"
-                   f"SUM(db_loadingreid) AS loadingreidsum,"
-                   f"SUM(db_lunloadport) AS lunloadportsum,"
-                   f"SUM(db_loadingport) AS loadingportsum "
-                   f"FROM firstapp_datatable3 "
-                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
-    User1data = cursor.fetchall()
-    if User1data == []:
-        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
-    conn.close()
-    return User1data
-
-
-def getDataTableForDate(date):
-    conn = connection()
-    cursor = conn.cursor()
-    #
-    # Сумма по всем пользователям за дату
-    #
-    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                   f"SUM(db_importout) AS importoutsum,"
-                   f"SUM(db_exportin) AS exportinsum,"
-                   f"SUM(db_exportout) AS exportoutsum,"
-                   f"SUM(db_transitin) AS transitinsum,"
-                   f"SUM(db_transitout) AS transitoutsum,"
-                   f"SUM(db_exportempty) AS exportemptysum,"
-                   f"SUM(db_otherempty) AS otheremptysum,"
-                   f"SUM(db_unloadreid) AS unloadreidsum,"
-                   f"SUM(db_loadingreid) AS loadingreidsum,"
-                   f"SUM(db_lunloadport) AS lunloadportsum,"
-                   f"SUM(db_loadingport) AS loadingportsum "
-                   f"FROM firstapp_datatable3 "
-                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
-    result = cursor.fetchall()
-    conn.close()
-    return result
-
-
-def getDataTableForAllTime(date):
-    #
-    # Сумма по всем пользователям за всё время
-    #
-    conn = connection()
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
-                   f"SUM(db_importout) AS importoutsum,"
-                   f"SUM(db_exportin) AS exportinsum,"
-                   f"SUM(db_exportout) AS exportoutsum,"
-                   f"SUM(db_transitin) AS transitinsum,"
-                   f"SUM(db_transitout) AS transitoutsum,"
-                   f"SUM(db_exportempty) AS exportemptysum,"
-                   f"SUM(db_otherempty) AS otheremptysum,"
-                   f"SUM(db_unloadreid) AS unloadreidsum,"
-                   f"SUM(db_loadingreid) AS loadingreidsum,"
-                   f"SUM(db_lunloadport) AS lunloadportsum,"
-                   f"SUM(db_loadingport) AS loadingportsum "
-                   f"FROM firstapp_datatable3 "
-                   f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
-    result = cursor.fetchall()
-    conn.close()
-    return result
