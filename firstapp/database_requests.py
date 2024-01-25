@@ -30,12 +30,43 @@ def getDataTableForAllTime(date):
                    f"SUM(db_loading_port_lin) AS loadingportlin,"
                    f"SUM(db_loading_port_tramp) AS loadingporttramp,"
                    f"SUM(db_unload_port_lin) AS unloadportlin,"
-                   f"SUM(db_unload_port_tramp) AS unloadporttramp,"
-                   f"FROM firstapp_datatable3 "
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp "
+                   f"FROM firstapp_dailymonitoringuserdata "
                    f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
     result = cursor.fetchall()
     conn.close()
     return result
+
+
+def getTranzitUserInfoFromDB(userid,date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser
+    #
+    cursor.execute(f"SELECT SUM(db_transitin) AS transitinsum "
+                   f"FROM firstapp_dailymonitoringuserdata "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0)]
+    conn.close()
+    return User1data
+
+def getAllTranzitUserInfoFromDB(date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser
+    #
+    cursor.execute(f"SELECT SUM(db_transitin) AS transitinsum "
+                   f"FROM firstapp_dailymonitoringuserdata "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0)]
+    conn.close()
+    return User1data
 
 
 def getUserInfoFromDB(userid,date):
@@ -52,15 +83,49 @@ def getUserInfoFromDB(userid,date):
                    f"SUM(db_transitout) AS transitoutsum,"
                    f"SUM(db_exportempty) AS exportemptysum,"
                    f"SUM(db_otherempty) AS otheremptysum,"
-                   f"SUM(db_unloadreid) AS unloadreidsum,"
-                   f"SUM(db_loadingreid) AS loadingreidsum,"
-                   f"SUM(db_lunloadport) AS lunloadportsum,"
-                   f"SUM(db_loadingport) AS loadingportsum "
-                   f"FROM firstapp_datatable3 "
+                   f"SUM(db_unload_reid_lin) AS unloadreidlin,"
+                   f"SUM(db_unload_reid_tramp) AS unloadreidtramp,"
+                   f"SUM(db_loading_reid_lin) AS loadingreidlin,"
+                   f"SUM(db_loading_reid_tramp) AS loadingreidtramp,"
+                   f"SUM(db_loading_port_lin) AS loadingportlin,"
+                   f"SUM(db_loading_port_tramp) AS loadingporttramp,"
+                   f"SUM(db_unload_port_lin) AS unloadportlin,"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp"
+                   f"FROM firstapp_dailymonitoringuserdata "
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
     User1data = cursor.fetchall()
     if User1data == []:
-        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+    conn.close()
+    return User1data
+
+def getUserInfoFromDBDataset(userid,date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser
+    #
+    cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
+                   f"SUM(db_importout) AS importoutsum,"
+                   f"SUM(db_exportin) AS exportinsum,"
+                   f"SUM(db_exportout) AS exportoutsum,"
+                   f"SUM(db_transitin) AS transitinsum,"
+                   f"SUM(db_transitout) AS transitoutsum,"
+                   f"SUM(db_exportempty) AS exportemptysum,"
+                   f"SUM(db_otherempty) AS otheremptysum,"
+                   f"SUM(db_unload_reid_lin) AS unloadreidlin,"
+                   f"SUM(db_unload_reid_tramp) AS unloadreidtramp,"
+                   f"SUM(db_loading_reid_lin) AS loadingreidlin,"
+                   f"SUM(db_loading_reid_tramp) AS loadingreidtramp,"
+                   f"SUM(db_loading_port_lin) AS loadingportlin,"
+                   f"SUM(db_loading_port_tramp) AS loadingporttramp,"
+                   f"SUM(db_unload_port_lin) AS unloadportlin,"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp "
+                   f"FROM firstapp_dailymonitoringuserdata "
+                   f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
     conn.close()
     return User1data
 
@@ -79,12 +144,66 @@ def getDataTableForDate(date):
                    f"SUM(db_transitout) AS transitoutsum,"
                    f"SUM(db_exportempty) AS exportemptysum,"
                    f"SUM(db_otherempty) AS otheremptysum,"
-                   f"SUM(db_unloadreid) AS unloadreidsum,"
-                   f"SUM(db_loadingreid) AS loadingreidsum,"
-                   f"SUM(db_lunloadport) AS lunloadportsum,"
-                   f"SUM(db_loadingport) AS loadingportsum "
-                   f"FROM firstapp_datatable3 "
+                   f"SUM(db_unload_reid_lin) AS unloadreidlin,"
+                   f"SUM(db_unload_reid_tramp) AS unloadreidtramp,"
+                   f"SUM(db_loading_reid_lin) AS loadingreidlin,"
+                   f"SUM(db_loading_reid_tramp) AS loadingreidtramp,"
+                   f"SUM(db_loading_port_lin) AS loadingportlin,"
+                   f"SUM(db_loading_port_tramp) AS loadingporttramp,"
+                   f"SUM(db_unload_port_lin) AS unloadportlin,"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp "
+                   f"FROM firstapp_dailymonitoringuserdata "
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def getMaxWarehouseQty(userid):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_max) AS max "
+                   f"FROM firstapp_constantuserdata "
+                   f"WHERE db_userid = {userid}")
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def getMaxWarehouseAllQty():
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_max) AS max "
+                   f"FROM firstapp_constantuserdata ")
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def getNormsWarehouseQty(userid):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_norms) AS norms "
+                   f"FROM firstapp_constantuserdata "
+                   f"WHERE db_userid = {userid}")
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def getNormsWarehouseAllQty():
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_norms) AS norms "
+                   f"FROM firstapp_constantuserdata ")
     result = cursor.fetchall()
     conn.close()
     return result

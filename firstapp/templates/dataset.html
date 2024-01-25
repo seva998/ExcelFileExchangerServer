@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr">
 <head>
-    <title>Данные за {{date}}</title>
+    <title>Справочная информация о динамике движения импортно-экспортных контейнеров в морских портах Владивосток и Восточный за {{date}}</title>
     <style type="text/css">
        TABLE {
         border-collapse: collapse; /* Убираем двойные линии между ячейками */
         width: 300px; /* Ширина таблицы */
         border: 5px double #000; /* Рамка вокруг таблицы */
        }
-       TH, TD {
+       TH, TD, TH1 {
         border: 1px solid black; /* Параметры рамки */
         text-align: center; /* Выравнивание по центру */
         padding: 4px; /* Поля вокруг текста */
@@ -20,25 +20,317 @@
         vertical-align: top; /* Выравнивание по краю */
         padding: 0; /* Убираем поля вокруг текста */
        }
+       TH1 {
+        background: yellow; /* Цвет фона ячейки */
+        color: black; /* Цвет текста */
+        height: 40px; /* Высота ячеек */
+        vertical-align: top; /* Выравнивание по краю */
+        padding: 0; /* Убираем поля вокруг текста */
+       }
     </style>
-    <h1>Сумма присланных данных за {{date}}</h1>
+    <h1>Справочная информация о динамике движения импортно-экспортных контейнеров в морских портах Владивосток и Восточный за {{date}}</h1>
     <ul>
         <table border="1" width="30%" cellpadding="5">
             <tr>
-                <th>Заголовок</th>
-                <th>в т.ч. импорт Прибыло</th>
-                <th>в т.ч. импорт Убыло</th>
-                <th>в т.ч. экспорт Прибыло</th>
-                <th>в т.ч. экспорт Убыло</th>
-                <th>в т.ч. транзит Прибыло</th>
-                <th>в т.ч. транзит Убыло</th>
-                <th>в т.ч. экспорт порожние</th>
-                <th>в т.ч. прочие порожние</th>
-                <th>На рейде в ожидании Выгрузки</th>
-                <th>На рейде в ожидании Погрузки</th>
-                <th>На подходах к порту для Выгрузки</th>
-                <th>На подходах к порту для Погрузки</th>
+                <th1 colspan="14">1. Информация о количестве импортно-экспортных контейнеров в портовых терминалах, ДФЭ</th1>
             </tr>
+            <tr>
+                <th rowspan="2">№</th>
+                <th rowspan="2">Наименование контейнерного терминала</th>
+                <th rowspan="2">Полная проектная емкость складов (100%)</th>
+                <th rowspan="2">Емкость технологического накопления контейнеров (90%)</th>
+                <th colspan="2">Загрузка складов</th>
+                <th></th>
+                <th colspan="3">Прибытие</th>
+                <th colspan="3">Убытие</th>
+                <th>Накопление</th>
+            </tr>
+                <th>Факт, контейнеры</th>
+                <th>%</th>
+                <th>в т.ч растаможенных </th>
+                <th>Норма прибытия контейнеров всеми видами транспорта на терминал в соответствии со всеми заключенными договорами перевалки в сутки</th>
+                <th>Факт прибытия всеми видами транспорта</th>
+                <th>Отклонение факта от нормы прибытия</th>
+                <th>Норма убытия контейнеров всеми видами транспорта на терминал в соответствии со всеми заключенными договорами перевалки в сутки</th>
+                <th>Факт убытия всеми видами транспорта</th>
+                <th>Отклонение факта от нормы прибытия</th>
+                <th>Убытие -</th>
+            </tr>
+            </tr>
+                <td>1</td>
+                <td>Восточная стивидорная компания</td>
+                <td>{{MaxWarehouseQty1User}}</td>
+                <td>{{NormsWarehouseQty1User}}</td>
+                <td>{{AllQty1User}}</td>
+                <td>{{AllQtyPercent1User}}%</td>
+                <td>%2 datatable</td>
+                <td>2400</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>2400</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td>2</td>
+                <td>Владивостокский морской торговый порт</td>
+                <td>{{MaxWarehouseQty2User}}</td>
+                <td>{{NormsWarehouseQty2User}}</td>
+                <td>{{AllQty2User}}</td>
+                <td>{{AllQtyPercent2User}}%</td>
+                <td>%2 datatable</td>
+                <td>2860</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>2860</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td>3</td>
+                <td>Владивостокский морской рыбный порт/ВМКТ</td>
+                <td>UserTableMax</td>
+                <td>UserTableNorm</td>
+                <td>%1 datatable%</td>
+                <td>%1 datatable/const%</td>
+                <td>%2 datatable</td>
+                <td>800</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>800</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td>4</td>
+                <td>ВМП Первомайский</td>
+                <td>UserTableMax</td>
+                <td>UserTableNorm</td>
+                <td>%1 datatable%</td>
+                <td>%1 datatable/const%</td>
+                <td>%2 datatable</td>
+                <td>380</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>380</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td>5</td>
+                <td>Пасифик Лоджистик</td>
+                <td>UserTableMax</td>
+                <td>UserTableNorm</td>
+                <td>%1 datatable%</td>
+                <td>%1 datatable/const%</td>
+                <td>%2 datatable</td>
+                <td>580</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>580</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td>6</td>
+                <td>Ванинский МТП</td>
+                <td>UserTableMax</td>
+                <td>UserTableNorm</td>
+                <td>%1 datatable%</td>
+                <td>%1 datatable/const%</td>
+                <td>%2 datatable</td>
+                <td>100</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>100</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td>7</td>
+                <td>Терминал Астафьева</td>
+                <td>UserTableMax</td>
+                <td>UserTableNorm</td>
+                <td>%1 datatable%</td>
+                <td>%1 datatable/const%</td>
+                <td>%2 datatable</td>
+                <td>0</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>0</td>
+                <td>%5 datatable</td>
+                <td>%5 datatable/const%</td>
+                <td>%5 datatable/const +_-%</td>
+            </tr>
+            </tr>
+                <td colspan="2">ИТОГО</td>
+                <td>{{MaxWarehouseQtyAll}}</td>
+                <td>{{NormsWarehouseQtyAll}}</td>
+                <td>{{AllQtyAll}}</td>
+                <td>{{AllQtyPercent1All}}%</td>
+                <td>sum %2 datatable</td>
+                <td>7120</td>
+                <td>sum %5 datatable</td>
+                <td>sum %5 datatable/const%</td>
+                <td>7120</td>
+                <td>sum %5 datatable</td>
+                <td>sum %5 datatable/const%</td>
+                <td>sum %5 datatable/const +_-%</td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <th1 colspan="8">2. Информация о количестве контейнеров в тыловых терминалах (справочно), ДФЭ </th1>
+            </tr>
+            <tr>
+                <th rowspan="2">№</th>
+                <th rowspan="2">Наименование контейнерного терминала</th>
+                <th rowspan="2">Максимальная емкость складов</th>
+                <th rowspan="2">Факт загрузки экспортно-импортных контейнеров на начало текущей даты</th>
+                <th rowspan="2">Процент загрузки,%</th>
+                <th colspan="2">Прибытие и убытие контейнеров</th>
+                <th>Накопление</th>
+            </tr>
+            <tr>
+                <th>Всего убыло всеми видами транспорта</th>
+                <th>Всего прибыло всеми видами транспорта</th>
+                <th>Убытие -</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Первая речка</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Угловая</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Угольная</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Уссурийск</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Артём 1</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Находка</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Рыбники</td>
+                <td>UserTableMax</td>
+                <td>%6 table%</td>
+                <td>%6 table/UserTableMax %</td>
+                <td>%6 table%</td>
+                <td>%6 table%</td>
+                <td>%6 datatable/const +_-%</td>
+            </tr>
+            <tr>
+                <td colspan="2">ИТОГО</td>
+                <td>sum UserTableMax</td>
+                <td>sum %6 table%</td>
+                <td>sum %6 table/UserTableMax %</td>
+                <td>sum %6 table%</td>
+                <td>sum %6 table%</td>
+                <td>sum %6 datatable/const +_-%</td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <th1 colspan="8">3. Информация о количестве контейнеров на судах, ДФЭ</th1>
+            </tr>
+            <tr>
+                <th rowspan="2">№</th>
+                <th rowspan="2">Наименование контейнерного терминала</th>
+                <th colspan="6">На рейде</th>
+                <th>Накопление +</th>
+                <th colspan="6">В пути в направлении портов</th>
+                <th>Накопление +</th>
+            </tr>
+            <tr>
+                <th>В ожидании выгрузки, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>В ожидании погрузки, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>Убытие -</th>
+                <th>Под выгрузку, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>Под погрузку, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>Убытие -</th>
+            </tr>
+            <tr>
+                <th>1</th>
+                <th>Восточная стивидорная компания</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>В ожидании погрузки, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>Убытие -</th>
+                <th>Под выгрузку, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>Под погрузку, всего</th>
+                <th>в т.ч на линейных судах</th>
+                <th>в т.ч. на трамповых судах</th>
+                <th>Убытие -</th>
+            </tr>
+        </table>
+        <br>
+        <table>
             <tr>
                 <td>TestUser1 за {{date}}</td>
                 {% for item in User1data %}
@@ -52,26 +344,12 @@
                 {% endfor %}
             </tr>
             <tr>
-                <td>TestUser3 за {{date}}</td>
-                {% for item in User3data %}
-                    {% for i in item %}
-                        <td>{{ i }}</td>
-                    {% endfor %}
-                {% endfor %}
-            </tr>
-            <tr>
-                <td>UserAlldatafordate за {{date}}</td>
-                {% for item in UserAlldatafordate %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-            <tr>
                 <td>UserAlldata за {{date}}</td>
                 {% for item in UserAlldata %}
                     <td>{{ item }}</td>
                 {% endfor %}
             </tr>
-          </table>
+        </table>
     </ul>
 <br>
 <div id="badges4">

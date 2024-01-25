@@ -12,7 +12,15 @@ import datetime as dt
 from io import BytesIO
 from django.http import FileResponse
 
-from .database_requests import getDataTableForAllTime, getUserInfoFromDB, getDataTableForDate
+from .database_requests import (getDataTableForAllTime,
+                                getUserInfoFromDB,
+                                getUserInfoFromDBDataset,
+                                getTranzitUserInfoFromDB,
+                                getAllTranzitUserInfoFromDB,
+                                getMaxWarehouseQty,
+                                getMaxWarehouseAllQty,
+                                getNormsWarehouseQty,
+                                getNormsWarehouseAllQty)
 from .models import DailyMonitoringUserData,ConstantUserData
 
 DAYDELTA = dt.timedelta(days=1,
@@ -269,10 +277,14 @@ def confirm(request):
                 'TransitOut': Userdata[0][5],
                 'ExportEmpty': Userdata[0][6],
                 'OtherEmpty': Userdata[0][7],
-                'UnloadReid': Userdata[0][8],
-                'LoadingReid': Userdata[0][9],
-                'UnloadPort': Userdata[0][10],
-                'LoadingPort': Userdata[0][11],
+                'UnloadReidlin': Userdata[0][8],
+                'UnloadReidtramp': Userdata[0][9],
+                'LoadingReidLin': Userdata[0][10],
+                'LoadingReidTramp': Userdata[0][11],
+                'UnloadPortlin': Userdata[0][12],
+                'UnloadPorttramp': Userdata[0][13],
+                'LoadingPortLin': Userdata[0][13],
+                'LoadingPortTramp': Userdata[0][14]
             })
         except:
             return render(request, 'confirm.html', {
@@ -546,7 +558,6 @@ def download(request):
             #
             # Сумма по всем пользователям за дату
             #
-            UserAlldatafordate = getDataTableForDate(date)
             #
             # Сумма по всем пользователям за всё время
             #
@@ -584,40 +595,59 @@ def dataset(request):
     if request.user.id == 1:
         params = request.session.get('parameters', {})
         date = params.get('date1')
-        try:
+        # try:
             #
-            # TestUser1
+            # TestUser1Table1
             #
-            User1data = getUserInfoFromDB(2, date)
-            #
-            # TestUser2
-            #
-            User2data = getUserInfoFromDB(3, date)
-            #
-            # TestUser3 massive query
-            #
-            User3data = getUserInfoFromDB(4, date)
-            #
-            # Сумма по всем пользователям за дату
-            #
-            UserAlldatafordate = getDataTableForDate(date)
-            #
-            # Сумма по всем пользователям за всё время
-            #
-            UserAlldata = getDataTableForAllTime(date)
-        except:
-            return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
+        Tranzit1 = getTranzitUserInfoFromDB(2,date)
+        User1data = getUserInfoFromDBDataset(2, date)
+        MaxWarehouseQty1User = getMaxWarehouseQty(2)[0][0]
+        NormsWarehouseQty1User = getNormsWarehouseQty(2)[0][0]
+        AllQty1User = AllQtyCalculator(User1data,Tranzit1)
+        AllQtyPercent1User = AllQtyPercent(AllQty1User,MaxWarehouseQty1User,0)
+
+        #
+        # TestUser2Table1
+        #
+
+        Tranzit2 = getTranzitUserInfoFromDB(3,date)
+        User2data = getUserInfoFromDBDataset(3, date)
+        MaxWarehouseQty2User = getMaxWarehouseQty(3)[0][0]
+        NormsWarehouseQty2User = getNormsWarehouseQty(3)[0][0]
+        AllQty2User = AllQtyCalculator(User2data,Tranzit2)
+        AllQtyPercent2User = AllQtyPercent(AllQty2User,MaxWarehouseQty2User,0)
+
+
+
+        UserAlldata = getDataTableForAllTime(date)
+        TranzitAll = getAllTranzitUserInfoFromDB(date)
+        MaxWarehouseQtyAll = getMaxWarehouseAllQty()[0][0]
+        NormsWarehouseQtyAll = getNormsWarehouseAllQty()[0][0]
+        AllQtyAll = AllQtyCalculator(UserAlldata,TranzitAll)
+        AllQtyPercent1All = AllQtyPercent(AllQtyAll,MaxWarehouseQtyAll,0)
+        # except:
+        #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
-                                                    'date' : (dt.datetime.strptime(date,'%Y-%m-%d').strftime('%d.%m.%Y.')),
-                                                    'UserAlldatafordate': UserAlldatafordate[0],
+                                                    'date' : ((dt.datetime.strptime(date,'%Y-%m-%d')+DAYDELTA).strftime('%d.%m.%Y.')),
 
                                                     'User1data' : User1data[0],
-
-                                                    'User2data' : User2data[0],
-
-                                                    'User3data' : User3data,
-
+                                                    'User2data': User2data[0],
                                                     'UserAlldata': UserAlldata[0],
+
+                                                    'AllQtyPercent1User': AllQtyPercent1User,
+                                                    'AllQty1User' :AllQty1User,
+                                                    'MaxWarehouseQty2User': MaxWarehouseQty2User,
+                                                    'NormsWarehouseQty1User' : NormsWarehouseQty1User,
+
+                                                    'AllQtyPercent2User': AllQtyPercent2User,
+                                                    'AllQty2User': AllQty2User,
+                                                    'MaxWarehouseQty1User': MaxWarehouseQty1User,
+                                                    'NormsWarehouseQty2User': NormsWarehouseQty2User,
+
+                                                    'AllQtyAll' :AllQtyAll,
+                                                    'AllQtyPercent1All' : AllQtyPercent1All,
+                                                    'MaxWarehouseQtyAll':MaxWarehouseQtyAll,
+                                                    'NormsWarehouseQtyAll':NormsWarehouseQtyAll,
 
                                                     'user': request.user})
     else:
@@ -628,7 +658,7 @@ def datepick_admin(request):
     if request.user.id == 1:
         if request.method == 'POST':
             date1 = request.POST['date1']
-            request.session['parameters'] = {'date1': date1}
+            request.session['parameters'] = {'date1': ((dt.datetime.strptime(date1, '%Y-%m-%d') - DAYDELTA).strftime('%Y-%m-%d'))}
             return redirect(dataset)
         return render(request, 'datepick_admin.html' , {'currentdate':(dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d')})
     else:
@@ -640,3 +670,24 @@ def set_border(ws, cell_range):
     for row in ws[cell_range]:
         for cell in row:
             cell.border = openpyxl.styles.Border(top=thin, left=thin, right=thin, bottom=thin)
+
+def AllQtyPercent(top,bot,signs):
+    # For persents with signs after , 0 if no signs
+    if (top != None and bot != None):
+        return int(round((top/bot*100),signs))
+    else:
+        return 0
+
+
+def AllQtyCalculator(UserInfo,TranzitInfo):
+    if (UserInfo[0][0] != None
+            and UserInfo[0][1] != None
+            and UserInfo[0][2] != None
+            and UserInfo[0][3] != None):
+                if TranzitInfo[0][0] != None :
+                    return (UserInfo[0][0] - UserInfo[0][1] + UserInfo[0][2] - UserInfo[0][3] + TranzitInfo[0][0])
+                else:
+                    return (UserInfo[0][0] - UserInfo[0][1] + UserInfo[0][2] - UserInfo[0][3])
+    else:
+        return 0
+
