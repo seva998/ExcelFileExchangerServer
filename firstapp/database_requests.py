@@ -68,6 +68,50 @@ def getAllTranzitUserInfoFromDB(date):
     conn.close()
     return User1data
 
+def getReidUserInfoFromDB(userid,date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser
+    #
+    cursor.execute(f"SELECT SUM(db_unload_reid_lin) AS unloadreidlin,"
+                   f"SUM(db_unload_reid_tramp) AS unloadreidtramp,"
+                   f"SUM(db_loading_reid_lin) AS loadingreidlin,"
+                   f"SUM(db_loading_reid_tramp) AS loadingreidtramp,"
+                   f"SUM(db_loading_port_lin) AS loadingportlin,"
+                   f"SUM(db_loading_port_tramp) AS loadingporttramp,"
+                   f"SUM(db_unload_port_lin) AS unloadportlin,"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp "
+                   f"FROM firstapp_dailymonitoringuserdata "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0,0,0,0,0,0,0,0)]
+    conn.close()
+    return User1data
+
+def getReidAllInfoFromDB(date):
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # TestUser
+    #
+    cursor.execute(f"SELECT SUM(db_unload_reid_lin) AS unloadreidlin,"
+                   f"SUM(db_unload_reid_tramp) AS unloadreidtramp,"
+                   f"SUM(db_loading_reid_lin) AS loadingreidlin,"
+                   f"SUM(db_loading_reid_tramp) AS loadingreidtramp,"
+                   f"SUM(db_loading_port_lin) AS loadingportlin,"
+                   f"SUM(db_loading_port_tramp) AS loadingporttramp,"
+                   f"SUM(db_unload_port_lin) AS unloadportlin,"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp "
+                   f"FROM firstapp_dailymonitoringuserdata "
+                   f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'")
+    User1data = cursor.fetchall()
+    if User1data == []:
+        User1data = [(0,0,0,0,0,0,0,0)]
+    conn.close()
+    return User1data
+
 
 def getUserInfoFromDB(userid,date):
     conn = connection()

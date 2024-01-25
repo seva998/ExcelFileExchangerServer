@@ -20,7 +20,9 @@ from .database_requests import (getDataTableForAllTime,
                                 getMaxWarehouseQty,
                                 getMaxWarehouseAllQty,
                                 getNormsWarehouseQty,
-                                getNormsWarehouseAllQty)
+                                getNormsWarehouseAllQty,
+                                getReidUserInfoFromDB,
+                                getReidAllInfoFromDB)
 from .models import DailyMonitoringUserData,ConstantUserData
 
 DAYDELTA = dt.timedelta(days=1,
@@ -605,6 +607,8 @@ def dataset(request):
         NormsWarehouseQty1User = getNormsWarehouseQty(2)[0][0]
         AllQty1User = AllQtyCalculator(User1data,Tranzit1)
         AllQtyPercent1User = AllQtyPercent(AllQty1User,MaxWarehouseQty1User,0)
+        Reid_info1 = getReidUserInfoFromDB(2,date)
+        ReidAllUser1 = ReidAllStr(Reid_info1)
 
         #
         # TestUser2Table1
@@ -616,6 +620,8 @@ def dataset(request):
         NormsWarehouseQty2User = getNormsWarehouseQty(3)[0][0]
         AllQty2User = AllQtyCalculator(User2data,Tranzit2)
         AllQtyPercent2User = AllQtyPercent(AllQty2User,MaxWarehouseQty2User,0)
+        Reid_info2 = getReidUserInfoFromDB(3,date)
+        ReidAllUser2 = ReidAllStr(Reid_info2)
 
 
 
@@ -625,15 +631,17 @@ def dataset(request):
         NormsWarehouseQtyAll = getNormsWarehouseAllQty()[0][0]
         AllQtyAll = AllQtyCalculator(UserAlldata,TranzitAll)
         AllQtyPercent1All = AllQtyPercent(AllQtyAll,MaxWarehouseQtyAll,0)
+        Reid_infoAll = getReidAllInfoFromDB(date)
+        ReidAllAll = ReidAllStr(Reid_infoAll)
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
                                                     'date' : ((dt.datetime.strptime(date,'%Y-%m-%d')+DAYDELTA).strftime('%d.%m.%Y.')),
-
+            # Dataset for all tables
                                                     'User1data' : User1data[0],
                                                     'User2data': User2data[0],
                                                     'UserAlldata': UserAlldata[0],
-
+            # 1 table dataset
                                                     'AllQtyPercent1User': AllQtyPercent1User,
                                                     'AllQty1User' :AllQty1User,
                                                     'MaxWarehouseQty2User': MaxWarehouseQty2User,
@@ -648,6 +656,48 @@ def dataset(request):
                                                     'AllQtyPercent1All' : AllQtyPercent1All,
                                                     'MaxWarehouseQtyAll':MaxWarehouseQtyAll,
                                                     'NormsWarehouseQtyAll':NormsWarehouseQtyAll,
+
+
+            #3 table dataset
+
+                                                    'UnloadReidlin1User': Reid_info1[0][0],
+                                                    'UnloadReidtramp1User': Reid_info1[0][1],
+                                                    'UnloadReidSum1User' : (Reid_info1[0][0]+Reid_info1[0][1]),
+                                                    'LoadingReidLin1User': Reid_info1[0][2],
+                                                    'LoadingReidTramp1User': Reid_info1[0][3],
+                                                    'LoadingReidSum1User' :(Reid_info1[0][2]+Reid_info1[0][3]),
+                                                    'ReidAllUser1' : ReidAllUser1,
+                                                    'UnloadPortlin1User' : Reid_info1[0][4],
+                                                    'UnloadPorttramp1User': Reid_info1[0][5],
+                                                    'LoadingPortLin1User': Reid_info1[0][6],
+                                                    'LoadingPortTramp1User': Reid_info1[0][7],
+
+
+                                                    'UnloadReidlin2User': Reid_info2[0][0],
+                                                    'UnloadReidtramp2User': Reid_info2[0][1],
+                                                    'UnloadReidSum2User': (Reid_info2[0][0] + Reid_info2[0][1]),
+                                                    'LoadingReidLin2User': Reid_info2[0][2],
+                                                    'LoadingReidTramp2User': Reid_info2[0][3],
+                                                    'LoadingReidSum2User': (Reid_info2[0][2] + Reid_info2[0][3]),
+                                                    'ReidAllUser2': ReidAllUser2,
+                                                    'UnloadPortlin2User': Reid_info2[0][4],
+                                                    'UnloadPorttramp2User': Reid_info2[0][5],
+                                                    'LoadingPortLin2User': Reid_info2[0][6],
+                                                    'LoadingPortTramp2User': Reid_info2[0][7],
+
+                                                    'UnloadReidlinAllUser': Reid_infoAll[0][0],
+                                                    'UnloadReidtrampAllUser': Reid_infoAll[0][1],
+                                                    'UnloadReidSumAllUser': (Reid_infoAll[0][0] + Reid_infoAll[0][1]),
+                                                    'LoadingReidLinAllUser': Reid_infoAll[0][2],
+                                                    'LoadingReidTrampAllUser': Reid_infoAll[0][3],
+                                                    'LoadingReidSumAllUser': (Reid_infoAll[0][2] + Reid_infoAll[0][3]),
+                                                    'ReidAllAll' : ReidAllAll,
+                                                    'UnloadPortlinAllUser': Reid_infoAll[0][4],
+                                                    'UnloadPorttrampAllUser': Reid_infoAll[0][5],
+                                                    'LoadingPortLinAllUser': Reid_infoAll[0][6],
+                                                    'LoadingPortTrampAllUser': Reid_infoAll[0][7],
+
+
 
                                                     'user': request.user})
     else:
@@ -691,3 +741,9 @@ def AllQtyCalculator(UserInfo,TranzitInfo):
     else:
         return 0
 
+
+def ReidAllStr(Reid_info):
+    if ((Reid_info[0][0]+Reid_info[0][1]) > (Reid_info[0][2]+Reid_info[0][3])):
+        return f'+{(Reid_info[0][0]+Reid_info[0][1])-(Reid_info[0][2]+Reid_info[0][3])}'
+    else:
+        return (Reid_info[0][2]+Reid_info[0][3])-(Reid_info[0][0]+Reid_info[0][1])
