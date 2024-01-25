@@ -1,0 +1,5 @@
+firstapp/migretions/
+config/__pycache__/
+firstapp/__pycache__/
+venv/
+.idea/
