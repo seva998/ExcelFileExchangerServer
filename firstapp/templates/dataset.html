@@ -54,7 +54,9 @@
             <tr>
                 <td>TestUser3 за {{date}}</td>
                 {% for item in User3data %}
-                    <td>{{ item }}</td>
+                    {% for i in item %}
+                        <td>{{ i }}</td>
+                    {% endfor %}
                 {% endfor %}
             </tr>
             <tr>

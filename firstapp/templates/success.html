@@ -10,24 +10,34 @@
     <h2>Данные</h2>
     <ul>
         <table border="1" width="30%" cellpadding="5">
+                <tr>
+                    <th rowspan="3">Данные</th>
+                    <th rowspan="2">date2</th>
+                    <th colspan="2">в т.ч. импорт</th>
+                    <th colspan="2">в т.ч. экспорт</th>
+                    <th colspan="2">в т.ч. транзит</th>
+                    <th rowspan="2">в т.ч. экспорт порожние</th>
+                    <th rowspan="2">в т.ч. прочие порожние</th>
+                    <th colspan="4">На рейде в ожидании</th>
+                    <th colspan="4">На подходах к порту для</th>
+                </tr>
+                <tr>
+                    <th>Прибыло</th>
+                    <th>Убыло</th>
+                    <th>Прибыло</th>
+                    <th>Убыло</th>
+                    <th>Прибыло</th>
+                    <th>Убыло</th>
+                    <th>Выгрузки, в т.ч на линейных судах</th>
+                    <th>Выгрузки, в т.ч на трамповых судах</th>
+                    <th>Погрузки, в т.ч на линейных судах</th>
+                    <th>Погрузки, в т.ч на трамповых судах</th>
+                    <th>Выгрузки, в т.ч на линейных судах</th>
+                    <th>Выгрузки, в т.ч на трамповых судах</th>
+                    <th>Погрузки, в т.ч на линейных судах</th>
+                    <th>Погрузки, в т.ч на трамповых судах</th>
+                </tr>
             <tr>
-                <th>Заголовок</th>
-                <th>Дата предоставления данных</th>
-                <th>в т.ч. импорт Прибыло</th>
-                <th>в т.ч. импорт Убыло</th>
-                <th>в т.ч. экспорт Прибыло</th>
-                <th>в т.ч. экспорт Убыло</th>
-                <th>в т.ч. транзит Прибыло</th>
-                <th>в т.ч. транзит Убыло</th>
-                <th>в т.ч. экспорт порожние</th>
-                <th>в т.ч. прочие порожние</th>
-                <th>На рейде в ожидании Выгрузки</th>
-                <th>На рейде в ожидании Погрузки</th>
-                <th>На подходах к порту для Выгрузки</th>
-                <th>На подходах к порту для Погрузки</th>
-            </tr>
-            <tr>
-                <td>Данные</td>
                 <td>{{date2}}</td>
                 <td>{{ImportIn}}</td>
                 <td>{{ImportOut}}</td>
@@ -37,10 +47,14 @@
                 <td>{{TransitOut}}</td>
                 <td>{{ExportEmpty}}</td>
                 <td>{{OtherEmpty}}</td>
-                <td>{{UnloadReid}}</td>
-                <td>{{LoadingReid}}</td>
-                <td>{{UnloadPort}}</td>
-                <td>{{LoadingPort}}</td>
+                <td>{{UnloadReidlin}}</td>
+                <td>{{UnloadReidtramp}}</td>
+                <td>{{LoadingReidLin}}</td>
+                <td>{{LoadingReidTramp}}</td>
+                <td>{{UnloadPortlin}}</td>
+                <td>{{UnloadPorttramp}}</td>
+                <td>{{LoadingPortLin}}</td>
+                <td>{{LoadingPortTramp}}</td>
             </tr>
           </table>
     </ul>

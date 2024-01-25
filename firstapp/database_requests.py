@@ -23,10 +23,14 @@ def getDataTableForAllTime(date):
                    f"SUM(db_transitout) AS transitoutsum,"
                    f"SUM(db_exportempty) AS exportemptysum,"
                    f"SUM(db_otherempty) AS otheremptysum,"
-                   f"SUM(db_unloadreid) AS unloadreidsum,"
-                   f"SUM(db_loadingreid) AS loadingreidsum,"
-                   f"SUM(db_lunloadport) AS lunloadportsum,"
-                   f"SUM(db_loadingport) AS loadingportsum "
+                   f"SUM(db_unload_reid_lin) AS unloadreidlin,"
+                   f"SUM(db_unload_reid_tramp) AS unloadreidtramp,"
+                   f"SUM(db_loading_reid_lin) AS loadingreidlin,"
+                   f"SUM(db_loading_reid_tramp) AS loadingreidtramp,"
+                   f"SUM(db_loading_port_lin) AS loadingportlin,"
+                   f"SUM(db_loading_port_tramp) AS loadingporttramp,"
+                   f"SUM(db_unload_port_lin) AS unloadportlin,"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp,"
                    f"FROM firstapp_datatable3 "
                    f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
     result = cursor.fetchall()

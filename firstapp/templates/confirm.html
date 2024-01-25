@@ -32,18 +32,31 @@
    #OtherEmpty {
     width: 50px; /* Ширина поля в пикселах */
    }
-   #UnloadReid {
+   #UnloadReidlin {
     width: 60px; /* Ширина поля в пикселах */
    }
-   #LoadingReid {
+   #UnloadReidtramp {
     width: 60px; /* Ширина поля в пикселах */
    }
-   #UnloadPort {
+   #LoadingReidLin {
     width: 60px; /* Ширина поля в пикселах */
    }
-   #LoadingPort {
+   #LoadingReidTramp {
     width: 60px; /* Ширина поля в пикселах */
    }
+         #UnloadPortlin {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+         #UnloadPorttramp {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+         #LoadingPortLin {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+         #LoadingPortTramp {
+    width: 60px; /* Ширина поля в пикселах */
+   }
+
   </style>
     <style type="text/css">
        TABLE {
@@ -72,23 +85,34 @@
         <ul>
             <table border="1" width="30%" cellpadding="5">
                 <tr>
-                    <th>Заголовок</th>
-                    <th>date2</th>
-                    <th>в т.ч. импорт Прибыло</th>
-                    <th>в т.ч. импорт Убыло</th>
-                    <th>в т.ч. экспорт Прибыло</th>
-                    <th>в т.ч. экспорт Убыло</th>
-                    <th>в т.ч. транзит Прибыло</th>
-                    <th>в т.ч. транзит Убыло</th>
-                    <th>в т.ч. экспорт порожние</th>
-                    <th>в т.ч. прочие порожние</th>
-                    <th>На рейде в ожидании Выгрузки</th>
-                    <th>На рейде в ожидании Погрузки</th>
-                    <th>На подходах к порту для Выгрузки</th>
-                    <th>На подходах к порту для Погрузки</th>
+                    <th rowspan="3">Данные</th>
+                    <th rowspan="2">date2</th>
+                    <th colspan="2">в т.ч. импорт</th>
+                    <th colspan="2">в т.ч. экспорт</th>
+                    <th colspan="2">в т.ч. транзит</th>
+                    <th rowspan="2">в т.ч. экспорт порожние</th>
+                    <th rowspan="2">в т.ч. прочие порожние</th>
+                    <th colspan="4">На рейде в ожидании</th>
+                    <th colspan="4">На подходах к порту для</th>
                 </tr>
                 <tr>
-                    <td>Данные</td>
+                    <th>Прибыло</th>
+                    <th>Убыло</th>
+                    <th>Прибыло</th>
+                    <th>Убыло</th>
+                    <th>Прибыло</th>
+                    <th>Убыло</th>
+                    <th>Выгрузки, в т.ч на линейных судах</th>
+                    <th>Выгрузки, в т.ч на трамповых судах</th>
+                    <th>Погрузки, в т.ч на линейных судах</th>
+                    <th>Погрузки, в т.ч на трамповых судах</th>
+                    <th>Выгрузки, в т.ч на линейных судах</th>
+                    <th>Выгрузки, в т.ч на трамповых судах</th>
+                    <th>Погрузки, в т.ч на линейных судах</th>
+                    <th>Погрузки, в т.ч на трамповых судах</th>
+
+                </tr>
+                <tr>
                     <td><input type="date" value={{date2}} id ="date2" name = "date2" ></td>
                     <td><input value={{ImportIn}} id ="ImportIn" name = "ImportIn" ></td>
                     <td><input value={{ImportOut}} id ="ImportOut" name = "ImportOut" ></td>
@@ -98,10 +122,14 @@
                     <td><input value={{TransitOut}} id ="TransitOut" name = "TransitOut" ></td>
                     <td><input value={{ExportEmpty}} id ="ExportEmpty" name = "ExportEmpty" ></td>
                     <td><input value={{OtherEmpty}} id ="OtherEmpty" name = "OtherEmpty" ></td>
-                    <td><input value={{UnloadReid}} id ="UnloadReid" name = "UnloadReid" ></td>
-                    <td><input value={{LoadingReid}} id ="LoadingReid" name = "LoadingReid" ></td>
-                    <td><input value={{UnloadPort}} id ="UnloadPort" name = "UnloadPort" ></td>
-                    <td><input value={{LoadingPort}} id ="LoadingPort" name = "LoadingPort" ></td>
+                    <td><input value={{UnloadReidlin}} id ="UnloadReidlin" name = "UnloadReidlin" ></td>
+                    <td><input value={{UnloadReidtramp}} id ="UnloadReidtramp" name = "UnloadReidtramp" ></td>
+                    <td><input value={{LoadingReidLin}} id ="LoadingReidLin" name = "LoadingReidLin" ></td>
+                    <td><input value={{LoadingReidTramp}} id ="LoadingReidTramp" name = "LoadingReidTramp" ></td>
+                    <td><input value={{UnloadPortlin}} id ="UnloadPortlin" name = "UnloadPortlin" ></td>
+                    <td><input value={{UnloadPorttramp}} id ="UnloadPorttramp" name = "UnloadPorttramp" ></td>
+                    <td><input value={{LoadingPortLin}} id ="LoadingPortLin" name = "LoadingPortLin" ></td>
+                    <td><input value={{LoadingPortTramp}} id ="LoadingPortTramp" name = "LoadingPortTramp" ></td>
                 </tr>
               </table>
         </ul>

@@ -1,5 +1,6 @@
 # Файл views.py
 import psycopg2
+import openpyxl
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
 from django.shortcuts import render, redirect
@@ -7,13 +8,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.backends.db import SessionStore
-
-from .database_requests import getDataTableForAllTime, getUserInfoFromDB, getDataTableForDate
-from .models import DataTable3
 import datetime as dt
-import openpyxl
 from io import BytesIO
 from django.http import FileResponse
+
+from .database_requests import getDataTableForAllTime, getUserInfoFromDB, getDataTableForDate
+from .models import DailyMonitoringUserData,ConstantUserData
+
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
                            microseconds=0,
@@ -94,10 +95,13 @@ def register(request):
             try:
                 username = request.POST['username']
                 password = request.POST['password']
+                norms = request.POST['norms']
+                max = request.POST['max']
 
                 # Создание нового пользователя
                 user = User.objects.create_user(username=username, password=password)
                 user.save()
+                ConstantUserData.objects.create(db_userid=user.id, db_norms=norms, db_max=max)
                 return redirect('login')
             except:
                 return render(request, 'register.html')
@@ -140,10 +144,14 @@ def confirm(request):
         TransitOut = params.get('TransitOut')
         ExportEmpty = params.get('ExportEmpty')
         OtherEmpty = params.get('OtherEmpty')
-        UnloadReid = params.get('UnloadReid')
-        LoadingReid = params.get('LoadingReid')
-        UnloadPort = params.get('UnloadPort')
-        LoadingPort = params.get('LoadingPort')
+        UnloadReidlin = params.get('UnloadReidlin')
+        UnloadReidtramp = params.get('UnloadReidtramp')
+        LoadingReidLin = params.get('LoadingReidLin')
+        LoadingReidTramp = params.get('LoadingReidTramp')
+        UnloadPortlin = params.get('UnloadPortlin')
+        UnloadPorttramp = params.get('UnloadPorttramp')
+        LoadingPortLin = params.get('LoadingPortLin')
+        LoadingPortTramp = params.get('LoadingPortTramp')
         if request.method == 'POST':
             date2 = [[request.POST['date2']]]
             ImportIn = [request.POST['ImportIn']]
@@ -154,10 +162,14 @@ def confirm(request):
             TransitOut = [request.POST['TransitOut']]
             ExportEmpty = [request.POST['ExportEmpty']]
             OtherEmpty = [request.POST['OtherEmpty']]
-            UnloadReid = [request.POST['UnloadReid']]
-            LoadingReid = [request.POST['LoadingReid']]
-            UnloadPort = [request.POST['UnloadPort']]
-            LoadingPort = [request.POST['LoadingPort']]
+            UnloadReidlin = [request.POST['UnloadReidlin']]
+            UnloadReidtramp = [request.POST['UnloadReidtramp']]
+            LoadingReidLin = [request.POST['LoadingReidLin']]
+            LoadingReidTramp = [request.POST['LoadingReidTramp']]
+            UnloadPortlin = [request.POST['UnloadPortlin']]
+            UnloadPorttramp = [request.POST['UnloadPorttramp']]
+            LoadingPortLin = [request.POST['LoadingPortLin']]
+            LoadingPortTramp = [request.POST['LoadingPortTramp']]
             request.session['parameters'] = {
                 'date2' : date2,
                 'ImportIn': ImportIn,
@@ -168,10 +180,14 @@ def confirm(request):
                 'TransitOut': TransitOut,
                 'ExportEmpty': ExportEmpty,
                 'OtherEmpty': OtherEmpty,
-                'UnloadReid': UnloadReid,
-                'LoadingReid': LoadingReid,
-                'UnloadPort': UnloadPort,
-                'LoadingPort': LoadingPort
+                'UnloadReidlin': UnloadReidlin,
+                'UnloadReidtramp': UnloadReidtramp,
+                'LoadingReidLin': LoadingReidLin,
+                'LoadingReidTramp': LoadingReidTramp,
+                'UnloadPortlin' : UnloadPortlin,
+                'UnloadPorttramp': UnloadPorttramp,
+                'LoadingPortLin': LoadingPortLin,
+                'LoadingPortTramp': LoadingPortTramp
             }
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
@@ -185,10 +201,14 @@ def confirm(request):
                                                         'TransitOut': TransitOut[0],
                                                         'ExportEmpty': ExportEmpty[0],
                                                         'OtherEmpty': OtherEmpty[0],
-                                                        'UnloadReid': UnloadReid[0],
-                                                        'LoadingReid': LoadingReid[0],
-                                                        'UnloadPort': UnloadPort[0],
-                                                        'LoadingPort': LoadingPort[0],
+                                                        'UnloadReidlin': UnloadReidlin[0],
+                                                        'UnloadReidtramp': UnloadReidtramp[0],
+                                                        'LoadingReidLin': LoadingReidLin[0],
+                                                        'LoadingReidTramp': LoadingReidTramp[0],
+                                                        'UnloadPortlin' : UnloadPortlin[0],
+                                                        'UnloadPorttramp': UnloadPorttramp[0],
+                                                        'LoadingPortLin': LoadingPortLin[0],
+                                                        'LoadingPortTramp': LoadingPortTramp[0]
         })
     else:
         if request.method == 'POST':
@@ -201,10 +221,14 @@ def confirm(request):
             TransitOut = [request.POST['TransitOut']]
             ExportEmpty = [request.POST['ExportEmpty']]
             OtherEmpty = [request.POST['OtherEmpty']]
-            UnloadReid = [request.POST['UnloadReid']]
-            LoadingReid = [request.POST['LoadingReid']]
-            UnloadPort = [request.POST['UnloadPort']]
-            LoadingPort = [request.POST['LoadingPort']]
+            UnloadReidlin = [request.POST['UnloadReidlin']]
+            UnloadReidtramp = [request.POST['UnloadReidtramp']]
+            LoadingReidLin = [request.POST['LoadingReidLin']]
+            LoadingReidTramp = [request.POST['LoadingReidTramp']]
+            UnloadPortlin = [request.POST['UnloadPortlin']]
+            UnloadPorttramp = [request.POST['UnloadPorttramp']]
+            LoadingPortLin = [request.POST['LoadingPortLin']]
+            LoadingPortTramp = [request.POST['LoadingPortTramp']]
             request.session['parameters'] = {
                 'date2': date2,
                 'ImportIn': ImportIn,
@@ -214,11 +238,15 @@ def confirm(request):
                 'TransitIn': TransitIn,
                 'TransitOut': TransitOut,
                 'ExportEmpty': ExportEmpty,
-                'OtherEmpty': OtherEmpty,
-                'UnloadReid': UnloadReid,
-                'LoadingReid': LoadingReid,
-                'UnloadPort': UnloadPort,
-                'LoadingPort': LoadingPort
+                'OtherEmpty' : OtherEmpty,
+                'UnloadReidlin': UnloadReidlin,
+                'UnloadReidtramp': UnloadReidtramp,
+                'LoadingReidLin': LoadingReidLin,
+                'LoadingReidTramp': LoadingReidTramp,
+                'UnloadPortlin' : UnloadPortlin,
+                'UnloadPorttramp': UnloadPorttramp,
+                'LoadingPortLin': LoadingPortLin,
+                'LoadingPortTramp': LoadingPortTramp
             }
             # Сохраните сессию, чтобы сгенерировать сессионный ключ
             request.session.save()
@@ -229,6 +257,7 @@ def confirm(request):
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
         try:
+            #WORK IN PROGRESS
             Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
             return render(request, 'confirm.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
@@ -247,6 +276,7 @@ def confirm(request):
             })
         except:
             return render(request, 'confirm.html', {
+                'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ImportIn': 0,
                 'ImportOut': 0,
                 'ExportIn': 0,
@@ -255,10 +285,14 @@ def confirm(request):
                 'TransitOut': 0,
                 'ExportEmpty': 0,
                 'OtherEmpty': 0,
-                'UnloadReid': 0,
-                'LoadingReid': 0,
-                'UnloadPort': 0,
-                'LoadingPort': 0,
+                'UnloadReidlin': 0,
+                'UnloadReidtramp': 0,
+                'LoadingReidLin': 0,
+                'LoadingReidTramp': 0,
+                'UnloadPortlin': 0,
+                'UnloadPorttramp': 0,
+                'LoadingPortLin': 0,
+                'LoadingPortTramp': 0
             })
 
 @login_required(login_url='')
@@ -278,10 +312,14 @@ def success(request):
         TransitOut = params.get('TransitOut')
         ExportEmpty = params.get('ExportEmpty')
         OtherEmpty = params.get('OtherEmpty')
-        UnloadReid = params.get('UnloadReid')
-        LoadingReid = params.get('LoadingReid')
-        UnloadPort = params.get('UnloadPort')
-        LoadingPort = params.get('LoadingPort')
+        UnloadReidlin = params.get('UnloadReidlin')
+        UnloadReidtramp = params.get('UnloadReidtramp')
+        LoadingReidLin = params.get('LoadingReidLin')
+        LoadingReidTramp = params.get('LoadingReidTramp')
+        UnloadPortlin = params.get('UnloadPortlin')
+        UnloadPorttramp = params.get('UnloadPorttramp')
+        LoadingPortLin = params.get('LoadingPortLin')
+        LoadingPortTramp = params.get('LoadingPortTramp')
         ImportIn[0] = NanCheck(ImportIn[0])
         ImportOut[0] = NanCheck(ImportOut[0])
         ExportIn[0] = NanCheck(ExportIn[0])
@@ -290,41 +328,53 @@ def success(request):
         TransitOut[0] = NanCheck(TransitOut[0])
         ExportEmpty[0] = NanCheck(ExportEmpty[0])
         OtherEmpty[0] = NanCheck(OtherEmpty[0])
-        UnloadReid[0] = NanCheck(UnloadReid[0])
-        LoadingReid[0] = NanCheck(LoadingReid[0])
-        UnloadPort[0] = NanCheck(UnloadPort[0])
-        LoadingPort[0] = NanCheck(LoadingPort[0])
+        UnloadReidlin[0] = NanCheck(UnloadReidlin[0])
+        UnloadReidtramp[0] = NanCheck(UnloadReidtramp[0])
+        LoadingReidLin[0] = NanCheck(LoadingReidLin[0])
+        LoadingReidTramp[0] = NanCheck(LoadingReidTramp[0])
+        UnloadPortlin[0] = NanCheck(UnloadPortlin[0])
+        UnloadPorttramp[0] = NanCheck(UnloadPorttramp[0])
+        LoadingPortLin[0] = NanCheck(LoadingPortLin[0])
+        LoadingPortTramp[0] = NanCheck(LoadingPortTramp[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DataTable3.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
-                db_importin=float(ImportIn[0]),
-                db_importout=float(ImportOut[0]),
-                db_exportin=float(ExportIn[0]),
-                db_exportout=float(ExportOut[0]),
-                db_transitin=float(TransitIn[0]),
-                db_transitout=float(TransitOut[0]),
-                db_exportempty=float(ExportEmpty[0]),
-                db_otherempty=float(OtherEmpty[0]),
-                db_unloadreid=float(UnloadReid[0]),
-                db_loadingreid=float(LoadingReid[0]),
-                db_lunloadport=float(UnloadPort[0]),
-                db_loadingport=float(LoadingPort[0])
+        DataItem = DailyMonitoringUserData.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+                db_importin=int(ImportIn[0]),
+                db_importout=int(ImportOut[0]),
+                db_exportin=int(ExportIn[0]),
+                db_exportout=int(ExportOut[0]),
+                db_transitin=int(TransitIn[0]),
+                db_transitout=int(TransitOut[0]),
+                db_exportempty=int(ExportEmpty[0]),
+                db_otherempty=int(OtherEmpty[0]),
+                db_unload_reid_lin=int(UnloadReidlin[0]),
+                db_unload_reid_tramp=int(UnloadReidtramp[0]),
+                db_loading_reid_lin=int(LoadingReidLin[0]),
+                db_loading_reid_tramp=int(LoadingReidTramp[0]),
+                db_loading_port_lin=int(UnloadPortlin[0]),
+                db_loading_port_tramp=int(UnloadPorttramp[0]),
+                db_unload_port_lin=int(LoadingPortLin[0]),
+                db_unload_port_tramp=int(LoadingPortTramp[0])
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DataTable3.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+            DailyMonitoringUserData.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
                                           db_userid = request.user.id,
-                                          db_importin= float(ImportIn[0]),
-                                          db_importout = float(ImportOut[0]),
-                                          db_exportin = float(ExportIn[0]),
-                                          db_exportout = float(ExportOut[0]),
-                                          db_transitin = float(TransitIn[0]),
-                                          db_transitout = float(TransitOut[0]),
-                                          db_exportempty = float(ExportEmpty[0]),
-                                          db_otherempty = float(OtherEmpty[0]),
-                                          db_unloadreid = float(UnloadReid[0]),
-                                          db_loadingreid = float(LoadingReid[0]),
-                                          db_lunloadport = float(UnloadPort[0]),
-                                          db_loadingport = float(LoadingPort[0])
+                                          db_importin= int(ImportIn[0]),
+                                          db_importout = int(ImportOut[0]),
+                                          db_exportin = int(ExportIn[0]),
+                                          db_exportout = int(ExportOut[0]),
+                                          db_transitin = int(TransitIn[0]),
+                                          db_transitout = int(TransitOut[0]),
+                                          db_exportempty = int(ExportEmpty[0]),
+                                          db_otherempty = int(OtherEmpty[0]),
+                                          db_unload_reid_lin=int(UnloadReidlin[0]),
+                                          db_unload_reid_tramp=int(UnloadReidtramp[0]),
+                                          db_loading_reid_lin=int(LoadingReidLin[0]),
+                                          db_loading_reid_tramp=int(LoadingReidTramp[0]),
+                                          db_loading_port_lin=int(UnloadPortlin[0]),
+                                          db_loading_port_tramp=int(UnloadPorttramp[0]),
+                                          db_unload_port_lin=int(LoadingPortLin[0]),
+                                          db_unload_port_tramp=int(LoadingPortTramp[0])
                                           )
 
         return render(request, 'success.html', {
@@ -337,10 +387,14 @@ def success(request):
                                                 'TransitOut': TransitOut[0],
                                                 'ExportEmpty': ExportEmpty[0],
                                                 'OtherEmpty': OtherEmpty[0],
-                                                'UnloadReid': UnloadReid[0],
-                                                'LoadingReid': LoadingReid[0],
-                                                'UnloadPort': UnloadPort[0],
-                                                'LoadingPort': LoadingPort[0],
+                                                'UnloadReidlin': UnloadReidlin[0],
+                                                'UnloadReidtramp': UnloadReidtramp[0],
+                                                'LoadingReidLin': LoadingReidLin[0],
+                                                'LoadingReidTramp': LoadingReidTramp[0],
+                                                'UnloadPortlin' : UnloadPortlin[0],
+                                                'UnloadPorttramp': UnloadPorttramp[0],
+                                                'LoadingPortLin': LoadingPortLin[0],
+                                                'LoadingPortTramp': LoadingPortTramp[0],
                                                 'user': request.user})
 
 def NanCheck(i):
@@ -353,11 +407,125 @@ def NanCheck(i):
         i = 0
     return i
 
+# ###File download realization
+# @login_required(login_url='')
+# def download(request):
+#     if request.user.id == 1:
+#         wb = openpyxl.load_workbook('./Test.xlsx')
+#         ws = wb.get_sheet_by_name('Шаблон1')
+#         params = request.session.get('parameters', {})
+#         date = params.get('date1')
+#         try:
+#             #admin_id = 2
+#             #
+#             # TestUser1
+#             #
+#             User1data = getUserInfoFromDB(2, date)
+#             #ws[f'A2'] = date
+#             ws[f'A4'] = 'TestUser1'
+#             ws[f'B4'] = User1data[0][0]
+#             ws[f'C4'] = User1data[0][1]
+#             ws[f'D4'] = User1data[0][2]
+#             ws[f'E4'] = User1data[0][3]
+#             ws[f'F4'] = User1data[0][4]
+#             ws[f'G4'] = User1data[0][5]
+#             ws[f'H4'] = User1data[0][6]
+#             ws[f'I4'] = User1data[0][7]
+#             ws[f'J4'] = User1data[0][8]
+#             ws[f'K4'] = User1data[0][9]
+#             ws[f'L4'] = User1data[0][10]
+#             ws[f'M4'] = User1data[0][11]
+#
+#             #
+#             # TestUser2
+#             #
+#
+#             User2data = getUserInfoFromDB(3, date)
+#
+#             #ws[f'A3'] = date
+#             ws[f'A5'] = 'TestUser1'
+#             ws[f'B5'] = User2data[0][0]
+#             ws[f'C5'] = User2data[0][1]
+#             ws[f'D5'] = User2data[0][2]
+#             ws[f'E5'] = User2data[0][3]
+#             ws[f'F5'] = User2data[0][4]
+#             ws[f'G5'] = User2data[0][5]
+#             ws[f'H5'] = User2data[0][6]
+#             ws[f'I5'] = User2data[0][7]
+#             ws[f'J5'] = User2data[0][8]
+#             ws[f'K5'] = User2data[0][9]
+#             ws[f'L5'] = User2data[0][10]
+#             ws[f'M5'] = User2data[0][11]
+#
+#             #
+#             # TestUser3 massive query
+#             #
+#             User3data = getUserInfoFromDB(4, date)
+#
+#             #ws[f'A4'] = date
+#             ws[f'A6'] = 'TestUser1'
+#             ws[f'B6'] = User2data[0][0]
+#             ws[f'C6'] = User2data[0][1]
+#             ws[f'D6'] = User2data[0][2]
+#             ws[f'E6'] = User2data[0][3]
+#             ws[f'F6'] = User2data[0][4]
+#             ws[f'G6'] = User2data[0][5]
+#             ws[f'H6'] = User2data[0][6]
+#             ws[f'I6'] = User2data[0][7]
+#             ws[f'J6'] = User2data[0][8]
+#             ws[f'K6'] = User2data[0][9]
+#             ws[f'L6'] = User2data[0][10]
+#             ws[f'M6'] = User2data[0][11]
+#             #
+#             # Сумма по всем пользователям за дату
+#             #
+#             UserAlldatafordate = getDataTableForDate(date)
+#             #ws[f'A5'] = date
+#             ws[f'A7'] = 'TestUser1'
+#             ws[f'B7'] = UserAlldatafordate[0][0]
+#             ws[f'C7'] = UserAlldatafordate[0][1]
+#             ws[f'D7'] = UserAlldatafordate[0][2]
+#             ws[f'E7'] = UserAlldatafordate[0][3]
+#             ws[f'F7'] = UserAlldatafordate[0][4]
+#             ws[f'G7'] = UserAlldatafordate[0][5]
+#             ws[f'H7'] = UserAlldatafordate[0][6]
+#             ws[f'I7'] = UserAlldatafordate[0][7]
+#             ws[f'J7'] = UserAlldatafordate[0][8]
+#             ws[f'K7'] = UserAlldatafordate[0][9]
+#             ws[f'L7'] = UserAlldatafordate[0][10]
+#             ws[f'M7'] = UserAlldatafordate[0][11]
+#             #
+#             # Сумма по всем пользователям за всё время
+#             #
+#             UserAlldata = getDataTableForAllTime(date)
+#             #ws[f'A6'] = date
+#             ws[f'A8'] = 'TestUser1'
+#             ws[f'B8'] = UserAlldata[0][0]
+#             ws[f'C8'] = UserAlldata[0][1]
+#             ws[f'D8'] = UserAlldata[0][2]
+#             ws[f'E8'] = UserAlldata[0][3]
+#             ws[f'F8'] = UserAlldata[0][4]
+#             ws[f'G8'] = UserAlldata[0][5]
+#             ws[f'H8'] = UserAlldata[0][6]
+#             ws[f'I8'] = UserAlldata[0][7]
+#             ws[f'J8'] = UserAlldata[0][8]
+#             ws[f'K8'] = UserAlldata[0][9]
+#             ws[f'L8'] = UserAlldata[0][10]
+#             ws[f'M8'] = UserAlldata[0][11]
+#         except:
+#             pass
+#         bytes_io = BytesIO()
+#         wb.save(bytes_io)
+#         bytes_io.seek(0)
+#         return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xslx'))
+#     else:
+#         return redirect('home')
+
 ###File download realization
 @login_required(login_url='')
 def download(request):
     if request.user.id == 1:
-        wb = openpyxl.load_workbook('./Test.xlsx')
+        wb = openpyxl.load_workbook('./WS1_s.xlsx')
         ws = wb.get_sheet_by_name('Шаблон1')
         params = request.session.get('parameters', {})
         date = params.get('date1')
@@ -367,97 +535,41 @@ def download(request):
             # TestUser1
             #
             User1data = getUserInfoFromDB(2, date)
-            #ws[f'A2'] = date
-            ws[f'A4'] = 'TestUser1'
-            ws[f'B4'] = User1data[0][0]
-            ws[f'C4'] = User1data[0][1]
-            ws[f'D4'] = User1data[0][2]
-            ws[f'E4'] = User1data[0][3]
-            ws[f'F4'] = User1data[0][4]
-            ws[f'G4'] = User1data[0][5]
-            ws[f'H4'] = User1data[0][6]
-            ws[f'I4'] = User1data[0][7]
-            ws[f'J4'] = User1data[0][8]
-            ws[f'K4'] = User1data[0][9]
-            ws[f'L4'] = User1data[0][10]
-            ws[f'M4'] = User1data[0][11]
-
             #
             # TestUser2
             #
-
             User2data = getUserInfoFromDB(3, date)
-
-            #ws[f'A3'] = date
-            ws[f'A5'] = 'TestUser1'
-            ws[f'B5'] = User2data[0][0]
-            ws[f'C5'] = User2data[0][1]
-            ws[f'D5'] = User2data[0][2]
-            ws[f'E5'] = User2data[0][3]
-            ws[f'F5'] = User2data[0][4]
-            ws[f'G5'] = User2data[0][5]
-            ws[f'H5'] = User2data[0][6]
-            ws[f'I5'] = User2data[0][7]
-            ws[f'J5'] = User2data[0][8]
-            ws[f'K5'] = User2data[0][9]
-            ws[f'L5'] = User2data[0][10]
-            ws[f'M5'] = User2data[0][11]
-
             #
             # TestUser3 massive query
             #
             User3data = getUserInfoFromDB(4, date)
-
-            #ws[f'A4'] = date
-            ws[f'A6'] = 'TestUser1'
-            ws[f'B6'] = User2data[0][0]
-            ws[f'C6'] = User2data[0][1]
-            ws[f'D6'] = User2data[0][2]
-            ws[f'E6'] = User2data[0][3]
-            ws[f'F6'] = User2data[0][4]
-            ws[f'G6'] = User2data[0][5]
-            ws[f'H6'] = User2data[0][6]
-            ws[f'I6'] = User2data[0][7]
-            ws[f'J6'] = User2data[0][8]
-            ws[f'K6'] = User2data[0][9]
-            ws[f'L6'] = User2data[0][10]
-            ws[f'M6'] = User2data[0][11]
             #
             # Сумма по всем пользователям за дату
             #
             UserAlldatafordate = getDataTableForDate(date)
-            #ws[f'A5'] = date
-            ws[f'A7'] = 'TestUser1'
-            ws[f'B7'] = UserAlldatafordate[0][0]
-            ws[f'C7'] = UserAlldatafordate[0][1]
-            ws[f'D7'] = UserAlldatafordate[0][2]
-            ws[f'E7'] = UserAlldatafordate[0][3]
-            ws[f'F7'] = UserAlldatafordate[0][4]
-            ws[f'G7'] = UserAlldatafordate[0][5]
-            ws[f'H7'] = UserAlldatafordate[0][6]
-            ws[f'I7'] = UserAlldatafordate[0][7]
-            ws[f'J7'] = UserAlldatafordate[0][8]
-            ws[f'K7'] = UserAlldatafordate[0][9]
-            ws[f'L7'] = UserAlldatafordate[0][10]
-            ws[f'M7'] = UserAlldatafordate[0][11]
             #
             # Сумма по всем пользователям за всё время
             #
+            UserAllDataOlder = getDataTableForAllTime((dt.datetime.strptime(date, '%Y-%m-%d')-DAYDELTA).strftime('%Y-%m-%d'))
             UserAlldata = getDataTableForAllTime(date)
-            #ws[f'A6'] = date
-            ws[f'A8'] = 'TestUser1'
-            ws[f'B8'] = UserAlldata[0][0]
-            ws[f'C8'] = UserAlldata[0][1]
-            ws[f'D8'] = UserAlldata[0][2]
-            ws[f'E8'] = UserAlldata[0][3]
-            ws[f'F8'] = UserAlldata[0][4]
-            ws[f'G8'] = UserAlldata[0][5]
-            ws[f'H8'] = UserAlldata[0][6]
-            ws[f'I8'] = UserAlldata[0][7]
-            ws[f'J8'] = UserAlldata[0][8]
-            ws[f'K8'] = UserAlldata[0][9]
-            ws[f'L8'] = UserAlldata[0][10]
-            ws[f'M8'] = UserAlldata[0][11]
+
+            ws['E9'] = (UserAlldata[0][0]-UserAlldata[0][1]+UserAlldata[0][2]-UserAlldata[0][3]+UserAlldata[0][4]-UserAlldata[0][5])
+            ws['Q22'] = UserAlldata[0][0]
+            ws['R22'] = UserAlldata[0][1]
+            ws['S22'] = UserAlldata[0][2]
+            ws['T22'] = UserAlldata[0][3]
+            ws['U22'] = UserAlldata[0][4]
+            ws['V22'] = UserAlldata[0][5]
+            ws['W22'] = UserAlldata[0][6]
+            ws['X22'] = UserAlldata[0][7]
+            ws['Y22'] = UserAlldata[0][8]
+            ws['Z22'] = UserAlldata[0][9]
+            ws['AA22'] = UserAlldata[0][10]
+            ws['AB22'] = UserAlldata[0][11]
+            ws['C33'] = UserAlldata[0][8]
+            ws['D33'] = UserAlldata[0][9]
+            ws['F33'] = UserAlldata[0][10]
+            ws['G33'] = UserAlldata[0][11]
         except:
             pass
         bytes_io = BytesIO()
@@ -503,7 +615,7 @@ def dataset(request):
 
                                                     'User2data' : User2data[0],
 
-                                                    'User3data' : User3data[0],
+                                                    'User3data' : User3data,
 
                                                     'UserAlldata': UserAlldata[0],
 
