@@ -32,69 +32,16 @@ DAYDELTA = dt.timedelta(days=1,
                            minutes=0,
                            hours=0,
                            weeks=0)
-
+def is_stevedor(user):
+    return user.groups.filter(name='stevedors').exists()
 
 @login_required(login_url='')
 def home(request):
-    #В данном случае ID админа 2, но рекомендуется использовать 1, и первым пользователем создавать именно админа.
     if request.user.id != 1:
-        if request.method == 'POST':
-            file = request.FILES.get('file')
-            if file is not None:
-                if file.name.endswith('.xlsx'):
-                    fs = FileSystemStorage()
-                    filename = fs.save(file.name, file)
-                    try:
-                        # Чтение xlsx файла
-                        df = pd.read_excel(fs.path(filename))
-                        # Игнорирование первых трёх строк
-                        df = df.iloc[2:]
-                        # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
-                        ImportIn = df.iloc[:, 0].tolist()                     # в т.ч. импорт Прибыло
-                        ImportOut = df.iloc[:, 1].tolist()                    # в т.ч. импорт Убыло
-                        ExportIn = df.iloc[:, 2].tolist()                     # в т.ч. экспорт Прибыло
-                        ExportOut = df.iloc[:, 3].tolist()                    # в т.ч. экспорт Убыло
-                        TransitIn = df.iloc[:, 4].tolist()                    # в т.ч. транзит Прибыло
-                        TransitOut = df.iloc[:, 5].tolist()                   # в т.ч. транзит Убыло
-                        ExportEmpty = df.iloc[:, 6].tolist()                  # в т.ч. экспорт порожние
-                        OtherEmpty = df.iloc[:, 7].tolist()                   # в т.ч. прочие порожние
-                        UnloadReid = df.iloc[:, 8].tolist()                   # На рейде в ожидании Выгрузки
-                        LoadingReid = df.iloc[:, 9].tolist()                  # На рейде в ожидании Погрузки
-                        UnloadPort = df.iloc[:, 10].tolist()                  # На подходах к порту для Выгрузки
-                        LoadingPort = df.iloc[:, 11].tolist()                 # На подходах к порту для Погрузки
-                        fs.delete(filename)
-
-                        # Дальнейшая обработка данных
-                        request.session['parameters'] = {
-                                                            'ImportIn': ImportIn,
-                                                            'ImportOut': ImportOut,
-                                                            'ExportIn': ExportIn,
-                                                            'ExportOut': ExportOut,
-                                                            'TransitIn': TransitIn,
-                                                            'TransitOut': TransitOut,
-                                                            'ExportEmpty': ExportEmpty,
-                                                            'OtherEmpty': OtherEmpty,
-                                                            'UnloadReid': UnloadReid,
-                                                            'LoadingReid': LoadingReid,
-                                                            'UnloadPort': UnloadPort,
-                                                            'LoadingPort': LoadingPort
-                                                            }
-                        # Сохраните сессию, чтобы сгенерировать сессионный ключ
-                        request.session.save()
-
-                        # Получить текущий session ID
-                        session_id = request.session.session_key
-                        # Создайте URL-адрес перенаправления с этим session ID
-                        redirect_url = f'/confirm/?session_id={session_id}'
-                        return redirect(redirect_url)
-                    except:
-                        fs.delete(filename)
-                        return render(request, 'error.html', {'ErrorText' : 'Ошибка выгрузки данных'})
-                else:
-                    return render(request, 'error.html', {'ErrorText' : 'Неверный формат файла'})
-            else:
-                return redirect('confirm')
-        return render(request, 'home.html')
+        if is_stevedor(request.user):
+            return render(request, 'home.html')
+        else:
+            return render(request, 'home_notstevedor.html')
     else:
         return render(request, 'admin.html')
 
@@ -140,7 +87,7 @@ def user_logout(request):
     return redirect('home')
 
 @login_required(login_url='')
-def confirm(request):
+def table1_data(request):
     session_id = request.GET.get('session_id')
     if session_id:
         # Используйте session_id, чтобы вручную загрузить сеанс
@@ -201,7 +148,7 @@ def confirm(request):
             }
             redirect_url = f'/success/?session_id={session_id}'
             return redirect(redirect_url)
-        return render(request, 'confirm.html', {
+        return render(request, 'table1_data.html', {
                                                         'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
                                                         'ImportIn': ImportIn[0],
                                                         'ImportOut': ImportOut[0],
@@ -269,7 +216,7 @@ def confirm(request):
         try:
             #WORK IN PROGRESS
             Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
-            return render(request, 'confirm.html', {
+            return render(request, 'table1_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ImportIn': Userdata[0][0],
                 'ImportOut': Userdata[0][1],
@@ -289,7 +236,7 @@ def confirm(request):
                 'LoadingPortTramp': Userdata[0][14]
             })
         except:
-            return render(request, 'confirm.html', {
+            return render(request, 'table1_data.html', {
                 'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ImportIn': 0,
                 'ImportOut': 0,
@@ -413,8 +360,8 @@ def success(request):
 
 def NanCheck(i):
     try:
-        float(i)
-        if str(i) == 'nan' or str(i) =='':
+        int(i)
+        if str(i) == 'nan' or str(i) =='' or i == None:
             i = 0
         return i
     except:
@@ -599,7 +546,7 @@ def dataset(request):
         date = params.get('date1')
         # try:
             #
-            # TestUser1Table1
+            # TestUser1
             #
         Tranzit1 = getTranzitUserInfoFromDB(2,date)
         User1data = getUserInfoFromDBDataset(2, date)
@@ -609,9 +556,10 @@ def dataset(request):
         AllQtyPercent1User = AllQtyPercent(AllQty1User,MaxWarehouseQty1User,0)
         Reid_info1 = getReidUserInfoFromDB(2,date)
         ReidAllUser1 = ReidAllStr(Reid_info1)
+        PortAllUser1 = PortAllStr(Reid_info1)
 
         #
-        # TestUser2Table1
+        # TestUser2
         #
 
         Tranzit2 = getTranzitUserInfoFromDB(3,date)
@@ -622,8 +570,12 @@ def dataset(request):
         AllQtyPercent2User = AllQtyPercent(AllQty2User,MaxWarehouseQty2User,0)
         Reid_info2 = getReidUserInfoFromDB(3,date)
         ReidAllUser2 = ReidAllStr(Reid_info2)
+        PortAllUser2 = PortAllStr(Reid_info2)
 
 
+        #
+        # AllUsers
+        #
 
         UserAlldata = getDataTableForAllTime(date)
         TranzitAll = getAllTranzitUserInfoFromDB(date)
@@ -633,6 +585,7 @@ def dataset(request):
         AllQtyPercent1All = AllQtyPercent(AllQtyAll,MaxWarehouseQtyAll,0)
         Reid_infoAll = getReidAllInfoFromDB(date)
         ReidAllAll = ReidAllStr(Reid_infoAll)
+        PortAllAll = PortAllStr(Reid_infoAll)
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
@@ -660,42 +613,52 @@ def dataset(request):
 
             #3 table dataset
 
-                                                    'UnloadReidlin1User': Reid_info1[0][0],
-                                                    'UnloadReidtramp1User': Reid_info1[0][1],
-                                                    'UnloadReidSum1User' : (Reid_info1[0][0]+Reid_info1[0][1]),
-                                                    'LoadingReidLin1User': Reid_info1[0][2],
-                                                    'LoadingReidTramp1User': Reid_info1[0][3],
-                                                    'LoadingReidSum1User' :(Reid_info1[0][2]+Reid_info1[0][3]),
-                                                    'ReidAllUser1' : ReidAllUser1,
-                                                    'UnloadPortlin1User' : Reid_info1[0][4],
-                                                    'UnloadPorttramp1User': Reid_info1[0][5],
-                                                    'LoadingPortLin1User': Reid_info1[0][6],
-                                                    'LoadingPortTramp1User': Reid_info1[0][7],
+                                                    'UnloadReidlin1User': NanCheck(Reid_info1[0][0]),
+                                                    'UnloadReidtramp1User': NanCheck(Reid_info1[0][1]),
+                                                    'UnloadReidSum1User' : (NanCheck(Reid_info1[0][0])+NanCheck(Reid_info1[0][1])),
+                                                    'LoadingReidLin1User': NanCheck(Reid_info1[0][2]),
+                                                    'LoadingReidTramp1User': NanCheck(Reid_info1[0][3]),
+                                                    'LoadingReidSum1User' :(NanCheck(Reid_info1[0][2])+NanCheck(Reid_info1[0][3])),
+                                                    'ReidAllUser1' : NanCheck(ReidAllUser1),
+                                                    'UnloadPortlin1User' : NanCheck(Reid_info1[0][4]),
+                                                    'UnloadPorttramp1User': NanCheck(Reid_info1[0][5]),
+                                                    'UnloadPortSum1User' : (NanCheck(Reid_info1[0][4])+NanCheck(Reid_info1[0][5])),
+                                                    'LoadingPortLin1User': NanCheck(Reid_info1[0][6]),
+                                                    'LoadingPortTramp1User': NanCheck(Reid_info1[0][7]),
+                                                    'LoadingPortSum1User': (NanCheck(Reid_info1[0][6])+NanCheck(Reid_info1[0][7])),
+                                                    'PortAllUser1':PortAllUser1,
 
 
-                                                    'UnloadReidlin2User': Reid_info2[0][0],
-                                                    'UnloadReidtramp2User': Reid_info2[0][1],
-                                                    'UnloadReidSum2User': (Reid_info2[0][0] + Reid_info2[0][1]),
-                                                    'LoadingReidLin2User': Reid_info2[0][2],
-                                                    'LoadingReidTramp2User': Reid_info2[0][3],
-                                                    'LoadingReidSum2User': (Reid_info2[0][2] + Reid_info2[0][3]),
+                                                    'UnloadReidlin2User': NanCheck(Reid_info2[0][0]),
+                                                    'UnloadReidtramp2User': NanCheck(Reid_info2[0][1]),
+                                                    'UnloadReidSum2User': (NanCheck(Reid_info2[0][0]) + NanCheck(Reid_info2[0][1])),
+                                                    'LoadingReidLin2User': NanCheck(Reid_info2[0][2]),
+                                                    'LoadingReidTramp2User': NanCheck(Reid_info2[0][3]),
+                                                    'LoadingReidSum2User': (NanCheck(Reid_info2[0][2]) + NanCheck(Reid_info2[0][3])),
                                                     'ReidAllUser2': ReidAllUser2,
-                                                    'UnloadPortlin2User': Reid_info2[0][4],
-                                                    'UnloadPorttramp2User': Reid_info2[0][5],
-                                                    'LoadingPortLin2User': Reid_info2[0][6],
-                                                    'LoadingPortTramp2User': Reid_info2[0][7],
+                                                    'UnloadPortlin2User': NanCheck(Reid_info2[0][4]),
+                                                    'UnloadPorttramp2User': NanCheck(Reid_info2[0][5]),
+                                                    'UnloadPortSum2User': (NanCheck(Reid_info2[0][4]) + NanCheck(Reid_info2[0][5])),
+                                                    'LoadingPortLin2User': NanCheck(Reid_info2[0][6]),
+                                                    'LoadingPortTramp2User': NanCheck(Reid_info2[0][7]),
+                                                    'LoadingPortSum2User': (NanCheck(Reid_info2[0][6]) + NanCheck(Reid_info2[0][7])),
+                                                    'PortAllUser2': PortAllUser2,
 
-                                                    'UnloadReidlinAllUser': Reid_infoAll[0][0],
-                                                    'UnloadReidtrampAllUser': Reid_infoAll[0][1],
-                                                    'UnloadReidSumAllUser': (Reid_infoAll[0][0] + Reid_infoAll[0][1]),
-                                                    'LoadingReidLinAllUser': Reid_infoAll[0][2],
-                                                    'LoadingReidTrampAllUser': Reid_infoAll[0][3],
-                                                    'LoadingReidSumAllUser': (Reid_infoAll[0][2] + Reid_infoAll[0][3]),
+
+                                                    'UnloadReidlinAllUser': NanCheck(Reid_infoAll[0][0]),
+                                                    'UnloadReidtrampAllUser': NanCheck(Reid_infoAll[0][1]),
+                                                    'UnloadReidSumAllUser': (NanCheck(Reid_infoAll[0][0]) + NanCheck(Reid_infoAll[0][1])),
+                                                    'LoadingReidLinAllUser': NanCheck(Reid_infoAll[0][2]),
+                                                    'LoadingReidTrampAllUser': NanCheck(Reid_infoAll[0][3]),
+                                                    'LoadingReidSumAllUser': (NanCheck(Reid_infoAll[0][2]) + NanCheck(Reid_infoAll[0][3])),
                                                     'ReidAllAll' : ReidAllAll,
-                                                    'UnloadPortlinAllUser': Reid_infoAll[0][4],
-                                                    'UnloadPorttrampAllUser': Reid_infoAll[0][5],
-                                                    'LoadingPortLinAllUser': Reid_infoAll[0][6],
-                                                    'LoadingPortTrampAllUser': Reid_infoAll[0][7],
+                                                    'UnloadPortlinAllUser': NanCheck(Reid_infoAll[0][4]),
+                                                    'UnloadPorttrampAllUser': NanCheck(Reid_infoAll[0][5]),
+                                                    'UnloadPortSumAllUser': (NanCheck(Reid_infoAll[0][4]) + NanCheck(Reid_infoAll[0][5])),
+                                                    'LoadingPortLinAllUser': NanCheck(Reid_infoAll[0][6]),
+                                                    'LoadingPortTrampAllUser': NanCheck(Reid_infoAll[0][7]),
+                                                    'LoadingPortSumAllUser': (NanCheck(Reid_infoAll[0][6]) + NanCheck(Reid_infoAll[0][7])),
+                                                    'PortAllAll': PortAllAll,
 
 
 
@@ -743,7 +706,73 @@ def AllQtyCalculator(UserInfo,TranzitInfo):
 
 
 def ReidAllStr(Reid_info):
-    if ((Reid_info[0][0]+Reid_info[0][1]) > (Reid_info[0][2]+Reid_info[0][3])):
-        return f'+{(Reid_info[0][0]+Reid_info[0][1])-(Reid_info[0][2]+Reid_info[0][3])}'
+    if ((NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1])) > (NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))):
+        return f'+{(NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1]))-(NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))}'
     else:
-        return (Reid_info[0][2]+Reid_info[0][3])-(Reid_info[0][0]+Reid_info[0][1])
+        return (NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))-(NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1]))
+
+def PortAllStr(Reid_info):
+    if ((NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5])) > (NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))):
+        return f'+{(NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5]))-(NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))}'
+    else:
+        return (NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))-(NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5]))
+
+
+def table1_upload(request):
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        if file is not None:
+            if file.name.endswith('.xlsx'):
+                fs = FileSystemStorage()
+                filename = fs.save(file.name, file)
+                try:
+                    # Чтение xlsx файла
+                    df = pd.read_excel(fs.path(filename))
+                    # Игнорирование первых трёх строк
+                    df = df.iloc[2:]
+                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
+                    ImportIn = df.iloc[:, 0].tolist()  # в т.ч. импорт Прибыло
+                    ImportOut = df.iloc[:, 1].tolist()  # в т.ч. импорт Убыло
+                    ExportIn = df.iloc[:, 2].tolist()  # в т.ч. экспорт Прибыло
+                    ExportOut = df.iloc[:, 3].tolist()  # в т.ч. экспорт Убыло
+                    TransitIn = df.iloc[:, 4].tolist()  # в т.ч. транзит Прибыло
+                    TransitOut = df.iloc[:, 5].tolist()  # в т.ч. транзит Убыло
+                    ExportEmpty = df.iloc[:, 6].tolist()  # в т.ч. экспорт порожние
+                    OtherEmpty = df.iloc[:, 7].tolist()  # в т.ч. прочие порожние
+                    UnloadReid = df.iloc[:, 8].tolist()  # На рейде в ожидании Выгрузки
+                    LoadingReid = df.iloc[:, 9].tolist()  # На рейде в ожидании Погрузки
+                    UnloadPort = df.iloc[:, 10].tolist()  # На подходах к порту для Выгрузки
+                    LoadingPort = df.iloc[:, 11].tolist()  # На подходах к порту для Погрузки
+                    fs.delete(filename)
+
+                    # Дальнейшая обработка данных
+                    request.session['parameters'] = {
+                        'ImportIn': ImportIn,
+                        'ImportOut': ImportOut,
+                        'ExportIn': ExportIn,
+                        'ExportOut': ExportOut,
+                        'TransitIn': TransitIn,
+                        'TransitOut': TransitOut,
+                        'ExportEmpty': ExportEmpty,
+                        'OtherEmpty': OtherEmpty,
+                        'UnloadReid': UnloadReid,
+                        'LoadingReid': LoadingReid,
+                        'UnloadPort': UnloadPort,
+                        'LoadingPort': LoadingPort
+                    }
+                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
+                    request.session.save()
+
+                    # Получить текущий session ID
+                    session_id = request.session.session_key
+                    # Создайте URL-адрес перенаправления с этим session ID
+                    redirect_url = f'/table1_data/?session_id={session_id}'
+                    return redirect(redirect_url)
+                except:
+                    fs.delete(filename)
+                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
+            else:
+                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
+        else:
+            return redirect('table1_data')
+    return render(request, 'table1_upload.html')

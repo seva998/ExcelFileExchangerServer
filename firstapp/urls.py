@@ -6,9 +6,11 @@ urlpatterns = [
     path('', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('home/', views.home, name='home'),
-    path('confirm/', views.confirm, name='confirm'),
+    path('home_notstevedor/', views.home, name='home_notstevedor'),
+    path('table1_data/', views.table1_data, name='table1_data'),
     path('success/', views.success, name='success'),
     path('dataset/', views.dataset, name = 'dataset'),
     path('datepick_admin/', views.datepick_admin, name = 'datepick_admin'),
+    path('table1_upload/', views.table1_upload, name = 'table1_upload'),
     re_path('download/', views.download, name='download'),
 ]
