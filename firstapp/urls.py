@@ -15,5 +15,8 @@ urlpatterns = [
     path('table2_data/', views.table2_data, name='table2_data'),
     path('table2_upload/', views.table2_upload, name='table2_upload'),
     path('success_table2/', views.success_table2, name='success_table2'),
+    path('table3_data/', views.table3_data, name='table3_data'),
+    path('table3_upload/', views.table3_upload, name='table3_upload'),
+    path('success_table3/', views.success_table3, name='success_table3'),
     re_path('download/', views.download, name='download'),
 ]
