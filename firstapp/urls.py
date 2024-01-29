@@ -18,5 +18,8 @@ urlpatterns = [
     path('table3_data/', views.table3_data, name='table3_data'),
     path('table3_upload/', views.table3_upload, name='table3_upload'),
     path('success_table3/', views.success_table3, name='success_table3'),
+    path('table4_data/', views.table4_data, name='table4_data'),
+    path('table4_upload/', views.table4_upload, name='table4_upload'),
+    path('success_table4/', views.success_table4, name='success_table4'),
     re_path('download/', views.download, name='download'),
 ]

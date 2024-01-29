@@ -26,10 +26,13 @@ from .database_requests_table1 import (getDataTableForAllTime,
 
 from .database_requests_table2 import (getContaunerUserInfoFromDB,
                                        getContaunerInfoFromDBAll)
-from .database_requests_table3 import getWagonsUserInfoFromDB, getWagonsInfoFromDBAll
+from .database_requests_table3_4 import getWagonsUserInfoFromDB, getWagonsInfoFromDBAll, getWagonsUserInfoFromDBFE, \
+    getWagonsInfoFromDBAllFE
 from .models import (DailyMonitoringUserData,
                      ConstantUserData,
-                     DailyMonitoringUserContainers, DailyMonitoringUserWagons)
+                     DailyMonitoringUserContainers,
+                     DailyMonitoringUserWagons,
+                     DailyMonitoringUserWagonsFE)
 
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
@@ -569,6 +572,8 @@ def dataset(request):
         ContainerDataNow1 = getContaunerUserInfoFromDB(2, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
                 #table3
         WagonsData1 = getWagonsUserInfoFromDB(2,date)
+                #table4
+        WagonsDataFE1 = getWagonsUserInfoFromDBFE(2,date)
 
         #
         # TestUser2
@@ -588,6 +593,8 @@ def dataset(request):
         ContainerDataNow2 = getContaunerUserInfoFromDB(3,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
                 #table3
         WagonsData2 = getWagonsUserInfoFromDB(3,date)
+                #table4
+        WagonsDataFE2 = getWagonsUserInfoFromDBFE(3,date)
 
         #
         # AllUsers
@@ -607,6 +614,8 @@ def dataset(request):
         ContainerDataAllNow = getContaunerInfoFromDBAll((dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
             # table3
         WagonDataAll = getWagonsInfoFromDBAll(date)
+            # table4
+        WagonDataAllFE = getWagonsInfoFromDBAllFE(date)
 
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
@@ -627,6 +636,8 @@ def dataset(request):
                                                     'ContainerDataNow1_2': NanCheck(ContainerDataNow1[0][2]),
                                                     'WagonsData1': NanCheck(WagonsData1[0][0]),
                                                     'WagonsDataQty1': NanCheck(WagonsData1[0][0])* 3.5,
+                                                    'WagonsDataFE1': NanCheck(WagonsDataFE1[0][0]),
+                                                    'WagonsDataQtyFE1': NanCheck(WagonsDataFE1[0][0]) * 3.5,
 
                                                     'AllQtyPercent2User': AllQtyPercent2User,
                                                     'AllQty2User': AllQty2User,
@@ -638,6 +649,8 @@ def dataset(request):
                                                     'ContainerDataNow2_2': NanCheck(ContainerDataNow2[0][2]),
                                                     'WagonsData2': NanCheck(WagonsData2[0][0]),
                                                     'WagonsDataQty2': NanCheck(WagonsData2[0][0])* 3.5,
+                                                    'WagonsDataFE2': NanCheck(WagonsDataFE2[0][0]),
+                                                    'WagonsDataQtyFE2': NanCheck(WagonsDataFE2[0][0]) * 3.5,
 
                                                     'AllQtyAll' :AllQtyAll,
                                                     'AllQtyPercent1All' : AllQtyPercent1All,
@@ -649,6 +662,8 @@ def dataset(request):
                                                     'ContainerDataAllNow_2': NanCheck(ContainerDataAllNow[0][2]),
                                                     'WagonsDataAll': NanCheck(WagonDataAll[0][0]),
                                                     'WagonsDataQtyAll': NanCheck(WagonDataAll[0][0])* 3.5,
+                                                    'WagonsDataAllFE': NanCheck(WagonDataAllFE[0][0]),
+                                                    'WagonsDataQtyAllFE': NanCheck(WagonDataAllFE[0][0]) * 3.5,
 
 
 
@@ -1013,8 +1028,8 @@ def table3_data(request):
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
-        Wagons = params.get('ContainerTrain')
-        WagonsOut = params.get('ContainerAuto')
+        Wagons = params.get('Wagons')
+        WagonsOut = params.get('WagonsOut')
         if request.method == 'POST':
             date2 = [[request.POST['date2']]]
             Wagons = [request.POST['Wagons']]
@@ -1096,4 +1111,139 @@ def success_table3(request):
                                                 'date2': date2[0][0],
                                                 'Wagons': Wagons[0],
                                                 'WagonsOut': WagonsOut[0],
+                                                'user': request.user})
+
+
+
+@login_required(login_url='')
+def table4_upload(request):
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        if file is not None:
+            if file.name.endswith('.xlsx'):
+                fs = FileSystemStorage()
+                filename = fs.save(file.name, file)
+                try:
+                    # Чтение xlsx файла
+                    df = pd.read_excel(fs.path(filename))
+                    # Игнорирование первых трёх строк
+                    df = df.iloc[2:]
+                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
+                    Wagons_FE = df.iloc[:, 0].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
+                    WagonsOut_FE = df.iloc[:, 1].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
+                    fs.delete(filename)
+
+                    # Дальнейшая обработка данных
+                    request.session['parameters'] = {
+                        'Wagons_FE': Wagons_FE,
+                        'WagonsOut_FE': WagonsOut_FE
+
+                    }
+                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
+                    request.session.save()
+
+                    # Получить текущий session ID
+                    session_id = request.session.session_key
+                    # Создайте URL-адрес перенаправления с этим session ID
+                    redirect_url = f'/table4_data/?session_id={session_id}'
+                    return redirect(redirect_url)
+                except:
+                    fs.delete(filename)
+                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
+            else:
+                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
+        else:
+            return redirect('table4_data')
+    return render(request, 'table4_upload.html')
+
+@login_required(login_url='')
+def table4_data(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        Wagons_FE = params.get('Wagons_FE')
+        WagonsOut_FE = params.get('WagonsOut_FE')
+        if request.method == 'POST':
+            date2 = [[request.POST['date2']]]
+            Wagons_FE = [request.POST['Wagons_FE']]
+            WagonsOut_FE = [request.POST['WagonsOut_FE']]
+            request.session['parameters'] = {
+                'date2' : date2,
+                'Wagons_FE': Wagons_FE,
+                'WagonsOut_FE': WagonsOut_FE,
+            }
+            redirect_url = f'/success_table4/?session_id={session_id}'
+            return redirect(redirect_url)
+        return render(request, 'table4_data.html', {
+                                                        'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                                                        'Wagons_FE': Wagons_FE[0],
+                                                        'WagonsOut_FE': WagonsOut_FE[0],
+        })
+    else:
+        if request.method == 'POST':
+            date2 = [request.POST['date2']],
+            Wagons_FE = [request.POST['Wagons_FE']]
+            WagonsOut_FE = [request.POST['WagonsOut_FE']]
+            request.session['parameters'] = {
+                'date2': date2,
+                'Wagons_FE': Wagons_FE,
+                'WagonsOut_FE': WagonsOut_FE,
+            }
+            # Сохраните сессию, чтобы сгенерировать сессионный ключ
+            request.session.save()
+
+            # Получить текущий session ID
+            session_id = request.session.session_key
+            # Создайте URL-адрес перенаправления с этим session ID
+            redirect_url = f'/success_table4/?session_id={session_id}'
+            return redirect(redirect_url)
+        try:
+            #WORK IN PROGRESS
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            print(123321)
+            return render(request, 'table4_data.html', {
+                'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'Wagons_FE': Userdata[0][0],
+                'WagonsOut_FE': Userdata[0][1],
+            })
+        except:
+            return render(request, 'table4_data.html', {
+                'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'Wagons_FE': 0,
+                'WagonsOut_FE': 0,
+            })
+
+
+@login_required(login_url='')
+def success_table4(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        date2 = params.get('date2')
+        print(date2)
+        Wagons_FE = params.get('Wagons_FE')
+        WagonsOut_FE = params.get('WagonsOut_FE')
+        Wagons_FE[0] = NanCheck(Wagons_FE[0])
+        WagonsOut_FE[0] = NanCheck(WagonsOut_FE[0])
+        # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
+        DataItem = DailyMonitoringUserWagonsFE.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+                db_wagons_fe=int(Wagons_FE[0]),
+                db_wagons_out_fe=int(WagonsOut_FE[0]),
+            )
+        # Запись новых данных, если ID пользователя и дата не совпадают.
+        if DataItem == 0:
+            DailyMonitoringUserWagonsFE.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                          db_userid = request.user.id,
+                                          db_wagons_fe= int(Wagons_FE[0]),
+                                          db_wagons_out_fe = int(WagonsOut_FE[0]),
+                                          )
+
+        return render(request, 'success_table4.html', {
+                                                'date2': date2[0][0],
+                                                'Wagons_FE': Wagons_FE[0],
+                                                'WagonsOut_FE': WagonsOut_FE[0],
                                                 'user': request.user})
