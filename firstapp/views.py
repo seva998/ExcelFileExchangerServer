@@ -12,7 +12,7 @@ import datetime as dt
 from io import BytesIO
 from django.http import FileResponse
 
-from .database_requests import (getDataTableForAllTime,
+from .database_requests_table1 import (getDataTableForAllTime,
                                 getUserInfoFromDB,
                                 getUserInfoFromDBDataset,
                                 getTranzitUserInfoFromDB,
@@ -23,7 +23,12 @@ from .database_requests import (getDataTableForAllTime,
                                 getNormsWarehouseAllQty,
                                 getReidUserInfoFromDB,
                                 getReidAllInfoFromDB)
-from .models import DailyMonitoringUserData,ConstantUserData
+
+from .database_requests_table2 import (getContaunerUserInfoFromDB,
+                                       getContaunerInfoFromDBAll)
+from .models import (DailyMonitoringUserData,
+                     ConstantUserData,
+                     DailyMonitoringUserContainers)
 
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
@@ -146,7 +151,7 @@ def table1_data(request):
                 'LoadingPortLin': LoadingPortLin,
                 'LoadingPortTramp': LoadingPortTramp
             }
-            redirect_url = f'/success/?session_id={session_id}'
+            redirect_url = f'/success_table1/?session_id={session_id}'
             return redirect(redirect_url)
         return render(request, 'table1_data.html', {
                                                         'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
@@ -211,7 +216,7 @@ def table1_data(request):
             # Получить текущий session ID
             session_id = request.session.session_key
             # Создайте URL-адрес перенаправления с этим session ID
-            redirect_url = f'/success/?session_id={session_id}'
+            redirect_url = f'/success_table1/?session_id={session_id}'
             return redirect(redirect_url)
         try:
             #WORK IN PROGRESS
@@ -257,7 +262,7 @@ def table1_data(request):
             })
 
 @login_required(login_url='')
-def success(request):
+def success_table1(request):
     session_id = request.GET.get('session_id')
     if session_id:
         # Используйте session_id, чтобы вручную загрузить сеанс
@@ -338,7 +343,7 @@ def success(request):
                                           db_unload_port_tramp=int(LoadingPortTramp[0])
                                           )
 
-        return render(request, 'success.html', {
+        return render(request, 'success_table1.html', {
                                                 'date2': date2[0][0],
                                                 'ImportIn': ImportIn[0],
                                                 'ImportOut': ImportOut[0],
@@ -548,6 +553,7 @@ def dataset(request):
             #
             # TestUser1
             #
+                #table 1
         Tranzit1 = getTranzitUserInfoFromDB(2,date)
         User1data = getUserInfoFromDBDataset(2, date)
         MaxWarehouseQty1User = getMaxWarehouseQty(2)[0][0]
@@ -557,7 +563,11 @@ def dataset(request):
         Reid_info1 = getReidUserInfoFromDB(2,date)
         ReidAllUser1 = ReidAllStr(Reid_info1)
         PortAllUser1 = PortAllStr(Reid_info1)
-
+                #table 2
+        ContainerData1 = getContaunerUserInfoFromDB(2,date)
+        ContainerDataNow1 = getContaunerUserInfoFromDB(2, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        print(ContainerData1)
+        print(ContainerDataNow1)
         #
         # TestUser2
         #
@@ -571,12 +581,16 @@ def dataset(request):
         Reid_info2 = getReidUserInfoFromDB(3,date)
         ReidAllUser2 = ReidAllStr(Reid_info2)
         PortAllUser2 = PortAllStr(Reid_info2)
-
+                #table 2
+        ContainerData2 = getContaunerUserInfoFromDB(3,date)
+        ContainerDataNow2 = getContaunerUserInfoFromDB(3,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        print(ContainerData2)
+        print(ContainerDataNow2)
 
         #
         # AllUsers
         #
-
+            #table 1
         UserAlldata = getDataTableForAllTime(date)
         TranzitAll = getAllTranzitUserInfoFromDB(date)
         MaxWarehouseQtyAll = getMaxWarehouseAllQty()[0][0]
@@ -586,6 +600,11 @@ def dataset(request):
         Reid_infoAll = getReidAllInfoFromDB(date)
         ReidAllAll = ReidAllStr(Reid_infoAll)
         PortAllAll = PortAllStr(Reid_infoAll)
+            #table 2
+        ContainerDataAll = getContaunerInfoFromDBAll(date)
+        ContainerDataAllNow = getContaunerInfoFromDBAll((dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        print(ContainerDataAll)
+        print(ContainerDataAllNow)
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
@@ -599,19 +618,32 @@ def dataset(request):
                                                     'AllQty1User' :AllQty1User,
                                                     'MaxWarehouseQty2User': MaxWarehouseQty2User,
                                                     'NormsWarehouseQty1User' : NormsWarehouseQty1User,
+                                                    'ContainerData1': NanCheck(ContainerData1[0][0]),
+                                                    'ContainerDataNow1_0': NanCheck(ContainerDataNow1[0][0]),
+                                                    'ContainerDataNow1_1': NanCheck(ContainerDataNow1[0][1]),
+                                                    'ContainerDataNow1_2': NanCheck(ContainerDataNow1[0][2]),
 
                                                     'AllQtyPercent2User': AllQtyPercent2User,
                                                     'AllQty2User': AllQty2User,
                                                     'MaxWarehouseQty1User': MaxWarehouseQty1User,
                                                     'NormsWarehouseQty2User': NormsWarehouseQty2User,
+                                                    'ContainerData2': NanCheck(ContainerData2[0][0]),
+                                                    'ContainerDataNow2_0': NanCheck(ContainerDataNow2[0][0]),
+                                                    'ContainerDataNow2_1': NanCheck(ContainerDataNow2[0][1]),
+                                                    'ContainerDataNow2_2': NanCheck(ContainerDataNow2[0][2]),
 
                                                     'AllQtyAll' :AllQtyAll,
                                                     'AllQtyPercent1All' : AllQtyPercent1All,
                                                     'MaxWarehouseQtyAll':MaxWarehouseQtyAll,
                                                     'NormsWarehouseQtyAll':NormsWarehouseQtyAll,
+                                                    'ContainerDataAll': NanCheck(ContainerDataAll[0][0]),
+                                                    'ContainerDataAllNow_0': NanCheck(ContainerDataAllNow[0][0]),
+                                                    'ContainerDataAllNow_1': NanCheck(ContainerDataAllNow[0][1]),
+                                                    'ContainerDataAllNow_2': NanCheck(ContainerDataAllNow[0][2]),
 
 
-            #3 table dataset
+
+            # 3 table dataset
 
                                                     'UnloadReidlin1User': NanCheck(Reid_info1[0][0]),
                                                     'UnloadReidtramp1User': NanCheck(Reid_info1[0][1]),
@@ -717,7 +749,7 @@ def PortAllStr(Reid_info):
     else:
         return (NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))-(NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5]))
 
-
+@login_required(login_url='')
 def table1_upload(request):
     if request.method == 'POST':
         file = request.FILES.get('file')
@@ -776,3 +808,150 @@ def table1_upload(request):
         else:
             return redirect('table1_data')
     return render(request, 'table1_upload.html')
+
+@login_required(login_url='')
+def table2_upload(request):
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        if file is not None:
+            if file.name.endswith('.xlsx'):
+                fs = FileSystemStorage()
+                filename = fs.save(file.name, file)
+                try:
+                    # Чтение xlsx файла
+                    df = pd.read_excel(fs.path(filename))
+                    # Игнорирование первых трёх строк
+                    df = df.iloc[2:]
+                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
+                    ContainerTrain = df.iloc[:, 0].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
+                    ContainerAuto = df.iloc[:, 1].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
+                    ContainerAutoQty = df.iloc[:, 2].tolist()  # Обеспечение автотранспортом портовых терминалов
+                    fs.delete(filename)
+
+                    # Дальнейшая обработка данных
+                    request.session['parameters'] = {
+                        'ContainerTrain': ContainerTrain,
+                        'ContainerAuto': ContainerAuto,
+                        'ContainerAutoQty': ContainerAutoQty,
+
+                    }
+                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
+                    request.session.save()
+
+                    # Получить текущий session ID
+                    session_id = request.session.session_key
+                    # Создайте URL-адрес перенаправления с этим session ID
+                    redirect_url = f'/table2_data/?session_id={session_id}'
+                    return redirect(redirect_url)
+                except:
+                    fs.delete(filename)
+                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
+            else:
+                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
+        else:
+            return redirect('table2_data')
+    return render(request, 'table2_upload.html')
+
+@login_required(login_url='')
+def table2_data(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        ContainerTrain = params.get('ContainerTrain')
+        ContainerAuto = params.get('ContainerAuto')
+        ContainerAutoQty = params.get('ContainerAutoQty')
+        if request.method == 'POST':
+            date2 = [[request.POST['date2']]]
+            ContainerTrain = [request.POST['ContainerTrain']]
+            ContainerAuto = [request.POST['ContainerAuto']]
+            ContainerAutoQty = [request.POST['ContainerAutoQty']]
+            request.session['parameters'] = {
+                'date2' : date2,
+                'ContainerTrain': ContainerTrain,
+                'ContainerAuto': ContainerAuto,
+                'ContainerAutoQty': ContainerAutoQty
+            }
+            redirect_url = f'/success_table2/?session_id={session_id}'
+            return redirect(redirect_url)
+        return render(request, 'table2_data.html', {
+                                                        'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                                                        'ContainerTrain': ContainerTrain[0],
+                                                        'ContainerAuto': ContainerAuto[0],
+                                                        'ContainerAutoQty': ContainerAutoQty[0],
+        })
+    else:
+        if request.method == 'POST':
+            date2 = [request.POST['date2']],
+            ContainerTrain = [request.POST['ContainerTrain']]
+            ContainerAuto = [request.POST['ContainerAuto']]
+            ContainerAutoQty = [request.POST['ContainerAutoQty']]
+            request.session['parameters'] = {
+                'date2': date2,
+                'ContainerTrain': ContainerTrain,
+                'ContainerAuto': ContainerAuto,
+                'ContainerAutoQty': ContainerAutoQty,
+            }
+            # Сохраните сессию, чтобы сгенерировать сессионный ключ
+            request.session.save()
+
+            # Получить текущий session ID
+            session_id = request.session.session_key
+            # Создайте URL-адрес перенаправления с этим session ID
+            redirect_url = f'/success_table2/?session_id={session_id}'
+            return redirect(redirect_url)
+        try:
+            #WORK IN PROGRESS
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            return render(request, 'table2_data.html', {
+                'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'ContainerTrain': Userdata[0][0],
+                'ContainerAuto': Userdata[0][1],
+                'ContainerAutoQty': Userdata[0][2],
+            })
+        except:
+            return render(request, 'table2_data.html', {
+                'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'ContainerTrain': 0,
+                'ContainerAuto': 0,
+                'ContainerAutoQty': 0
+            })
+
+
+@login_required(login_url='')
+def success_table2(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        date2 = params.get('date2')
+        print(date2)
+        ContainerTrain = params.get('ContainerTrain')
+        ContainerAuto = params.get('ContainerAuto')
+        ContainerAutoQty = params.get('ContainerAutoQty')
+        ContainerTrain[0] = NanCheck(ContainerTrain[0])
+        ContainerAuto[0] = NanCheck(ContainerAuto[0])
+        ContainerAutoQty[0] = NanCheck(ContainerAutoQty[0])
+        # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
+        DataItem = DailyMonitoringUserContainers.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+                db_container_train=int(ContainerTrain[0]),
+                db_container_auto=int(ContainerAuto[0]),
+                db_container_auto_qty=int(ContainerAutoQty[0])
+            )
+        # Запись новых данных, если ID пользователя и дата не совпадают.
+        if DataItem == 0:
+            DailyMonitoringUserContainers.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                          db_userid = request.user.id,
+                                          db_container_train= int(ContainerTrain[0]),
+                                          db_container_auto = int(ContainerAuto[0]),
+                                          db_container_auto_qty = int(ContainerAutoQty[0])
+                                          )
+
+        return render(request, 'success_table2.html', {
+                                                'date2': date2[0][0],
+                                                'ContainerTrain': ContainerTrain[0],
+                                                'ContainerAuto': ContainerAuto[0],
+                                                'ContainerAutoQty': ContainerAutoQty[0],
+                                                'user': request.user})
