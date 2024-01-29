@@ -26,9 +26,10 @@ from .database_requests_table1 import (getDataTableForAllTime,
 
 from .database_requests_table2 import (getContaunerUserInfoFromDB,
                                        getContaunerInfoFromDBAll)
+from .database_requests_table3 import getWagonsUserInfoFromDB, getWagonsInfoFromDBAll
 from .models import (DailyMonitoringUserData,
                      ConstantUserData,
-                     DailyMonitoringUserContainers)
+                     DailyMonitoringUserContainers, DailyMonitoringUserWagons)
 
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
@@ -566,12 +567,13 @@ def dataset(request):
                 #table 2
         ContainerData1 = getContaunerUserInfoFromDB(2,date)
         ContainerDataNow1 = getContaunerUserInfoFromDB(2, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
-        print(ContainerData1)
-        print(ContainerDataNow1)
+                #table3
+        WagonsData1 = getWagonsUserInfoFromDB(2,date)
+
         #
         # TestUser2
         #
-
+                #table 1
         Tranzit2 = getTranzitUserInfoFromDB(3,date)
         User2data = getUserInfoFromDBDataset(3, date)
         MaxWarehouseQty2User = getMaxWarehouseQty(3)[0][0]
@@ -584,8 +586,8 @@ def dataset(request):
                 #table 2
         ContainerData2 = getContaunerUserInfoFromDB(3,date)
         ContainerDataNow2 = getContaunerUserInfoFromDB(3,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
-        print(ContainerData2)
-        print(ContainerDataNow2)
+                #table3
+        WagonsData2 = getWagonsUserInfoFromDB(3,date)
 
         #
         # AllUsers
@@ -603,8 +605,9 @@ def dataset(request):
             #table 2
         ContainerDataAll = getContaunerInfoFromDBAll(date)
         ContainerDataAllNow = getContaunerInfoFromDBAll((dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
-        print(ContainerDataAll)
-        print(ContainerDataAllNow)
+            # table3
+        WagonDataAll = getWagonsInfoFromDBAll(date)
+
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
@@ -622,6 +625,8 @@ def dataset(request):
                                                     'ContainerDataNow1_0': NanCheck(ContainerDataNow1[0][0]),
                                                     'ContainerDataNow1_1': NanCheck(ContainerDataNow1[0][1]),
                                                     'ContainerDataNow1_2': NanCheck(ContainerDataNow1[0][2]),
+                                                    'WagonsData1': NanCheck(WagonsData1[0][0]),
+                                                    'WagonsDataQty1': NanCheck(WagonsData1[0][0])* 3.5,
 
                                                     'AllQtyPercent2User': AllQtyPercent2User,
                                                     'AllQty2User': AllQty2User,
@@ -631,6 +636,8 @@ def dataset(request):
                                                     'ContainerDataNow2_0': NanCheck(ContainerDataNow2[0][0]),
                                                     'ContainerDataNow2_1': NanCheck(ContainerDataNow2[0][1]),
                                                     'ContainerDataNow2_2': NanCheck(ContainerDataNow2[0][2]),
+                                                    'WagonsData2': NanCheck(WagonsData2[0][0]),
+                                                    'WagonsDataQty2': NanCheck(WagonsData2[0][0])* 3.5,
 
                                                     'AllQtyAll' :AllQtyAll,
                                                     'AllQtyPercent1All' : AllQtyPercent1All,
@@ -640,6 +647,8 @@ def dataset(request):
                                                     'ContainerDataAllNow_0': NanCheck(ContainerDataAllNow[0][0]),
                                                     'ContainerDataAllNow_1': NanCheck(ContainerDataAllNow[0][1]),
                                                     'ContainerDataAllNow_2': NanCheck(ContainerDataAllNow[0][2]),
+                                                    'WagonsDataAll': NanCheck(WagonDataAll[0][0]),
+                                                    'WagonsDataQtyAll': NanCheck(WagonDataAll[0][0])* 3.5,
 
 
 
@@ -927,7 +936,6 @@ def success_table2(request):
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         date2 = params.get('date2')
-        print(date2)
         ContainerTrain = params.get('ContainerTrain')
         ContainerAuto = params.get('ContainerAuto')
         ContainerAutoQty = params.get('ContainerAutoQty')
@@ -954,4 +962,138 @@ def success_table2(request):
                                                 'ContainerTrain': ContainerTrain[0],
                                                 'ContainerAuto': ContainerAuto[0],
                                                 'ContainerAutoQty': ContainerAutoQty[0],
+                                                'user': request.user})
+
+
+@login_required(login_url='')
+def table3_upload(request):
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        if file is not None:
+            if file.name.endswith('.xlsx'):
+                fs = FileSystemStorage()
+                filename = fs.save(file.name, file)
+                try:
+                    # Чтение xlsx файла
+                    df = pd.read_excel(fs.path(filename))
+                    # Игнорирование первых трёх строк
+                    df = df.iloc[2:]
+                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
+                    Wagons = df.iloc[:, 0].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
+                    WagonsOut = df.iloc[:, 1].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
+                    fs.delete(filename)
+
+                    # Дальнейшая обработка данных
+                    request.session['parameters'] = {
+                        'Wagons': Wagons,
+                        'WagonsOut': WagonsOut
+
+                    }
+                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
+                    request.session.save()
+
+                    # Получить текущий session ID
+                    session_id = request.session.session_key
+                    # Создайте URL-адрес перенаправления с этим session ID
+                    redirect_url = f'/table3_data/?session_id={session_id}'
+                    return redirect(redirect_url)
+                except:
+                    fs.delete(filename)
+                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
+            else:
+                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
+        else:
+            return redirect('table3_data')
+    return render(request, 'table3_upload.html')
+
+@login_required(login_url='')
+def table3_data(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        Wagons = params.get('ContainerTrain')
+        WagonsOut = params.get('ContainerAuto')
+        if request.method == 'POST':
+            date2 = [[request.POST['date2']]]
+            Wagons = [request.POST['Wagons']]
+            WagonsOut = [request.POST['WagonsOut']]
+            request.session['parameters'] = {
+                'date2' : date2,
+                'Wagons': Wagons,
+                'WagonsOut': WagonsOut,
+            }
+            redirect_url = f'/success_table3/?session_id={session_id}'
+            return redirect(redirect_url)
+        return render(request, 'table3_data.html', {
+                                                        'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                                                        'Wagons': Wagons[0],
+                                                        'WagonsOut': WagonsOut[0],
+        })
+    else:
+        if request.method == 'POST':
+            date2 = [request.POST['date2']],
+            Wagons = [request.POST['Wagons']]
+            WagonsOut = [request.POST['WagonsOut']]
+            request.session['parameters'] = {
+                'date2': date2,
+                'Wagons': Wagons,
+                'WagonsOut': WagonsOut,
+            }
+            # Сохраните сессию, чтобы сгенерировать сессионный ключ
+            request.session.save()
+
+            # Получить текущий session ID
+            session_id = request.session.session_key
+            # Создайте URL-адрес перенаправления с этим session ID
+            redirect_url = f'/success_table3/?session_id={session_id}'
+            return redirect(redirect_url)
+        try:
+            #WORK IN PROGRESS
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            print(123321)
+            return render(request, 'table3_data.html', {
+                'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'Wagons': Userdata[0][0],
+                'WagonsOut': Userdata[0][1],
+            })
+        except:
+            return render(request, 'table3_data.html', {
+                'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'Wagons': 0,
+                'WagonsOut': 0,
+            })
+
+
+@login_required(login_url='')
+def success_table3(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        date2 = params.get('date2')
+        print(date2)
+        Wagons = params.get('Wagons')
+        WagonsOut = params.get('WagonsOut')
+        Wagons[0] = NanCheck(Wagons[0])
+        WagonsOut[0] = NanCheck(WagonsOut[0])
+        # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
+        DataItem = DailyMonitoringUserWagons.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+                db_wagons=int(Wagons[0]),
+                db_wagons_out=int(WagonsOut[0]),
+            )
+        # Запись новых данных, если ID пользователя и дата не совпадают.
+        if DataItem == 0:
+            DailyMonitoringUserWagons.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                          db_userid = request.user.id,
+                                          db_wagons= int(Wagons[0]),
+                                          db_wagons_out = int(WagonsOut[0]),
+                                          )
+
+        return render(request, 'success_table3.html', {
+                                                'date2': date2[0][0],
+                                                'Wagons': Wagons[0],
+                                                'WagonsOut': WagonsOut[0],
                                                 'user': request.user})

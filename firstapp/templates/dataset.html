@@ -476,17 +476,17 @@
             <tr>
                 <td>1</td>
                 <td>Восточная стивидорная компания</td>
-                <td>datable3</td>
+                <td>{{WagonsData1}}</td>
                 <td>datatable4</td>
-                <td>datatable3*3.5</td>
+                <td>{{WagonsDataQty1}}</td>
                 <td>datatable4*3.5</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>Владивостокский морской торговый порт</td>
-                <td>datable3</td>
+                <td>{{WagonsData2}}</td>
                 <td>datatable4</td>
-                <td>datatable3*3.5</td>
+                <td>{{WagonsDataQty2}}</td>
                 <td>datatable4*3.5</td>
             </tr>
             <tr>
@@ -531,9 +531,9 @@
             </tr>
             <tr>
                 <td colspan="2">ИТОГО</td>
-                <td>sumdatable3</td>
+                <td>{{WagonsDataAll}}</td>
                 <td>sumdatatable4</td>
-                <td>sumdatatable3*3.5</td>
+                <td>{{WagonsDataQtyAll}}</td>
                 <td>sumdatatable4*3.5</td>
             </tr>
         </table>
@@ -677,26 +677,6 @@
             </tr>
         </table>
         <br>
-        <table>
-            <tr>
-                <td>TestUser1 за {{date}}</td>
-                {% for item in User1data %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <td>TestUser2 за {{date}}</td>
-                {% for item in User2data %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <td>UserAlldata за {{date}}</td>
-                {% for item in UserAlldata %}
-                    <td>{{ item }}</td>
-                {% endfor %}
-            </tr>
-        </table>
     </ul>
 <br>
 <div id="badges4">

@@ -8,13 +8,10 @@
    #date2 {
     width: 100px; /* Ширина поля в пикселах */
    }
-   #ContainerTrain {
+   #Wagons {
     width: 50px; /* Ширина поля в пикселах */
    }
-   #ContainerAuto {
-    width: 50px; /* Ширина поля в пикселах */
-   }
-   #ContainerAutoQty {
+   #WagonsOut {
     width: 50px; /* Ширина поля в пикселах */
    }
   </style>
@@ -48,13 +45,11 @@
                     <th>date2</th>
                     <th>Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.</th>
                     <th>Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом</th>
-                    <th>Обеспечение автотранспортом портовых терминалов</th>
                 </tr>
                 <tr>
                     <td><input type="date" value={{date2}} id ="date2" name = "date2" ></td>
-                    <td><input value={{ContainerTrain}} id ="ContainerTrain" name = "ContainerTrain" ></td>
-                    <td><input value={{ContainerAuto}} id ="ImportOut" name = "ContainerAuto" ></td>
-                    <td><input value={{ContainerAutoQty}} id ="ContainerAutoQty" name = "ContainerAutoQty" ></td>
+                    <td><input value={{Wagons}} id ="Wagons" name = "Wagons" ></td>
+                    <td><input value={{WagonsOut}} id ="WagonsOut" name = "WagonsOut" ></td>
                 </tr>
               </table>
         </ul>
