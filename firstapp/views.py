@@ -32,7 +32,8 @@ from .models import (DailyMonitoringUserData,
                      ConstantUserData,
                      DailyMonitoringUserContainers,
                      DailyMonitoringUserWagons,
-                     DailyMonitoringUserWagonsFE)
+                     DailyMonitoringUserWagonsFE,
+                     DailyMonitoringUserTransport)
 
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
@@ -776,110 +777,74 @@ def PortAllStr(Reid_info):
 @login_required(login_url='')
 def table1_upload(request):
     if request.method == 'POST':
-        file = request.FILES.get('file')
-        if file is not None:
-            if file.name.endswith('.xlsx'):
-                fs = FileSystemStorage()
-                filename = fs.save(file.name, file)
-                try:
-                    # Чтение xlsx файла
-                    df = pd.read_excel(fs.path(filename))
-                    # Игнорирование первых трёх строк
-                    df = df.iloc[2:]
-                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
-                    ImportIn = df.iloc[:, 0].tolist()  # в т.ч. импорт Прибыло
-                    ImportOut = df.iloc[:, 1].tolist()  # в т.ч. импорт Убыло
-                    ExportIn = df.iloc[:, 2].tolist()  # в т.ч. экспорт Прибыло
-                    ExportOut = df.iloc[:, 3].tolist()  # в т.ч. экспорт Убыло
-                    TransitIn = df.iloc[:, 4].tolist()  # в т.ч. транзит Прибыло
-                    TransitOut = df.iloc[:, 5].tolist()  # в т.ч. транзит Убыло
-                    ExportEmpty = df.iloc[:, 6].tolist()  # в т.ч. экспорт порожние
-                    OtherEmpty = df.iloc[:, 7].tolist()  # в т.ч. прочие порожние
-                    UnloadReid = df.iloc[:, 8].tolist()  # На рейде в ожидании Выгрузки
-                    LoadingReid = df.iloc[:, 9].tolist()  # На рейде в ожидании Погрузки
-                    UnloadPort = df.iloc[:, 10].tolist()  # На подходах к порту для Выгрузки
-                    LoadingPort = df.iloc[:, 11].tolist()  # На подходах к порту для Погрузки
-                    fs.delete(filename)
-
-                    # Дальнейшая обработка данных
-                    request.session['parameters'] = {
-                        'ImportIn': ImportIn,
-                        'ImportOut': ImportOut,
-                        'ExportIn': ExportIn,
-                        'ExportOut': ExportOut,
-                        'TransitIn': TransitIn,
-                        'TransitOut': TransitOut,
-                        'ExportEmpty': ExportEmpty,
-                        'OtherEmpty': OtherEmpty,
-                        'UnloadReid': UnloadReid,
-                        'LoadingReid': LoadingReid,
-                        'UnloadPort': UnloadPort,
-                        'LoadingPort': LoadingPort
-                    }
-                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
-                    request.session.save()
-
-                    # Получить текущий session ID
-                    session_id = request.session.session_key
-                    # Создайте URL-адрес перенаправления с этим session ID
-                    redirect_url = f'/table1_data/?session_id={session_id}'
-                    return redirect(redirect_url)
-                except:
-                    fs.delete(filename)
-                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
-            else:
-                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
-        else:
-            return redirect('table1_data')
+        # file = request.FILES.get('file')
+        # if file is not None:
+        #     if file.name.endswith('.xlsx'):
+        #         fs = FileSystemStorage()
+        #         filename = fs.save(file.name, file)
+        #         try:
+        #             # Чтение xlsx файла
+        #             df = pd.read_excel(fs.path(filename))
+        #             # Игнорирование первых трёх строк
+        #             df = df.iloc[2:]
+        #             # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
+        #             ImportIn = df.iloc[:, 0].tolist()  # в т.ч. импорт Прибыло
+        #             ImportOut = df.iloc[:, 1].tolist()  # в т.ч. импорт Убыло
+        #             ExportIn = df.iloc[:, 2].tolist()  # в т.ч. экспорт Прибыло
+        #             ExportOut = df.iloc[:, 3].tolist()  # в т.ч. экспорт Убыло
+        #             TransitIn = df.iloc[:, 4].tolist()  # в т.ч. транзит Прибыло
+        #             TransitOut = df.iloc[:, 5].tolist()  # в т.ч. транзит Убыло
+        #             ExportEmpty = df.iloc[:, 6].tolist()  # в т.ч. экспорт порожние
+        #             OtherEmpty = df.iloc[:, 7].tolist()  # в т.ч. прочие порожние
+        #             UnloadReid = df.iloc[:, 8].tolist()  # На рейде в ожидании Выгрузки
+        #             LoadingReid = df.iloc[:, 9].tolist()  # На рейде в ожидании Погрузки
+        #             UnloadPort = df.iloc[:, 10].tolist()  # На подходах к порту для Выгрузки
+        #             LoadingPort = df.iloc[:, 11].tolist()  # На подходах к порту для Погрузки
+        #             fs.delete(filename)
+        #
+        #             # Дальнейшая обработка данных
+        #             request.session['parameters'] = {
+        #                 'ImportIn': ImportIn,
+        #                 'ImportOut': ImportOut,
+        #                 'ExportIn': ExportIn,
+        #                 'ExportOut': ExportOut,
+        #                 'TransitIn': TransitIn,
+        #                 'TransitOut': TransitOut,
+        #                 'ExportEmpty': ExportEmpty,
+        #                 'OtherEmpty': OtherEmpty,
+        #                 'UnloadReid': UnloadReid,
+        #                 'LoadingReid': LoadingReid,
+        #                 'UnloadPort': UnloadPort,
+        #                 'LoadingPort': LoadingPort
+        #             }
+        #             # Сохраните сессию, чтобы сгенерировать сессионный ключ
+        #             request.session.save()
+        #
+        #             # Получить текущий session ID
+        #             session_id = request.session.session_key
+        #             # Создайте URL-адрес перенаправления с этим session ID
+        #             redirect_url = f'/table1_data/?session_id={session_id}'
+        #             return redirect(redirect_url)
+        #         except:
+        #             fs.delete(filename)
+        #             return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
+        #     else:
+        #         return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
+        # else:
+        return redirect('table1_data')
     return render(request, 'table1_upload.html')
 
 @login_required(login_url='')
 def table2_upload(request):
     if request.method == 'POST':
-        file = request.FILES.get('file')
-        if file is not None:
-            if file.name.endswith('.xlsx'):
-                fs = FileSystemStorage()
-                filename = fs.save(file.name, file)
-                try:
-                    # Чтение xlsx файла
-                    df = pd.read_excel(fs.path(filename))
-                    # Игнорирование первых трёх строк
-                    df = df.iloc[2:]
-                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
-                    ContainerTrain = df.iloc[:, 0].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
-                    ContainerAuto = df.iloc[:, 1].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
-                    ContainerAutoQty = df.iloc[:, 2].tolist()  # Обеспечение автотранспортом портовых терминалов
-                    fs.delete(filename)
-
-                    # Дальнейшая обработка данных
-                    request.session['parameters'] = {
-                        'ContainerTrain': ContainerTrain,
-                        'ContainerAuto': ContainerAuto,
-                        'ContainerAutoQty': ContainerAutoQty,
-
-                    }
-                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
-                    request.session.save()
-
-                    # Получить текущий session ID
-                    session_id = request.session.session_key
-                    # Создайте URL-адрес перенаправления с этим session ID
-                    redirect_url = f'/table2_data/?session_id={session_id}'
-                    return redirect(redirect_url)
-                except:
-                    fs.delete(filename)
-                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
-            else:
-                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
-        else:
-            return redirect('table2_data')
+        return redirect('table2_data')
     return render(request, 'table2_upload.html')
 
 @login_required(login_url='')
 def table2_data(request):
     session_id = request.GET.get('session_id')
     if session_id:
+        #WORK IN PROGRESS
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
@@ -983,48 +948,14 @@ def success_table2(request):
 @login_required(login_url='')
 def table3_upload(request):
     if request.method == 'POST':
-        file = request.FILES.get('file')
-        if file is not None:
-            if file.name.endswith('.xlsx'):
-                fs = FileSystemStorage()
-                filename = fs.save(file.name, file)
-                try:
-                    # Чтение xlsx файла
-                    df = pd.read_excel(fs.path(filename))
-                    # Игнорирование первых трёх строк
-                    df = df.iloc[2:]
-                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
-                    Wagons = df.iloc[:, 0].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
-                    WagonsOut = df.iloc[:, 1].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
-                    fs.delete(filename)
-
-                    # Дальнейшая обработка данных
-                    request.session['parameters'] = {
-                        'Wagons': Wagons,
-                        'WagonsOut': WagonsOut
-
-                    }
-                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
-                    request.session.save()
-
-                    # Получить текущий session ID
-                    session_id = request.session.session_key
-                    # Создайте URL-адрес перенаправления с этим session ID
-                    redirect_url = f'/table3_data/?session_id={session_id}'
-                    return redirect(redirect_url)
-                except:
-                    fs.delete(filename)
-                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
-            else:
-                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
-        else:
-            return redirect('table3_data')
+        return redirect('table3_data')
     return render(request, 'table3_upload.html')
 
 @login_required(login_url='')
 def table3_data(request):
     session_id = request.GET.get('session_id')
     if session_id:
+        # WORK IN PROGRESS
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
@@ -1118,48 +1049,14 @@ def success_table3(request):
 @login_required(login_url='')
 def table4_upload(request):
     if request.method == 'POST':
-        file = request.FILES.get('file')
-        if file is not None:
-            if file.name.endswith('.xlsx'):
-                fs = FileSystemStorage()
-                filename = fs.save(file.name, file)
-                try:
-                    # Чтение xlsx файла
-                    df = pd.read_excel(fs.path(filename))
-                    # Игнорирование первых трёх строк
-                    df = df.iloc[2:]
-                    # Преобразование DataFrame в списки столбцов (В дальнейшем для новых столбцов таблицы создавать новые поля в таблице БД, а также добавлять ниже в переменные)
-                    Wagons_FE = df.iloc[:, 0].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
-                    WagonsOut_FE = df.iloc[:, 1].tolist()  # Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
-                    fs.delete(filename)
-
-                    # Дальнейшая обработка данных
-                    request.session['parameters'] = {
-                        'Wagons_FE': Wagons_FE,
-                        'WagonsOut_FE': WagonsOut_FE
-
-                    }
-                    # Сохраните сессию, чтобы сгенерировать сессионный ключ
-                    request.session.save()
-
-                    # Получить текущий session ID
-                    session_id = request.session.session_key
-                    # Создайте URL-адрес перенаправления с этим session ID
-                    redirect_url = f'/table4_data/?session_id={session_id}'
-                    return redirect(redirect_url)
-                except:
-                    fs.delete(filename)
-                    return render(request, 'error.html', {'ErrorText': 'Ошибка выгрузки данных'})
-            else:
-                return render(request, 'error.html', {'ErrorText': 'Неверный формат файла'})
-        else:
-            return redirect('table4_data')
+        return redirect('table4_data')
     return render(request, 'table4_upload.html')
 
 @login_required(login_url='')
 def table4_data(request):
     session_id = request.GET.get('session_id')
     if session_id:
+        # WORK IN PROGRESS
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
@@ -1246,4 +1143,185 @@ def success_table4(request):
                                                 'date2': date2[0][0],
                                                 'Wagons_FE': Wagons_FE[0],
                                                 'WagonsOut_FE': WagonsOut_FE[0],
+                                                'user': request.user})
+
+
+@login_required(login_url='')
+def table5_upload(request):
+    if request.method == 'POST':
+        return redirect('table5_data')
+    return render(request, 'table5_upload.html')
+
+@login_required(login_url='')
+def table5_data(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # WORK IN PROGRESS
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        FittingPlatformOut = params.get('FittingPlatformOut')
+        SemiwagonOut = params.get('SemiwagonOut')
+        AutoOut = params.get('AutoOut')
+        SeaOut = params.get('SeaOut')
+        FittingPlatformIn = params.get('FittingPlatformIn')
+        SemiwagonIn = params.get('SemiwagonIn')
+        AutoIn = params.get('AutoIn')
+        SeaIn = params.get('SeaIn')
+        if request.method == 'POST':
+            date2 = [[request.POST['date2']]]
+            FittingPlatformOut = [request.POST['FittingPlatformOut']]
+            SemiwagonOut = [request.POST['SemiwagonOut']]
+            AutoOut = [request.POST['AutoOut']]
+            SeaOut = [request.POST['SeaOut']]
+            FittingPlatformIn = [request.POST['FittingPlatformIn']]
+            SemiwagonIn = [request.POST['SemiwagonIn']]
+            AutoIn = [request.POST['AutoIn']]
+            SeaIn = [request.POST['SeaIn']]
+            request.session['parameters'] = {
+                'date2' : date2,
+                'FittingPlatformOut': FittingPlatformOut,
+                'SemiwagonOut': SemiwagonOut,
+                'AutoOut': AutoOut,
+                'SeaOut': SeaOut,
+                'FittingPlatformIn': FittingPlatformIn,
+                'SemiwagonIn': SemiwagonIn,
+                'AutoIn': AutoIn,
+                'SeaIn': SeaIn,
+            }
+            redirect_url = f'/success_table5/?session_id={session_id}'
+            return redirect(redirect_url)
+        return render(request, 'table5_data.html', {
+                                                        'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                                                        'FittingPlatformOut': FittingPlatformOut[0],
+                                                        'SemiwagonOut': SemiwagonOut[0],
+                                                        'AutoOut': AutoOut[0],
+                                                        'SeaOut': SeaOut[0],
+                                                        'FittingPlatformIn': FittingPlatformIn[0],
+                                                        'SemiwagonIn': SemiwagonIn[0],
+                                                        'AutoIn': AutoIn[0],
+                                                        'SeaIn': SeaIn[0],
+        })
+    else:
+        if request.method == 'POST':
+            date2 = [request.POST['date2']],
+            FittingPlatformOut = [request.POST['FittingPlatformOut']]
+            SemiwagonOut = [request.POST['SemiwagonOut']]
+            AutoOut = [request.POST['AutoOut']]
+            SeaOut = [request.POST['SeaOut']]
+            FittingPlatformIn = [request.POST['FittingPlatformIn']]
+            SemiwagonIn = [request.POST['SemiwagonIn']]
+            AutoIn = [request.POST['AutoIn']]
+            SeaIn = [request.POST['SeaIn']]
+            request.session['parameters'] = {
+                'date2': date2,
+                'FittingPlatformOut': FittingPlatformOut,
+                'SemiwagonOut': SemiwagonOut,
+                'AutoOut': AutoOut,
+                'SeaOut': SeaOut,
+                'FittingPlatformIn': FittingPlatformIn,
+                'SemiwagonIn': SemiwagonIn,
+                'AutoIn': AutoIn,
+                'SeaIn': SeaIn,
+            }
+            # Сохраните сессию, чтобы сгенерировать сессионный ключ
+            request.session.save()
+
+            # Получить текущий session ID
+            session_id = request.session.session_key
+            # Создайте URL-адрес перенаправления с этим session ID
+            redirect_url = f'/success_table5/?session_id={session_id}'
+            return redirect(redirect_url)
+        try:
+            #WORK IN PROGRESS
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            print(123321)
+            return render(request, 'table5_data.html', {
+                'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'FittingPlatformOut': Userdata[0][0],
+                'SemiwagonOut': Userdata[0][1],
+                'AutoOut': Userdata[0][0],
+                'SeaOut': Userdata[0][1],
+                'FittingPlatformIn': Userdata[0][0],
+                'SemiwagonIn': Userdata[0][1],
+                'AutoIn': Userdata[0][0],
+                'SeaIn': Userdata[0][1],
+            })
+        except:
+            return render(request, 'table5_data.html', {
+                'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'FittingPlatformOut': 0,
+                'SemiwagonOut': 0,
+                'AutoOut': 0,
+                'SeaOut': 0,
+                'FittingPlatformIn': 0,
+                'SemiwagonIn': 0,
+                'AutoIn': 0,
+                'SeaIn': 0,
+            })
+
+
+@login_required(login_url='')
+def success_table5(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        date2 = params.get('date2')
+        FittingPlatformOut = params.get('FittingPlatformOut')
+        SemiwagonOut = params.get('SemiwagonOut')
+        AutoOut = params.get('AutoOut')
+        SeaOut = params.get('SeaOut')
+        FittingPlatformIn = params.get('FittingPlatformIn')
+        SemiwagonIn = params.get('SemiwagonIn')
+        AutoIn = params.get('AutoIn')
+        SeaIn = params.get('SeaIn')
+        FittingPlatformOut[0] = NanCheck(FittingPlatformOut[0])
+        SemiwagonOut[0] = NanCheck(SemiwagonOut[0])
+        AutoOut[0] = NanCheck(AutoOut[0])
+        SeaOut[0] = NanCheck(SeaOut[0])
+        FittingPlatformIn[0] = NanCheck(FittingPlatformIn[0])
+        SemiwagonIn[0] = NanCheck(SemiwagonIn[0])
+        AutoIn[0] = NanCheck(AutoIn[0])
+        SeaIn[0] = NanCheck(SeaIn[0])
+        # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
+        DataItem = DailyMonitoringUserTransport.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+                db_fittingplatform_out=int(FittingPlatformOut[0]),
+                db_semiwagon_out=int(SemiwagonOut[0]),
+                db_auto_out=int(AutoOut[0]),
+                db_sea_out=int(SeaOut[0]),
+                db_fittingplatform_in=int(FittingPlatformIn[0]),
+                db_semiwagon_in=int(SemiwagonIn[0]),
+                db_auto_in=int(AutoIn[0]),
+                db_sea_in=int(SeaIn[0]),
+                db_factload=0,
+                db_reload=0,
+            )
+        # Запись новых данных, если ID пользователя и дата не совпадают.
+        if DataItem == 0:
+            DailyMonitoringUserTransport.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                          db_userid = request.user.id,
+                                        db_fittingplatform_out=int(FittingPlatformOut[0]),
+                                        db_semiwagon_out=int(SemiwagonOut[0]),
+                                        db_auto_out=int(AutoOut[0]),
+                                        db_sea_out=int(SeaOut[0]),
+                                        db_fittingplatform_in=int(FittingPlatformIn[0]),
+                                        db_semiwagon_in=int(SemiwagonIn[0]),
+                                        db_auto_in=int(AutoIn[0]),
+                                        db_sea_in=int(SeaIn[0]),
+                                        db_factload=0,
+                                        db_reload=0,
+                                        )
+
+        return render(request, 'success_table5.html', {
+                                                'date2': date2[0][0],
+                                                'FittingPlatformOut': FittingPlatformOut[0],
+                                                'SemiwagonOut': SemiwagonOut[0],
+                                                'AutoOut': AutoOut[0],
+                                                'SeaOut': SeaOut[0],
+                                                'FittingPlatformIn': FittingPlatformIn[0],
+                                                'SemiwagonIn': SemiwagonIn[0],
+                                                'AutoIn': AutoIn[0],
+                                                'SeaIn': SeaIn[0],
                                                 'user': request.user})

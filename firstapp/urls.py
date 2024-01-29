@@ -21,5 +21,8 @@ urlpatterns = [
     path('table4_data/', views.table4_data, name='table4_data'),
     path('table4_upload/', views.table4_upload, name='table4_upload'),
     path('success_table4/', views.success_table4, name='success_table4'),
+    path('table5_data/', views.table5_data, name='table5_data'),
+    path('table5_upload/', views.table5_upload, name='table5_upload'),
+    path('success_table5/', views.success_table5, name='success_table5'),
     re_path('download/', views.download, name='download'),
 ]
