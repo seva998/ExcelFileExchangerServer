@@ -23,7 +23,7 @@ def getContaunerUserInfoFromDB(userid,date):
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
     result = cursor.fetchall()
     if result == []:
-        result = [(0)]
+        result = [(0,0,0)]
     conn.close()
     return result
 
@@ -41,6 +41,6 @@ def getContaunerInfoFromDBAll(date):
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'")
     result = cursor.fetchall()
     if result == []:
-        result = [(0)]
+        result = [(0,0,0)]
     conn.close()
     return result
