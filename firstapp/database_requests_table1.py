@@ -222,7 +222,8 @@ def getMaxWarehouseAllQty():
     # Сумма по всем пользователям за дату
     #
     cursor.execute(f"SELECT SUM(db_max) AS max "
-                   f"FROM firstapp_constantuserdata ")
+                   f"FROM firstapp_constantuserdata "
+                   f"WHERE db_userid > 1  AND db_userid <= 8 ")
     result = cursor.fetchall()
     conn.close()
     return result
@@ -247,7 +248,34 @@ def getNormsWarehouseAllQty():
     # Сумма по всем пользователям за дату
     #
     cursor.execute(f"SELECT SUM(db_norms) AS norms "
-                   f"FROM firstapp_constantuserdata ")
+                   f"FROM firstapp_constantuserdata "
+                   f"WHERE db_userid > 1  AND db_userid <= 8 ")
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def getMaxWarehouseAllQtyNotST():
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_max) AS max "
+                   f"FROM firstapp_constantuserdata "
+                   f"WHERE db_userid > 8  AND db_userid <= 15 ")
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def getNormsWarehouseAllQtyNotST():
+    conn = connection()
+    cursor = conn.cursor()
+    #
+    # Сумма по всем пользователям за дату
+    #
+    cursor.execute(f"SELECT SUM(db_norms) AS norms "
+                   f"FROM firstapp_constantuserdata "
+                   f"WHERE db_userid > 8  AND db_userid <= 15 ")
     result = cursor.fetchall()
     conn.close()
     return result

@@ -1,4 +1,4 @@
-<!-- Файл table5_data.html -->
+<!-- Файл table6_data.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,9 +17,6 @@
    #AutoOut {
     width: 50px; /* Ширина поля в пикселах */
    }
-   #SeaOut {
-    width: 50px; /* Ширина поля в пикселах */
-   }
    #FittingPlatformIn {
     width: 50px; /* Ширина поля в пикселах */
    }
@@ -29,7 +26,10 @@
    #AutoIn {
     width: 50px; /* Ширина поля в пикселах */
    }
-   #SeaIn {
+   #FactLoad {
+    width: 50px; /* Ширина поля в пикселах */
+   }
+   #Reload {
     width: 50px; /* Ширина поля в пикселах */
    }
   </style>
@@ -61,29 +61,30 @@
             <table border="1" width="30%" cellpadding="5">
                 <tr>
                     <th rowspan="2">date2</th>
-                    <th colspan="4">Убыло</th>
-                    <th colspan="4">Прибыло</th>
+                    <th colspan="3">Убыло</th>
+                    <th colspan="2">Емкость склада</th>
+                    <th colspan="3">Прибыло</th>
                 </tr>
                 <tr>
                     <th>Фитинговые платформы</th>
                     <th>Полувагон</th>
                     <th>Автомобильный транспорт</th>
-                    <th>Морской транспорт</th>
+                    <th>Факт. Загрузка</th>
+                    <th>Резерв</th>
                     <th>Фитинговые платформы</th>
                     <th>Полувагон</th>
                     <th>Автомобильный транспорт</th>
-                    <th>Морской транспорт</th>
                 </tr>
                 <tr>
                     <td><input type="date" value={{date2}} id ="date2" name = "date2" ></td>
                     <td><input value={{FittingPlatformOut}} id ="FittingPlatformOut" name = "FittingPlatformOut" ></td>
                     <td><input value={{SemiwagonOut}} id ="SemiwagonOut" name = "SemiwagonOut" ></td>
                     <td><input value={{AutoOut}} id ="AutoOut" name = "AutoOut" ></td>
-                    <td><input value={{SeaOut}} id ="SeaOut" name = "SeaOut" ></td>
+                    <td><input value={{FactLoad}} id ="FactLoad" name = "FactLoad" ></td>
+                    <td><input value={{Reload}} id ="Reload" name = "Reload" ></td>
                     <td><input value={{FittingPlatformIn}} id ="FittingPlatformIn" name = "FittingPlatformIn" ></td>
                     <td><input value={{SemiwagonIn}} id ="SemiwagonIn" name = "SemiwagonIn" ></td>
                     <td><input value={{AutoIn}} id ="AutoIn" name = "AutoIn" ></td>
-                    <td><input value={{SeaIn}} id ="SeaIn" name = "SeaIn" ></td>
                 </tr>
               </table>
         </ul>
