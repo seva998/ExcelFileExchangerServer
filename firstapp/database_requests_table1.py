@@ -134,7 +134,7 @@ def getUserInfoFromDB(userid,date):
                    f"SUM(db_loading_port_lin) AS loadingportlin,"
                    f"SUM(db_loading_port_tramp) AS loadingporttramp,"
                    f"SUM(db_unload_port_lin) AS unloadportlin,"
-                   f"SUM(db_unload_port_tramp) AS unloadporttramp"
+                   f"SUM(db_unload_port_tramp) AS unloadporttramp "
                    f"FROM firstapp_dailymonitoringuserdata "
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}' AND db_userid = {userid}")
     User1data = cursor.fetchall()
