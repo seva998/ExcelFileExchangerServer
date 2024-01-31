@@ -1,8 +1,5 @@
 # Файл views.py
-import psycopg2
 import openpyxl
-from django.core.files.storage import FileSystemStorage
-import pandas as pd
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -13,18 +10,17 @@ from io import BytesIO
 from django.http import FileResponse
 
 from .database_requests_table1 import (getDataTableForAllTime,
-                                getUserInfoFromDB,
-                                getUserInfoFromDBDataset,
-                                getTranzitUserInfoFromDB,
-                                getAllTranzitUserInfoFromDB,
-                                getMaxWarehouseQty,
-                                getMaxWarehouseAllQty,
-                                getNormsWarehouseQty,
-                                getNormsWarehouseAllQty,
-                                getReidUserInfoFromDB,
-                                getReidAllInfoFromDB,
-                                getMaxWarehouseAllQtyNotST,
-                                getNormsWarehouseAllQtyNotST)
+                                       getUserInfoFromDB,
+                                       getUserInfoFromDBDataset,
+                                       getTranzitUserInfoFromDB,
+                                       getAllTranzitUserInfoFromDB,
+                                       getMaxWarehouseQty,
+                                       getMaxWarehouseAllQty,
+                                       getNormsWarehouseQty,
+                                       getNormsWarehouseAllQty,
+                                       getReidUserInfoFromDB,
+                                       getReidAllInfoFromDB,
+                                       getMaxWarehouseAllQtyNotST)
 
 from .database_requests_table2 import (getContaunerUserInfoFromDB,
                                        getContaunerInfoFromDBAll)
@@ -41,6 +37,15 @@ from .models import (DailyMonitoringUserData,
                      DailyMonitoringUserWagons,
                      DailyMonitoringUserWagonsFE,
                      DailyMonitoringUserTransport)
+from .utils import (AllQtyPercent,
+                    TransportPercent,
+                    AllQtyCalculator,
+                    TransportCalculator,
+                    ReidAllStr,
+                    PortAllStr,
+                    AutoCalculator,
+                    is_stevedor,
+                    NanCheck)
 
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
@@ -49,8 +54,7 @@ DAYDELTA = dt.timedelta(days=1,
                            minutes=0,
                            hours=0,
                            weeks=0)
-def is_stevedor(user):
-    return user.groups.filter(name='stevedors').exists()
+
 
 @login_required(login_url='')
 def home(request):
@@ -375,15 +379,6 @@ def success_table1(request):
                                                 'LoadingPortTramp': LoadingPortTramp[0],
                                                 'user': request.user})
 
-def NanCheck(i):
-    try:
-        int(i)
-        if str(i) == 'nan' or str(i) =='' or i == None:
-            i = 0
-        return i
-    except:
-        i = 0
-    return i
 
 ###File download realization
 @login_required(login_url='')
@@ -683,8 +678,8 @@ def download(request):
             ws['D26'] = NanCheck(TransportUserInfo14[0][8])
 
             #Всего убыло всеми видами транспорта	Всего прибыло всеми видами
-            ws['F20'] = NanCheck(TransportUserInfo8[0][0])+NanCheck(
-                TransportUserInfo8[0][1])+NanCheck(TransportUserInfo8[0][2])
+            ws['F20'] = NanCheck(TransportUserInfo8[0][0]) + NanCheck(
+                TransportUserInfo8[0][1]) + NanCheck(TransportUserInfo8[0][2])
             ws['F21'] = NanCheck(TransportUserInfo9[0][0]) + NanCheck(
                 TransportUserInfo9[0][1]) + NanCheck(TransportUserInfo9[0][2])
             ws['F22'] = NanCheck(TransportUserInfo10[0][0]) + NanCheck(
@@ -699,8 +694,8 @@ def download(request):
                 TransportUserInfo14[0][1]) + NanCheck(TransportUserInfo14[0][2])
 
             #Всего прибыло всеми видами транспорта
-            ws['G20'] = NanCheck(TransportUserInfo8[0][4])+NanCheck(
-                TransportUserInfo8[0][5])+NanCheck(TransportUserInfo8[0][6])
+            ws['G20'] = NanCheck(TransportUserInfo8[0][4]) + NanCheck(
+                TransportUserInfo8[0][5]) + NanCheck(TransportUserInfo8[0][6])
             ws['G21'] = NanCheck(TransportUserInfo9[0][4]) + NanCheck(
                 TransportUserInfo9[0][5]) + NanCheck(TransportUserInfo9[0][6])
             ws['G22'] = NanCheck(TransportUserInfo10[0][4]) + NanCheck(
@@ -884,8 +879,8 @@ def dataset(request):
         User1data = getUserInfoFromDBDataset(2, date)
         MaxWarehouseQty1User = getMaxWarehouseQty(2)[0][0]
         NormsWarehouseQty1User = getNormsWarehouseQty(2)[0][0]
-        AllQty1User = AllQtyCalculator(User1data,Tranzit1)
-        AllQtyPercent1User = AllQtyPercent(AllQty1User,MaxWarehouseQty1User,0)
+        AllQty1User = AllQtyCalculator(User1data, Tranzit1)
+        AllQtyPercent1User = AllQtyPercent(AllQty1User, MaxWarehouseQty1User, 0)
         Reid_info1 = getReidUserInfoFromDB(2,date)
         ReidAllUser1 = ReidAllStr(Reid_info1)
         PortAllUser1 = PortAllStr(Reid_info1)
@@ -902,14 +897,14 @@ def dataset(request):
                                                         + NanCheck(TransportUserInfo1[0][5])
                                                         + NanCheck(TransportUserInfo1[0][6])
                                                         + NanCheck(TransportUserInfo1[0][7])),
-                                                          2400,
-                                                          2)
+                                                       2400,
+                                                       2)
         TransportUserInfo1OutPercent = TransportPercent((NanCheck(TransportUserInfo1[0][0])
-                                                        + NanCheck(TransportUserInfo1[0][1])
-                                                        + NanCheck(TransportUserInfo1[0][2])
-                                                        + NanCheck(TransportUserInfo1[0][3])),
-                                                          2400,
-                                                          2)
+                                                         + NanCheck(TransportUserInfo1[0][1])
+                                                         + NanCheck(TransportUserInfo1[0][2])
+                                                         + NanCheck(TransportUserInfo1[0][3])),
+                                                        2400,
+                                                        2)
         TransportCalculated1 = TransportCalculator(TransportUserInfo1)
 
         #
@@ -920,8 +915,8 @@ def dataset(request):
         User2data = getUserInfoFromDBDataset(3, date)
         MaxWarehouseQty2User = getMaxWarehouseQty(3)[0][0]
         NormsWarehouseQty2User = getNormsWarehouseQty(3)[0][0]
-        AllQty2User = AllQtyCalculator(User2data,Tranzit2)
-        AllQtyPercent2User = AllQtyPercent(AllQty2User,MaxWarehouseQty2User,0)
+        AllQty2User = AllQtyCalculator(User2data, Tranzit2)
+        AllQtyPercent2User = AllQtyPercent(AllQty2User, MaxWarehouseQty2User, 0)
         Reid_info2 = getReidUserInfoFromDB(3,date)
         ReidAllUser2 = ReidAllStr(Reid_info2)
         PortAllUser2 = PortAllStr(Reid_info2)
@@ -938,14 +933,14 @@ def dataset(request):
                                                         + NanCheck(TransportUserInfo2[0][5])
                                                         + NanCheck(TransportUserInfo2[0][6])
                                                         + NanCheck(TransportUserInfo2[0][7])),
-                                                          2860,
-                                                          2)
+                                                       2860,
+                                                       2)
         TransportUserInfo2OutPercent = TransportPercent((NanCheck(TransportUserInfo2[0][0])
-                                                        + NanCheck(TransportUserInfo2[0][1])
-                                                        + NanCheck(TransportUserInfo2[0][2])
-                                                        + NanCheck(TransportUserInfo2[0][3])),
-                                                          2860,
-                                                          2)
+                                                         + NanCheck(TransportUserInfo2[0][1])
+                                                         + NanCheck(TransportUserInfo2[0][2])
+                                                         + NanCheck(TransportUserInfo2[0][3])),
+                                                        2860,
+                                                        2)
         TransportCalculated2 = TransportCalculator(TransportUserInfo2)
 
 
@@ -958,8 +953,8 @@ def dataset(request):
         User3data = getUserInfoFromDBDataset(4, date)
         MaxWarehouseQty3User = getMaxWarehouseQty(4)[0][0]
         NormsWarehouseQty3User = getNormsWarehouseQty(4)[0][0]
-        AllQty3User = AllQtyCalculator(User3data,Tranzit3)
-        AllQtyPercent3User = AllQtyPercent(AllQty3User,MaxWarehouseQty3User,0)
+        AllQty3User = AllQtyCalculator(User3data, Tranzit3)
+        AllQtyPercent3User = AllQtyPercent(AllQty3User, MaxWarehouseQty3User, 0)
         Reid_info3 = getReidUserInfoFromDB(4,date)
         ReidAllUser3 = ReidAllStr(Reid_info3)
         PortAllUser3 = PortAllStr(Reid_info3)
@@ -976,14 +971,14 @@ def dataset(request):
                                                         + NanCheck(TransportUserInfo3[0][5])
                                                         + NanCheck(TransportUserInfo3[0][6])
                                                         + NanCheck(TransportUserInfo3[0][7])),
-                                                          800,
-                                                          2)
+                                                       800,
+                                                       2)
         TransportUserInfo3OutPercent = TransportPercent((NanCheck(TransportUserInfo3[0][0])
-                                                        + NanCheck(TransportUserInfo3[0][1])
-                                                        + NanCheck(TransportUserInfo3[0][2])
-                                                        + NanCheck(TransportUserInfo3[0][3])),
-                                                          800,
-                                                          2)
+                                                         + NanCheck(TransportUserInfo3[0][1])
+                                                         + NanCheck(TransportUserInfo3[0][2])
+                                                         + NanCheck(TransportUserInfo3[0][3])),
+                                                        800,
+                                                        2)
         TransportCalculated3 = TransportCalculator(TransportUserInfo3)
 
         #
@@ -1149,8 +1144,8 @@ def dataset(request):
         TranzitAll = getAllTranzitUserInfoFromDB(date)
         MaxWarehouseQtyAll = getMaxWarehouseAllQty()[0][0]
         NormsWarehouseQtyAll = getNormsWarehouseAllQty()[0][0]
-        AllQtyAll = AllQtyCalculator(UserAlldata,TranzitAll)
-        AllQtyPercent1All = AllQtyPercent(AllQtyAll,MaxWarehouseQtyAll,0)
+        AllQtyAll = AllQtyCalculator(UserAlldata, TranzitAll)
+        AllQtyPercent1All = AllQtyPercent(AllQtyAll, MaxWarehouseQtyAll, 0)
         Reid_infoAll = getReidAllInfoFromDB(date)
         ReidAllAll = ReidAllStr(Reid_infoAll)
         PortAllAll = PortAllStr(Reid_infoAll)
@@ -1164,15 +1159,15 @@ def dataset(request):
                 #table5
         TransportUserInfoAll = getTransportInfoFromDBAll(date)
         TransportUserInfoAllInPercent = TransportPercent((NanCheck(TransportUserInfoAll[0][4])
-                                                        + NanCheck(TransportUserInfoAll[0][5])
-                                                        + NanCheck(TransportUserInfoAll[0][6])
-                                                        + NanCheck(TransportUserInfoAll[0][7])),
-                                                          7120,
-                                                          2)
+                                                          + NanCheck(TransportUserInfoAll[0][5])
+                                                          + NanCheck(TransportUserInfoAll[0][6])
+                                                          + NanCheck(TransportUserInfoAll[0][7])),
+                                                         7120,
+                                                         2)
         TransportUserInfoAllOutPercent = TransportPercent((NanCheck(TransportUserInfoAll[0][0])
-                                                        + NanCheck(TransportUserInfoAll[0][1])
-                                                        + NanCheck(TransportUserInfoAll[0][2])
-                                                        + NanCheck(TransportUserInfoAll[0][3])),
+                                                           + NanCheck(TransportUserInfoAll[0][1])
+                                                           + NanCheck(TransportUserInfoAll[0][2])
+                                                           + NanCheck(TransportUserInfoAll[0][3])),
                                                           7120,
                                                           2)
         TransportCalculatedAll = TransportCalculator(TransportUserInfoAll)
@@ -1187,56 +1182,56 @@ def dataset(request):
 
         TransportUserInfo8 = getTransportUserInfoFromDB(9, date)
         TransportUserInfo8Percent = TransportPercent(NanCheck(TransportUserInfo8[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(9)[0][0]),
-                                                       2)
+                                                     NanCheck(getMaxWarehouseQty(9)[0][0]),
+                                                     2)
         TransportCalculated8 = TransportCalculator(TransportUserInfo8)
 
         # 9 user
 
         TransportUserInfo9 = getTransportUserInfoFromDB(10, date)
         TransportUserInfo9Percent = TransportPercent(NanCheck(TransportUserInfo9[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(10)[0][0]),
-                                                       2)
+                                                     NanCheck(getMaxWarehouseQty(10)[0][0]),
+                                                     2)
         TransportCalculated9 = TransportCalculator(TransportUserInfo9)
 
         # 10 user
 
         TransportUserInfo10 = getTransportUserInfoFromDB(11, date)
         TransportUserInfo10Percent = TransportPercent(NanCheck(TransportUserInfo10[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(11)[0][0]),
-                                                       2)
+                                                      NanCheck(getMaxWarehouseQty(11)[0][0]),
+                                                      2)
         TransportCalculated10 = TransportCalculator(TransportUserInfo10)
 
         # 11 user
 
         TransportUserInfo11 = getTransportUserInfoFromDB(12, date)
         TransportUserInfo11Percent = TransportPercent(NanCheck(TransportUserInfo11[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(12)[0][0]),
-                                                       2)
+                                                      NanCheck(getMaxWarehouseQty(12)[0][0]),
+                                                      2)
         TransportCalculated11 = TransportCalculator(TransportUserInfo11)
 
         # 12 user
 
         TransportUserInfo12 = getTransportUserInfoFromDB(13, date)
         TransportUserInfo12Percent = TransportPercent(NanCheck(TransportUserInfo12[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(13)[0][0]),
-                                                       2)
+                                                      NanCheck(getMaxWarehouseQty(13)[0][0]),
+                                                      2)
         TransportCalculated12 = TransportCalculator(TransportUserInfo12)
 
         # 13 user
 
         TransportUserInfo13 = getTransportUserInfoFromDB(14, date)
         TransportUserInfo13Percent = TransportPercent(NanCheck(TransportUserInfo13[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(14)[0][0]),
-                                                       2)
+                                                      NanCheck(getMaxWarehouseQty(14)[0][0]),
+                                                      2)
         TransportCalculated13 = TransportCalculator(TransportUserInfo13)
 
         # 14 user
 
         TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
         TransportUserInfo14Percent = TransportPercent(NanCheck(TransportUserInfo14[0][8]),
-                                                       NanCheck(getMaxWarehouseQty(15)[0][0]),
-                                                       2)
+                                                      NanCheck(getMaxWarehouseQty(15)[0][0]),
+                                                      2)
         TransportCalculated14 = TransportCalculator(TransportUserInfo14)
 
 
@@ -1247,8 +1242,8 @@ def dataset(request):
         TransportUserInfoNotSTAll = getTransportInfoFromDBNotSTAll(date)
         print(TransportUserInfoNotSTAll)
         TransportUserInfoAllPercent = TransportPercent(NanCheck(TransportUserInfoNotSTAll[0][8]),
-                                                          NanCheck(getMaxWarehouseAllQtyNotST()[0][0]),
-                                                          2)
+                                                       NanCheck(getMaxWarehouseAllQtyNotST()[0][0]),
+                                                       2)
         TransportCalculatedAllNotST = TransportCalculator(TransportUserInfoNotSTAll)
 
         # except:
@@ -1270,18 +1265,18 @@ def dataset(request):
                                                     'ContainerDataNow1_1': NanCheck(ContainerDataNow1[0][1]),
                                                     'ContainerDataNow1_2': NanCheck(ContainerDataNow1[0][2]),
                                                     'WagonsData1': NanCheck(WagonsData1[0][0]),
-                                                    'WagonsDataQty1': NanCheck(WagonsData1[0][0])* 3.5,
+                                                    'WagonsDataQty1': NanCheck(WagonsData1[0][0]) * 3.5,
                                                     'WagonsDataFE1': NanCheck(WagonsDataFE1[0][0]),
                                                     'WagonsDataQtyFE1': NanCheck(WagonsDataFE1[0][0]) * 3.5,
                                                     'TransportUserInfo1In' : NanCheck(TransportUserInfo1[0][4])
-                                                                                      + NanCheck(TransportUserInfo1[0][5])
-                                                                                      + NanCheck(TransportUserInfo1[0][6])
-                                                                                      + NanCheck(TransportUserInfo1[0][7]),
+                                                                             + NanCheck(TransportUserInfo1[0][5])
+                                                                             + NanCheck(TransportUserInfo1[0][6])
+                                                                             + NanCheck(TransportUserInfo1[0][7]),
                                                     'TransportUserInfo1InPercent' : TransportUserInfo1InPercent,
                                                     'TransportUserInfo1Out': NanCheck(TransportUserInfo1[0][0])
-                                                                                     + NanCheck(TransportUserInfo1[0][1])
-                                                                                     + NanCheck(TransportUserInfo1[0][2])
-                                                                                     + NanCheck(TransportUserInfo1[0][3]),
+                                                                             + NanCheck(TransportUserInfo1[0][1])
+                                                                             + NanCheck(TransportUserInfo1[0][2])
+                                                                             + NanCheck(TransportUserInfo1[0][3]),
                                                     'TransportUserInfo1OutPercent': TransportUserInfo1OutPercent,
                                                     'TransportCalculated1':TransportCalculated1,
                                                     'AutoTransportIn1': NanCheck(TransportUserInfo1[0][6]),
@@ -1300,18 +1295,18 @@ def dataset(request):
                                                     'ContainerDataNow2_1': NanCheck(ContainerDataNow2[0][1]),
                                                     'ContainerDataNow2_2': NanCheck(ContainerDataNow2[0][2]),
                                                     'WagonsData2': NanCheck(WagonsData2[0][0]),
-                                                    'WagonsDataQty2': NanCheck(WagonsData2[0][0])* 3.5,
+                                                    'WagonsDataQty2': NanCheck(WagonsData2[0][0]) * 3.5,
                                                     'WagonsDataFE2': NanCheck(WagonsDataFE2[0][0]),
                                                     'WagonsDataQtyFE2': NanCheck(WagonsDataFE2[0][0]) * 3.5,
                                                     'TransportUserInfo2In': NanCheck(TransportUserInfo2[0][4])
-                                                                                     + NanCheck(TransportUserInfo2[0][5])
-                                                                                     + NanCheck(TransportUserInfo2[0][6])
-                                                                                     + NanCheck(TransportUserInfo2[0][7]),
+                                                                            + NanCheck(TransportUserInfo2[0][5])
+                                                                            + NanCheck(TransportUserInfo2[0][6])
+                                                                            + NanCheck(TransportUserInfo2[0][7]),
                                                     'TransportUserInfo2InPercent': TransportUserInfo2InPercent,
                                                     'TransportUserInfo2Out': NanCheck(TransportUserInfo2[0][0])
-                                                                                     + NanCheck(TransportUserInfo2[0][1])
-                                                                                     + NanCheck(TransportUserInfo2[0][2])
-                                                                                     + NanCheck(TransportUserInfo2[0][3]),
+                                                                             + NanCheck(TransportUserInfo2[0][1])
+                                                                             + NanCheck(TransportUserInfo2[0][2])
+                                                                             + NanCheck(TransportUserInfo2[0][3]),
                                                     'TransportUserInfo2OutPercent': TransportUserInfo2OutPercent,
                                                     'TransportCalculated2':TransportCalculated2,
                                                     'AutoTransportIn2': NanCheck(TransportUserInfo2[0][6]),
@@ -1474,18 +1469,18 @@ def dataset(request):
                                                     'ContainerDataAllNow_1': NanCheck(ContainerDataAllNow[0][1]),
                                                     'ContainerDataAllNow_2': NanCheck(ContainerDataAllNow[0][2]),
                                                     'WagonsDataAll': NanCheck(WagonDataAll[0][0]),
-                                                    'WagonsDataQtyAll': NanCheck(WagonDataAll[0][0])* 3.5,
+                                                    'WagonsDataQtyAll': NanCheck(WagonDataAll[0][0]) * 3.5,
                                                     'WagonsDataAllFE': NanCheck(WagonDataAllFE[0][0]),
                                                     'WagonsDataQtyAllFE': NanCheck(WagonDataAllFE[0][0]) * 3.5,
                                                     'TransportUserInfoAll': NanCheck(TransportUserInfoAll[0][4])
-                                                                                     + NanCheck(TransportUserInfoAll[0][5])
-                                                                                     + NanCheck(TransportUserInfoAll[0][6])
-                                                                                     + NanCheck(TransportUserInfoAll[0][7]),
+                                                                            + NanCheck(TransportUserInfoAll[0][5])
+                                                                            + NanCheck(TransportUserInfoAll[0][6])
+                                                                            + NanCheck(TransportUserInfoAll[0][7]),
                                                     'TransportUserInfoAllInPercent': TransportUserInfoAllInPercent,
                                                     'TransportUserInfoAllOut': NanCheck(TransportUserInfoAll[0][0])
-                                                                                     + NanCheck(TransportUserInfoAll[0][1])
-                                                                                     + NanCheck(TransportUserInfoAll[0][2])
-                                                                                     + NanCheck(TransportUserInfoAll[0][3]),
+                                                                               + NanCheck(TransportUserInfoAll[0][1])
+                                                                               + NanCheck(TransportUserInfoAll[0][2])
+                                                                               + NanCheck(TransportUserInfoAll[0][3]),
                                                     'TransportUserInfoAllOutPercent': TransportUserInfoAllOutPercent,
                                                     'TransportCalculatedAll':TransportCalculatedAll,
                                                     'AutoTransportInAll': NanCheck(TransportUserInfoAll[0][6]),
@@ -1498,113 +1493,141 @@ def dataset(request):
                         # 1 user
                                                     'UnloadReidlin1User': NanCheck(Reid_info1[0][0]),
                                                     'UnloadReidtramp1User': NanCheck(Reid_info1[0][1]),
-                                                    'UnloadReidSum1User' : (NanCheck(Reid_info1[0][0])+NanCheck(Reid_info1[0][1])),
+                                                    'UnloadReidSum1User' : (
+                                                                NanCheck(Reid_info1[0][0]) + NanCheck(Reid_info1[0][1])),
                                                     'LoadingReidLin1User': NanCheck(Reid_info1[0][2]),
                                                     'LoadingReidTramp1User': NanCheck(Reid_info1[0][3]),
-                                                    'LoadingReidSum1User' :(NanCheck(Reid_info1[0][2])+NanCheck(Reid_info1[0][3])),
+                                                    'LoadingReidSum1User' :(
+                                                                NanCheck(Reid_info1[0][2]) + NanCheck(Reid_info1[0][3])),
                                                     'ReidAllUser1' : NanCheck(ReidAllUser1),
                                                     'UnloadPortlin1User' : NanCheck(Reid_info1[0][4]),
                                                     'UnloadPorttramp1User': NanCheck(Reid_info1[0][5]),
-                                                    'UnloadPortSum1User' : (NanCheck(Reid_info1[0][4])+NanCheck(Reid_info1[0][5])),
+                                                    'UnloadPortSum1User' : (
+                                                                NanCheck(Reid_info1[0][4]) + NanCheck(Reid_info1[0][5])),
                                                     'LoadingPortLin1User': NanCheck(Reid_info1[0][6]),
                                                     'LoadingPortTramp1User': NanCheck(Reid_info1[0][7]),
-                                                    'LoadingPortSum1User': (NanCheck(Reid_info1[0][6])+NanCheck(Reid_info1[0][7])),
+                                                    'LoadingPortSum1User': (
+                                                                NanCheck(Reid_info1[0][6]) + NanCheck(Reid_info1[0][7])),
                                                     'PortAllUser1':PortAllUser1,
 
                     # 2 user
                                                     'UnloadReidlin2User': NanCheck(Reid_info2[0][0]),
                                                     'UnloadReidtramp2User': NanCheck(Reid_info2[0][1]),
-                                                    'UnloadReidSum2User': (NanCheck(Reid_info2[0][0]) + NanCheck(Reid_info2[0][1])),
+                                                    'UnloadReidSum2User': (
+                                                                NanCheck(Reid_info2[0][0]) + NanCheck(Reid_info2[0][1])),
                                                     'LoadingReidLin2User': NanCheck(Reid_info2[0][2]),
                                                     'LoadingReidTramp2User': NanCheck(Reid_info2[0][3]),
-                                                    'LoadingReidSum2User': (NanCheck(Reid_info2[0][2]) + NanCheck(Reid_info2[0][3])),
+                                                    'LoadingReidSum2User': (
+                                                                NanCheck(Reid_info2[0][2]) + NanCheck(Reid_info2[0][3])),
                                                     'ReidAllUser2': ReidAllUser2,
                                                     'UnloadPortlin2User': NanCheck(Reid_info2[0][4]),
                                                     'UnloadPorttramp2User': NanCheck(Reid_info2[0][5]),
-                                                    'UnloadPortSum2User': (NanCheck(Reid_info2[0][4]) + NanCheck(Reid_info2[0][5])),
+                                                    'UnloadPortSum2User': (
+                                                                NanCheck(Reid_info2[0][4]) + NanCheck(Reid_info2[0][5])),
                                                     'LoadingPortLin2User': NanCheck(Reid_info2[0][6]),
                                                     'LoadingPortTramp2User': NanCheck(Reid_info2[0][7]),
-                                                    'LoadingPortSum2User': (NanCheck(Reid_info2[0][6]) + NanCheck(Reid_info2[0][7])),
+                                                    'LoadingPortSum2User': (
+                                                                NanCheck(Reid_info2[0][6]) + NanCheck(Reid_info2[0][7])),
                                                     'PortAllUser2': PortAllUser2,
 
                     # 3 user
                                                     'UnloadReidlin3User': NanCheck(Reid_info3[0][0]),
                                                     'UnloadReidtramp3User': NanCheck(Reid_info3[0][1]),
-                                                    'UnloadReidSum3User': (NanCheck(Reid_info3[0][0]) + NanCheck(Reid_info3[0][1])),
+                                                    'UnloadReidSum3User': (
+                                                                NanCheck(Reid_info3[0][0]) + NanCheck(Reid_info3[0][1])),
                                                     'LoadingReidLin3User': NanCheck(Reid_info3[0][2]),
                                                     'LoadingReidTramp3User': NanCheck(Reid_info3[0][3]),
-                                                    'LoadingReidSum3User': (NanCheck(Reid_info3[0][2]) + NanCheck(Reid_info3[0][3])),
+                                                    'LoadingReidSum3User': (
+                                                                NanCheck(Reid_info3[0][2]) + NanCheck(Reid_info3[0][3])),
                                                     'ReidAllUser3': ReidAllUser3,
                                                     'UnloadPortlin3User': NanCheck(Reid_info3[0][4]),
                                                     'UnloadPorttramp3User': NanCheck(Reid_info3[0][5]),
-                                                    'UnloadPortSum3User': (NanCheck(Reid_info3[0][4]) + NanCheck(Reid_info3[0][5])),
+                                                    'UnloadPortSum3User': (
+                                                                NanCheck(Reid_info3[0][4]) + NanCheck(Reid_info3[0][5])),
                                                     'LoadingPortLin3User': NanCheck(Reid_info3[0][6]),
                                                     'LoadingPortTramp3User': NanCheck(Reid_info3[0][7]),
-                                                    'LoadingPortSum3User': (NanCheck(Reid_info3[0][6]) + NanCheck(Reid_info3[0][7])),
+                                                    'LoadingPortSum3User': (
+                                                                NanCheck(Reid_info3[0][6]) + NanCheck(Reid_info3[0][7])),
                                                     'PortAllUser3': PortAllUser3,
 
                     # 4 user
                                                     'UnloadReidlin4User': NanCheck(Reid_info4[0][0]),
                                                     'UnloadReidtramp4User': NanCheck(Reid_info4[0][1]),
-                                                    'UnloadReidSum4User': (NanCheck(Reid_info4[0][0]) + NanCheck(Reid_info4[0][1])),
+                                                    'UnloadReidSum4User': (
+                                                                NanCheck(Reid_info4[0][0]) + NanCheck(Reid_info4[0][1])),
                                                     'LoadingReidLin4User': NanCheck(Reid_info4[0][2]),
                                                     'LoadingReidTramp4User': NanCheck(Reid_info4[0][3]),
-                                                    'LoadingReidSum4User': (NanCheck(Reid_info4[0][2]) + NanCheck(Reid_info4[0][3])),
+                                                    'LoadingReidSum4User': (
+                                                                NanCheck(Reid_info4[0][2]) + NanCheck(Reid_info4[0][3])),
                                                     'ReidAllUser4': ReidAllUser4,
                                                     'UnloadPortlin4User': NanCheck(Reid_info4[0][4]),
                                                     'UnloadPorttramp4User': NanCheck(Reid_info4[0][5]),
-                                                    'UnloadPortSum4User': (NanCheck(Reid_info4[0][4]) + NanCheck(Reid_info4[0][5])),
+                                                    'UnloadPortSum4User': (
+                                                                NanCheck(Reid_info4[0][4]) + NanCheck(Reid_info4[0][5])),
                                                     'LoadingPortLin4User': NanCheck(Reid_info4[0][6]),
                                                     'LoadingPortTramp4User': NanCheck(Reid_info4[0][7]),
-                                                    'LoadingPortSum4User': (NanCheck(Reid_info4[0][6]) + NanCheck(Reid_info4[0][7])),
+                                                    'LoadingPortSum4User': (
+                                                                NanCheck(Reid_info4[0][6]) + NanCheck(Reid_info4[0][7])),
                                                     'PortAllUser4': PortAllUser4,
 
                     # 5 user
                                                     'UnloadReidlin5User': NanCheck(Reid_info5[0][0]),
                                                     'UnloadReidtramp5User': NanCheck(Reid_info5[0][1]),
-                                                    'UnloadReidSum5User': (NanCheck(Reid_info5[0][0]) + NanCheck(Reid_info5[0][1])),
+                                                    'UnloadReidSum5User': (
+                                                                NanCheck(Reid_info5[0][0]) + NanCheck(Reid_info5[0][1])),
                                                     'LoadingReidLin5User': NanCheck(Reid_info5[0][2]),
                                                     'LoadingReidTramp5User': NanCheck(Reid_info5[0][3]),
-                                                    'LoadingReidSum5User': (NanCheck(Reid_info5[0][2]) + NanCheck(Reid_info5[0][3])),
+                                                    'LoadingReidSum5User': (
+                                                                NanCheck(Reid_info5[0][2]) + NanCheck(Reid_info5[0][3])),
                                                     'ReidAllUser5': ReidAllUser5,
                                                     'UnloadPortlin5User': NanCheck(Reid_info5[0][4]),
                                                     'UnloadPorttramp5User': NanCheck(Reid_info5[0][5]),
-                                                    'UnloadPortSum5User': (NanCheck(Reid_info5[0][4]) + NanCheck(Reid_info5[0][5])),
+                                                    'UnloadPortSum5User': (
+                                                                NanCheck(Reid_info5[0][4]) + NanCheck(Reid_info5[0][5])),
                                                     'LoadingPortLin5User': NanCheck(Reid_info5[0][6]),
                                                     'LoadingPortTramp5User': NanCheck(Reid_info5[0][7]),
-                                                    'LoadingPortSum5User': (NanCheck(Reid_info5[0][6]) + NanCheck(Reid_info5[0][7])),
+                                                    'LoadingPortSum5User': (
+                                                                NanCheck(Reid_info5[0][6]) + NanCheck(Reid_info5[0][7])),
                                                     'PortAllUser5': PortAllUser5,
 
                     # 6 user
                                                     'UnloadReidlin6User': NanCheck(Reid_info6[0][0]),
                                                     'UnloadReidtramp6User': NanCheck(Reid_info6[0][1]),
-                                                    'UnloadReidSum6User': (NanCheck(Reid_info6[0][0]) + NanCheck(Reid_info6[0][1])),
+                                                    'UnloadReidSum6User': (
+                                                                NanCheck(Reid_info6[0][0]) + NanCheck(Reid_info6[0][1])),
                                                     'LoadingReidLin6User': NanCheck(Reid_info6[0][2]),
                                                     'LoadingReidTramp6User': NanCheck(Reid_info6[0][3]),
-                                                    'LoadingReidSum6User': (NanCheck(Reid_info6[0][2]) + NanCheck(Reid_info6[0][3])),
+                                                    'LoadingReidSum6User': (
+                                                                NanCheck(Reid_info6[0][2]) + NanCheck(Reid_info6[0][3])),
                                                     'ReidAllUser6': ReidAllUser6,
                                                     'UnloadPortlin6User': NanCheck(Reid_info6[0][4]),
                                                     'UnloadPorttramp6User': NanCheck(Reid_info6[0][5]),
-                                                    'UnloadPortSum6User': (NanCheck(Reid_info6[0][4]) + NanCheck(Reid_info6[0][5])),
+                                                    'UnloadPortSum6User': (
+                                                                NanCheck(Reid_info6[0][4]) + NanCheck(Reid_info6[0][5])),
                                                     'LoadingPortLin6User': NanCheck(Reid_info6[0][6]),
                                                     'LoadingPortTramp6User': NanCheck(Reid_info6[0][7]),
-                                                    'LoadingPortSum6User': (NanCheck(Reid_info6[0][6]) + NanCheck(Reid_info6[0][7])),
+                                                    'LoadingPortSum6User': (
+                                                                NanCheck(Reid_info6[0][6]) + NanCheck(Reid_info6[0][7])),
                                                     'PortAllUser6': PortAllUser6,
 
                     # 6 user
                                                     'UnloadReidlin7User': NanCheck(Reid_info7[0][0]),
                                                     'UnloadReidtramp7User': NanCheck(Reid_info7[0][1]),
-                                                    'UnloadReidSum7User': (NanCheck(Reid_info7[0][0]) + NanCheck(Reid_info7[0][1])),
+                                                    'UnloadReidSum7User': (
+                                                                NanCheck(Reid_info7[0][0]) + NanCheck(Reid_info7[0][1])),
                                                     'LoadingReidLin7User': NanCheck(Reid_info7[0][2]),
                                                     'LoadingReidTramp7User': NanCheck(Reid_info7[0][3]),
-                                                    'LoadingReidSum7User': (NanCheck(Reid_info7[0][2]) + NanCheck(Reid_info7[0][3])),
+                                                    'LoadingReidSum7User': (
+                                                                NanCheck(Reid_info7[0][2]) + NanCheck(Reid_info7[0][3])),
                                                     'ReidAllUser7': ReidAllUser7,
                                                     'UnloadPortlin7User': NanCheck(Reid_info7[0][4]),
                                                     'UnloadPorttramp7User': NanCheck(Reid_info7[0][5]),
-                                                    'UnloadPortSum7User': (NanCheck(Reid_info7[0][4]) + NanCheck(Reid_info7[0][5])),
+                                                    'UnloadPortSum7User': (
+                                                                NanCheck(Reid_info7[0][4]) + NanCheck(Reid_info7[0][5])),
                                                     'LoadingPortLin7User': NanCheck(Reid_info7[0][6]),
                                                     'LoadingPortTramp7User': NanCheck(Reid_info7[0][7]),
-                                                    'LoadingPortSum7User': (NanCheck(Reid_info7[0][6]) + NanCheck(Reid_info7[0][7])),
+                                                    'LoadingPortSum7User': (
+                                                                NanCheck(Reid_info7[0][6]) + NanCheck(Reid_info7[0][7])),
                                                     'PortAllUser7': PortAllUser7,
 
                     # alluser
@@ -1654,56 +1677,56 @@ def dataset(request):
                                                     'PercentAllNotST': TransportUserInfoAllPercent,
 
 
-                                                    'TransportQty8UserIn':  NanCheck(TransportUserInfo8[0][4])+
-                                                                            NanCheck(TransportUserInfo8[0][5])+
-                                                                            NanCheck(TransportUserInfo8[0][6]),
-                                                    'TransportQty9UserIn':  NanCheck(TransportUserInfo9[0][4])+
-                                                                            NanCheck(TransportUserInfo9[0][5])+
-                                                                            NanCheck(TransportUserInfo9[0][6]),
-                                                    'TransportQty10UserIn': NanCheck(TransportUserInfo10[0][4])+
-                                                                            NanCheck(TransportUserInfo10[0][5])+
+                                                    'TransportQty8UserIn': NanCheck(TransportUserInfo8[0][4]) +
+                                                                           NanCheck(TransportUserInfo8[0][5]) +
+                                                                           NanCheck(TransportUserInfo8[0][6]),
+                                                    'TransportQty9UserIn': NanCheck(TransportUserInfo9[0][4]) +
+                                                                           NanCheck(TransportUserInfo9[0][5]) +
+                                                                           NanCheck(TransportUserInfo9[0][6]),
+                                                    'TransportQty10UserIn': NanCheck(TransportUserInfo10[0][4]) +
+                                                                            NanCheck(TransportUserInfo10[0][5]) +
                                                                             NanCheck(TransportUserInfo10[0][6]),
-                                                    'TransportQty11UserIn': NanCheck(TransportUserInfo11[0][4])+
-                                                                            NanCheck(TransportUserInfo11[0][5])+
+                                                    'TransportQty11UserIn': NanCheck(TransportUserInfo11[0][4]) +
+                                                                            NanCheck(TransportUserInfo11[0][5]) +
                                                                             NanCheck(TransportUserInfo11[0][6]),
-                                                    'TransportQty12UserIn': NanCheck(TransportUserInfo12[0][4])+
-                                                                            NanCheck(TransportUserInfo12[0][5])+
+                                                    'TransportQty12UserIn': NanCheck(TransportUserInfo12[0][4]) +
+                                                                            NanCheck(TransportUserInfo12[0][5]) +
                                                                             NanCheck(TransportUserInfo12[0][6]),
-                                                    'TransportQty13UserIn': NanCheck(TransportUserInfo13[0][4])+
-                                                                            NanCheck(TransportUserInfo13[0][5])+
+                                                    'TransportQty13UserIn': NanCheck(TransportUserInfo13[0][4]) +
+                                                                            NanCheck(TransportUserInfo13[0][5]) +
                                                                             NanCheck(TransportUserInfo13[0][6]),
-                                                    'TransportQty14UserIn': NanCheck(TransportUserInfo14[0][4])+
-                                                                            NanCheck(TransportUserInfo14[0][5])+
+                                                    'TransportQty14UserIn': NanCheck(TransportUserInfo14[0][4]) +
+                                                                            NanCheck(TransportUserInfo14[0][5]) +
                                                                             NanCheck(TransportUserInfo14[0][6]),
                                                     'TransportQtyAllIn': NanCheck(TransportUserInfoNotSTAll[0][4]) +
-                                                                            NanCheck(TransportUserInfoNotSTAll[0][5]) +
-                                                                            NanCheck(TransportUserInfoNotSTAll[0][6]),
+                                                                         NanCheck(TransportUserInfoNotSTAll[0][5]) +
+                                                                         NanCheck(TransportUserInfoNotSTAll[0][6]),
 
 
                                                     'TransportQty8UserOut': NanCheck(TransportUserInfo8[0][0]) +
-                                                                           NanCheck(TransportUserInfo8[0][1]) +
-                                                                           NanCheck(TransportUserInfo8[0][2]),
+                                                                            NanCheck(TransportUserInfo8[0][1]) +
+                                                                            NanCheck(TransportUserInfo8[0][2]),
                                                     'TransportQty9UserOut': NanCheck(TransportUserInfo9[0][0]) +
-                                                                           NanCheck(TransportUserInfo9[0][1]) +
-                                                                           NanCheck(TransportUserInfo9[0][2]),
+                                                                            NanCheck(TransportUserInfo9[0][1]) +
+                                                                            NanCheck(TransportUserInfo9[0][2]),
                                                     'TransportQty10UserOut': NanCheck(TransportUserInfo10[0][0]) +
-                                                                            NanCheck(TransportUserInfo10[0][1]) +
-                                                                            NanCheck(TransportUserInfo10[0][2]),
+                                                                             NanCheck(TransportUserInfo10[0][1]) +
+                                                                             NanCheck(TransportUserInfo10[0][2]),
                                                     'TransportQty11UserOut': NanCheck(TransportUserInfo11[0][0]) +
-                                                                            NanCheck(TransportUserInfo11[0][1]) +
-                                                                            NanCheck(TransportUserInfo11[0][2]),
+                                                                             NanCheck(TransportUserInfo11[0][1]) +
+                                                                             NanCheck(TransportUserInfo11[0][2]),
                                                     'TransportQty12UserOut': NanCheck(TransportUserInfo12[0][0]) +
-                                                                            NanCheck(TransportUserInfo12[0][1]) +
-                                                                            NanCheck(TransportUserInfo12[0][2]),
+                                                                             NanCheck(TransportUserInfo12[0][1]) +
+                                                                             NanCheck(TransportUserInfo12[0][2]),
                                                     'TransportQty13UserOut': NanCheck(TransportUserInfo13[0][0]) +
-                                                                            NanCheck(TransportUserInfo13[0][1]) +
-                                                                            NanCheck(TransportUserInfo13[0][2]),
+                                                                             NanCheck(TransportUserInfo13[0][1]) +
+                                                                             NanCheck(TransportUserInfo13[0][2]),
                                                     'TransportQty14UserOut': NanCheck(TransportUserInfo14[0][0]) +
-                                                                            NanCheck(TransportUserInfo14[0][1]) +
-                                                                            NanCheck(TransportUserInfo14[0][2]),
+                                                                             NanCheck(TransportUserInfo14[0][1]) +
+                                                                             NanCheck(TransportUserInfo14[0][2]),
                                                     'TransportQtyAllOut': NanCheck(TransportUserInfoNotSTAll[0][0]) +
-                                                                         NanCheck(TransportUserInfoNotSTAll[0][1]) +
-                                                                         NanCheck(TransportUserInfoNotSTAll[0][2]),
+                                                                          NanCheck(TransportUserInfoNotSTAll[0][1]) +
+                                                                          NanCheck(TransportUserInfoNotSTAll[0][2]),
 
                                                     'TransportCalculated8': TransportCalculated8,
                                                     'TransportCalculated9': TransportCalculated9,
@@ -1731,80 +1754,6 @@ def datepick_admin(request):
         return redirect('home')
 
 
-def set_border(ws, cell_range):
-    thin = openpyxl.styles.Side(border_style="thin", color="000000")
-    for row in ws[cell_range]:
-        for cell in row:
-            cell.border = openpyxl.styles.Border(top=thin, left=thin, right=thin, bottom=thin)
-
-def AllQtyPercent(top,bot,signs):
-    # For persents with signs after , 0 if no signs
-    if (top != None and bot != None and bot!= 0):
-        return int(round((top/bot*100),signs))
-    else:
-        return 0
-
-def TransportPercent(top,bot,signs):
-    # For persents with signs after , 0 if no signs
-    if (top != None and bot != None and bot!=0):
-        return round(((top/bot-1)*100),signs)
-    else:
-        return 0
-
-
-def AllQtyCalculator(UserInfo,TranzitInfo):
-    if (UserInfo[0][0] != None
-            and UserInfo[0][1] != None
-            and UserInfo[0][2] != None
-            and UserInfo[0][3] != None):
-                if TranzitInfo[0][0] != None :
-                    return (UserInfo[0][0] - UserInfo[0][1] + UserInfo[0][2] - UserInfo[0][3] + TranzitInfo[0][0])
-                else:
-                    return (UserInfo[0][0] - UserInfo[0][1] + UserInfo[0][2] - UserInfo[0][3])
-    else:
-        return 0
-
-
-def TransportCalculator(TransportInfo):
-    if ((NanCheck(TransportInfo[0][4])
-        +NanCheck(TransportInfo[0][5])
-         +NanCheck(TransportInfo[0][6])
-         +NanCheck(TransportInfo[0][7])) > (NanCheck(TransportInfo[0][0])
-        +NanCheck(TransportInfo[0][1])
-         +NanCheck(TransportInfo[0][2])
-         +NanCheck(TransportInfo[0][3]))):
-        result = f'+{(NanCheck(TransportInfo[0][4])+ NanCheck(TransportInfo[0][5])+ NanCheck(TransportInfo[0][6])+ NanCheck(TransportInfo[0][7]))- NanCheck(TransportInfo[0][0])- NanCheck(TransportInfo[0][1])- NanCheck(TransportInfo[0][2])- NanCheck(TransportInfo[0][3])}'
-    else:
-        result = (NanCheck(TransportInfo[0][4])
-        +NanCheck(TransportInfo[0][5])
-        +NanCheck(TransportInfo[0][6])
-        +NanCheck(TransportInfo[0][7])
-        -NanCheck(TransportInfo[0][0])
-        - NanCheck(TransportInfo[0][1])
-        - NanCheck(TransportInfo[0][2])
-        - NanCheck(TransportInfo[0][3]))
-    return result
-
-
-
-
-def ReidAllStr(Reid_info):
-    if ((NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1])) > (NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))):
-        return f'+{(NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1]))-(NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))}'
-    else:
-        return (NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))-(NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1]))
-
-def PortAllStr(Reid_info):
-    if ((NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5])) > (NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))):
-        return f'+{(NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5]))-(NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))}'
-    else:
-        return (NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))-(NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5]))
-
-def AutoCalculator(TransportInfo):
-    if NanCheck(TransportInfo[0][6])>NanCheck(TransportInfo[0][2]):
-        return f'+{NanCheck(TransportInfo[0][6]) - NanCheck(TransportInfo[0][2])}'
-    else:
-        return (NanCheck(TransportInfo[0][6])- NanCheck(TransportInfo[0][2]))
 @login_required(login_url='')
 def table1_upload(request):
     if request.method == 'POST':
