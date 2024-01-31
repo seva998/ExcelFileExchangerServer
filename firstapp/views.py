@@ -720,10 +720,16 @@ def download(request):
 
             TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
 
+            # date
+
+            ws['L4'] = (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%d.%m.%Y')
 
             for i in range(8,15):
-                ws[f'C{i}'] = getMaxWarehouseQty(i-6)[0][0]
-                ws[f'D{i}'] = getNormsWarehouseQty(i-6)[0][0]
+                ws[f'C{i}'] = getMaxWarehouseQty(i-6)[0][0]  #Полная проектная емкость складов (100%)
+                ws[f'D{i}'] = getNormsWarehouseQty(i-6)[0][0] #Емкость технологического накопления контейнеров (90%)
+
+                #Факт, контейнеры
+
             ws['E8'] = AllQty1User
             ws['E9'] = AllQty2User
             ws['E10'] = AllQty3User
@@ -731,6 +737,9 @@ def download(request):
             ws['E12'] = AllQty5User
             ws['E13'] = AllQty6User
             ws['E14'] = AllQty7User
+
+            #в т.ч растаможенных
+
             ws['G8'] = NanCheck(ContainerData1[0][0])
             ws['G9'] = NanCheck(ContainerData2[0][0])
             ws['G10'] = NanCheck(ContainerData3[0][0])
@@ -738,6 +747,234 @@ def download(request):
             ws['G12'] = NanCheck(ContainerData5[0][0])
             ws['G13'] = NanCheck(ContainerData6[0][0])
             ws['G14'] = NanCheck(ContainerData7[0][0])
+
+            #Факт прибытия всеми видами транспорта
+
+            ws['I8'] = NanCheck(TransportUserInfo1[0][4]) + NanCheck(TransportUserInfo1[0][5]) + NanCheck(
+                TransportUserInfo1[0][6]) + NanCheck(TransportUserInfo1[0][7])
+            ws['I9'] = NanCheck(TransportUserInfo2[0][4]) + NanCheck(TransportUserInfo2[0][5]) + NanCheck(
+                TransportUserInfo2[0][6]) + NanCheck(TransportUserInfo2[0][7])
+            ws['I10'] = NanCheck(TransportUserInfo3[0][4]) + NanCheck(TransportUserInfo3[0][5]) + NanCheck(
+                TransportUserInfo3[0][6]) + NanCheck(TransportUserInfo3[0][7])
+            ws['I11'] = NanCheck(TransportUserInfo4[0][4]) + NanCheck(TransportUserInfo4[0][5]) + NanCheck(
+                TransportUserInfo4[0][6]) + NanCheck(TransportUserInfo4[0][7])
+            ws['I12'] = NanCheck(TransportUserInfo5[0][4]) + NanCheck(TransportUserInfo5[0][5]) + NanCheck(
+                TransportUserInfo5[0][6]) + NanCheck(TransportUserInfo5[0][7])
+            ws['I13'] = NanCheck(TransportUserInfo6[0][4]) + NanCheck(TransportUserInfo6[0][5]) + NanCheck(
+                TransportUserInfo6[0][6]) + NanCheck(TransportUserInfo6[0][7])
+            ws['I14'] = NanCheck(TransportUserInfo7[0][4]) + NanCheck(TransportUserInfo7[0][5]) + NanCheck(
+                TransportUserInfo7[0][6]) + NanCheck(TransportUserInfo7[0][7])
+
+            # Факт убытия всеми видами транспорта
+
+            ws['L8'] = NanCheck(TransportUserInfo1[0][0]) + NanCheck(TransportUserInfo1[0][1]) + NanCheck(
+                TransportUserInfo1[0][2]) + NanCheck(TransportUserInfo1[0][3])
+            ws['L9'] = NanCheck(TransportUserInfo2[0][0]) + NanCheck(TransportUserInfo2[0][1]) + NanCheck(
+                TransportUserInfo2[0][2]) + NanCheck(TransportUserInfo2[0][3])
+            ws['L10'] = NanCheck(TransportUserInfo3[0][0]) + NanCheck(TransportUserInfo3[0][1]) + NanCheck(
+                TransportUserInfo3[0][2]) + NanCheck(TransportUserInfo3[0][3])
+            ws['L11'] = NanCheck(TransportUserInfo4[0][0]) + NanCheck(TransportUserInfo4[0][1]) + NanCheck(
+                TransportUserInfo4[0][2]) + NanCheck(TransportUserInfo4[0][3])
+            ws['L12'] = NanCheck(TransportUserInfo5[0][0]) + NanCheck(TransportUserInfo5[0][1]) + NanCheck(
+                TransportUserInfo5[0][2]) + NanCheck(TransportUserInfo5[0][3])
+            ws['L13'] = NanCheck(TransportUserInfo6[0][0]) + NanCheck(TransportUserInfo6[0][1]) + NanCheck(
+                TransportUserInfo6[0][2]) + NanCheck(TransportUserInfo6[0][3])
+            ws['L14'] = NanCheck(TransportUserInfo7[0][0]) + NanCheck(TransportUserInfo7[0][1]) + NanCheck(
+                TransportUserInfo7[0][2]) + NanCheck(TransportUserInfo7[0][3])
+
+
+            #####2 table
+            for i in range(20,27):
+                ws[f'C{i}'] = getMaxWarehouseQty(i-11)[0][0]  #Максимальная емкость складов
+
+            #Факт загрузки экспортно-импортных контейнеров на начало текущей даты
+            ws['D20'] = NanCheck(TransportUserInfo8[0][8])
+            ws['D21'] = NanCheck(TransportUserInfo9[0][8])
+            ws['D22'] = NanCheck(TransportUserInfo10[0][8])
+            ws['D23'] = NanCheck(TransportUserInfo11[0][8])
+            ws['D24'] = NanCheck(TransportUserInfo12[0][8])
+            ws['D25'] = NanCheck(TransportUserInfo13[0][8])
+            ws['D26'] = NanCheck(TransportUserInfo14[0][8])
+
+            #Всего убыло всеми видами транспорта	Всего прибыло всеми видами
+            ws['F20'] = NanCheck(TransportUserInfo8[0][0])+NanCheck(
+                TransportUserInfo8[0][1])+NanCheck(TransportUserInfo8[0][2])
+            ws['F21'] = NanCheck(TransportUserInfo9[0][0]) + NanCheck(
+                TransportUserInfo9[0][1]) + NanCheck(TransportUserInfo9[0][2])
+            ws['F22'] = NanCheck(TransportUserInfo10[0][0]) + NanCheck(
+                TransportUserInfo10[0][1]) + NanCheck(TransportUserInfo10[0][2])
+            ws['F23'] = NanCheck(TransportUserInfo11[0][0]) + NanCheck(
+                TransportUserInfo11[0][1]) + NanCheck(TransportUserInfo11[0][2])
+            ws['F24'] = NanCheck(TransportUserInfo12[0][0]) + NanCheck(
+                TransportUserInfo12[0][1]) + NanCheck(TransportUserInfo12[0][2])
+            ws['F25'] = NanCheck(TransportUserInfo13[0][0]) + NanCheck(
+                TransportUserInfo13[0][1]) + NanCheck(TransportUserInfo13[0][2])
+            ws['F26'] = NanCheck(TransportUserInfo14[0][0]) + NanCheck(
+                TransportUserInfo14[0][1]) + NanCheck(TransportUserInfo14[0][2])
+
+            #Всего прибыло всеми видами транспорта
+            ws['G20'] = NanCheck(TransportUserInfo8[0][4])+NanCheck(
+                TransportUserInfo8[0][5])+NanCheck(TransportUserInfo8[0][6])
+            ws['G21'] = NanCheck(TransportUserInfo9[0][4]) + NanCheck(
+                TransportUserInfo9[0][5]) + NanCheck(TransportUserInfo9[0][6])
+            ws['G22'] = NanCheck(TransportUserInfo10[0][4]) + NanCheck(
+                TransportUserInfo10[0][5]) + NanCheck(TransportUserInfo10[0][6])
+            ws['G23'] = NanCheck(TransportUserInfo11[0][4]) + NanCheck(
+                TransportUserInfo11[0][5]) + NanCheck(TransportUserInfo11[0][6])
+            ws['G24'] = NanCheck(TransportUserInfo12[0][4]) + NanCheck(
+                TransportUserInfo12[0][5]) + NanCheck(TransportUserInfo12[0][6])
+            ws['G25'] = NanCheck(TransportUserInfo13[0][4]) + NanCheck(
+                TransportUserInfo13[0][5]) + NanCheck(TransportUserInfo13[0][6])
+            ws['G26'] = NanCheck(TransportUserInfo14[0][4]) + NanCheck(
+                TransportUserInfo14[0][5]) + NanCheck(TransportUserInfo14[0][6])
+
+
+            ######3table
+
+            #На рейде в т.ч на линейных судах В ожидании выгрузки
+            ws['D32'] = NanCheck(Reid_info1[0][0])
+            ws['D33'] = NanCheck(Reid_info2[0][0])
+            ws['D34'] = NanCheck(Reid_info3[0][0])
+            ws['D35'] = NanCheck(Reid_info4[0][0])
+            ws['D36'] = NanCheck(Reid_info5[0][0])
+            ws['D37'] = NanCheck(Reid_info6[0][0])
+            ws['D38'] = NanCheck(Reid_info7[0][0])
+
+            #На рейде в т.ч. на трамповых судах В ожидании выгрузки
+            ws['E32'] = NanCheck(Reid_info1[0][1])
+            ws['E33'] = NanCheck(Reid_info2[0][1])
+            ws['E34'] = NanCheck(Reid_info3[0][1])
+            ws['E35'] = NanCheck(Reid_info4[0][1])
+            ws['E36'] = NanCheck(Reid_info5[0][1])
+            ws['E37'] = NanCheck(Reid_info6[0][1])
+            ws['E38'] = NanCheck(Reid_info7[0][1])
+
+            #На рейде в т.ч на линейных судах В ожидании погрузки
+            ws['G32'] = NanCheck(Reid_info1[0][2])
+            ws['G33'] = NanCheck(Reid_info2[0][2])
+            ws['G34'] = NanCheck(Reid_info3[0][2])
+            ws['G35'] = NanCheck(Reid_info4[0][2])
+            ws['G36'] = NanCheck(Reid_info5[0][2])
+            ws['G37'] = NanCheck(Reid_info6[0][2])
+            ws['G38'] = NanCheck(Reid_info7[0][2])
+
+
+            #На рейде в т.ч. на трамповых судах В ожидании погрузки
+            ws['H32'] = NanCheck(Reid_info1[0][3])
+            ws['H33'] = NanCheck(Reid_info2[0][3])
+            ws['H34'] = NanCheck(Reid_info3[0][3])
+            ws['H35'] = NanCheck(Reid_info4[0][3])
+            ws['H36'] = NanCheck(Reid_info5[0][3])
+            ws['H37'] = NanCheck(Reid_info6[0][3])
+            ws['H38'] = NanCheck(Reid_info7[0][3])
+
+            #На рейде в т.ч на линейных судах В ожидании выгрузки
+            ws['K32'] = NanCheck(Reid_info1[0][4])
+            ws['K33'] = NanCheck(Reid_info2[0][4])
+            ws['K34'] = NanCheck(Reid_info3[0][4])
+            ws['K35'] = NanCheck(Reid_info4[0][4])
+            ws['K36'] = NanCheck(Reid_info5[0][4])
+            ws['K37'] = NanCheck(Reid_info6[0][4])
+            ws['K38'] = NanCheck(Reid_info7[0][4])
+
+            #На рейде в т.ч. на трамповых судах В ожидании выгрузки
+            ws['L32'] = NanCheck(Reid_info1[0][5])
+            ws['L33'] = NanCheck(Reid_info2[0][5])
+            ws['L34'] = NanCheck(Reid_info3[0][5])
+            ws['L35'] = NanCheck(Reid_info4[0][5])
+            ws['L36'] = NanCheck(Reid_info5[0][5])
+            ws['L37'] = NanCheck(Reid_info6[0][5])
+            ws['L38'] = NanCheck(Reid_info7[0][5])
+
+            #На рейде в т.ч на линейных судах В ожидании погрузки
+            ws['N32'] = NanCheck(Reid_info1[0][6])
+            ws['N33'] = NanCheck(Reid_info2[0][6])
+            ws['N34'] = NanCheck(Reid_info3[0][6])
+            ws['N35'] = NanCheck(Reid_info4[0][6])
+            ws['N36'] = NanCheck(Reid_info5[0][6])
+            ws['N37'] = NanCheck(Reid_info6[0][6])
+            ws['N38'] = NanCheck(Reid_info7[0][6])
+
+
+            #На рейде в т.ч. на трамповых судах В ожидании погрузки
+            ws['O32'] = NanCheck(Reid_info1[0][7])
+            ws['O33'] = NanCheck(Reid_info2[0][7])
+            ws['O34'] = NanCheck(Reid_info3[0][7])
+            ws['O35'] = NanCheck(Reid_info4[0][7])
+            ws['O36'] = NanCheck(Reid_info5[0][7])
+            ws['O37'] = NanCheck(Reid_info6[0][7])
+            ws['O38'] = NanCheck(Reid_info7[0][7])
+
+
+            ###4 table
+            #Количество фитинговых платформ, ед. Всего на сети
+            ws['C44'] = NanCheck(WagonsData1[0][0])
+            ws['C45'] = NanCheck(WagonsData2[0][0])
+            ws['C46'] = NanCheck(WagonsData3[0][0])
+            ws['C47'] = NanCheck(WagonsData4[0][0])
+            ws['C48'] = NanCheck(WagonsData5[0][0])
+            ws['C49'] = NanCheck(WagonsData6[0][0])
+            ws['C50'] = NanCheck(WagonsData7[0][0])
+
+            #Количество фитинговых платформ, ед. в т.ч. на дальневосточной дороге
+
+            ws['D44'] = NanCheck(WagonsDataFE1[0][0])
+            ws['D45'] = NanCheck(WagonsDataFE2[0][0])
+            ws['D46'] = NanCheck(WagonsDataFE3[0][0])
+            ws['D47'] = NanCheck(WagonsDataFE4[0][0])
+            ws['D48'] = NanCheck(WagonsDataFE5[0][0])
+            ws['D49'] = NanCheck(WagonsDataFE6[0][0])
+            ws['D50'] = NanCheck(WagonsDataFE7[0][0])
+
+
+            ### 5 table
+            #Убыло
+            ws['C56'] = NanCheck(TransportUserInfo1[0][2])
+            ws['C57'] = NanCheck(TransportUserInfo2[0][2])
+            ws['C58'] = NanCheck(TransportUserInfo3[0][2])
+            ws['C59'] = NanCheck(TransportUserInfo4[0][2])
+            ws['C60'] = NanCheck(TransportUserInfo5[0][2])
+            ws['C61'] = NanCheck(TransportUserInfo6[0][2])
+            ws['C62'] = NanCheck(TransportUserInfo7[0][2])
+
+            #Прибыло
+            ws['D56'] = NanCheck(TransportUserInfo1[0][6])
+            ws['D57'] = NanCheck(TransportUserInfo2[0][6])
+            ws['D58'] = NanCheck(TransportUserInfo3[0][6])
+            ws['D59'] = NanCheck(TransportUserInfo4[0][6])
+            ws['D60'] = NanCheck(TransportUserInfo5[0][6])
+            ws['D61'] = NanCheck(TransportUserInfo6[0][6])
+            ws['D62'] = NanCheck(TransportUserInfo7[0][6])
+
+
+            ####6 table
+            #Наличие контейнеров в портовых терминалах, готовых к вывозу по ж.д.
+            ws['C69'] = NanCheck(ContainerDataNow1[0][0])
+            ws['C70'] = NanCheck(ContainerDataNow2[0][0])
+            ws['C71'] = NanCheck(ContainerDataNow3[0][0])
+            ws['C72'] = NanCheck(ContainerDataNow4[0][0])
+            ws['C73'] = NanCheck(ContainerDataNow5[0][0])
+            ws['C74'] = NanCheck(ContainerDataNow6[0][0])
+            ws['C75'] = NanCheck(ContainerDataNow7[0][0])
+
+
+            #Наличие контейнеров в портовых терминалах, готовых к вывозу автотранспортом
+            ws['D69'] = NanCheck(ContainerDataNow1[0][1])
+            ws['D70'] = NanCheck(ContainerDataNow2[0][1])
+            ws['D71'] = NanCheck(ContainerDataNow3[0][1])
+            ws['D72'] = NanCheck(ContainerDataNow4[0][1])
+            ws['D73'] = NanCheck(ContainerDataNow5[0][1])
+            ws['D74'] = NanCheck(ContainerDataNow6[0][1])
+            ws['D75'] = NanCheck(ContainerDataNow7[0][1])
+
+            # Обеспечение автотранспортом портовых терминалов
+            ws['E69'] = NanCheck(ContainerDataNow1[0][2])
+            ws['E70'] = NanCheck(ContainerDataNow2[0][2])
+            ws['E71'] = NanCheck(ContainerDataNow3[0][2])
+            ws['E72'] = NanCheck(ContainerDataNow4[0][2])
+            ws['E73'] = NanCheck(ContainerDataNow5[0][2])
+            ws['E74'] = NanCheck(ContainerDataNow6[0][2])
+            ws['E75'] = NanCheck(ContainerDataNow7[0][2])
         except:
             pass
         bytes_io = BytesIO()
