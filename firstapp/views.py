@@ -107,6 +107,7 @@ def user_logout(request):
 def table1_data(request):
     session_id = request.GET.get('session_id')
     if session_id:
+        #WORK IN PROGRESS
         # Используйте session_id, чтобы вручную загрузить сеанс
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
@@ -231,26 +232,25 @@ def table1_data(request):
             redirect_url = f'/success_table1/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            #WORK IN PROGRESS
             Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
             return render(request, 'table1_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'ImportIn': Userdata[0][0],
-                'ImportOut': Userdata[0][1],
-                'ExportIn': Userdata[0][2],
-                'ExportOut': Userdata[0][3],
-                'TransitIn': Userdata[0][4],
-                'TransitOut': Userdata[0][5],
-                'ExportEmpty': Userdata[0][6],
-                'OtherEmpty': Userdata[0][7],
-                'UnloadReidlin': Userdata[0][8],
-                'UnloadReidtramp': Userdata[0][9],
-                'LoadingReidLin': Userdata[0][10],
-                'LoadingReidTramp': Userdata[0][11],
-                'UnloadPortlin': Userdata[0][12],
-                'UnloadPorttramp': Userdata[0][13],
-                'LoadingPortLin': Userdata[0][13],
-                'LoadingPortTramp': Userdata[0][14]
+                'ImportIn' : NanCheck(Userdata[0][0]),
+                'ImportOut' : NanCheck(Userdata[0][1]),
+                'ExportIn' : NanCheck(Userdata[0][2]),
+                'ExportOut' : NanCheck(Userdata[0][3]),
+                'TransitIn' : NanCheck(Userdata[0][4]),
+                'TransitOut' : NanCheck(Userdata[0][5]),
+                'ExportEmpty' : NanCheck(Userdata[0][6]),
+                'OtherEmpty' : NanCheck(Userdata[0][7]),
+                'UnloadReidlin' : NanCheck(Userdata[0][8]),
+                'UnloadReidtramp' : NanCheck(Userdata[0][9]),
+                'LoadingReidLin' : NanCheck(Userdata[0][10]),
+                'LoadingReidTramp' : NanCheck(Userdata[0][11]),
+                'UnloadPortlin' : NanCheck(Userdata[0][12]),
+                'UnloadPorttramp' : NanCheck(Userdata[0][13]),
+                'LoadingPortLin' : NanCheck(Userdata[0][13]),
+                'LoadingPortTramp' : NanCheck(Userdata[0][14])
             })
         except:
             return render(request, 'table1_data.html', {
@@ -384,120 +384,6 @@ def NanCheck(i):
     except:
         i = 0
     return i
-
-# ###File download realization
-# @login_required(login_url='')
-# def download(request):
-#     if request.user.id == 1:
-#         wb = openpyxl.load_workbook('./Test.xlsx')
-#         ws = wb.get_sheet_by_name('Шаблон1')
-#         params = request.session.get('parameters', {})
-#         date = params.get('date1')
-#         try:
-#             #admin_id = 2
-#             #
-#             # TestUser1
-#             #
-#             User1data = getUserInfoFromDB(2, date)
-#             #ws[f'A2'] = date
-#             ws[f'A4'] = 'TestUser1'
-#             ws[f'B4'] = User1data[0][0]
-#             ws[f'C4'] = User1data[0][1]
-#             ws[f'D4'] = User1data[0][2]
-#             ws[f'E4'] = User1data[0][3]
-#             ws[f'F4'] = User1data[0][4]
-#             ws[f'G4'] = User1data[0][5]
-#             ws[f'H4'] = User1data[0][6]
-#             ws[f'I4'] = User1data[0][7]
-#             ws[f'J4'] = User1data[0][8]
-#             ws[f'K4'] = User1data[0][9]
-#             ws[f'L4'] = User1data[0][10]
-#             ws[f'M4'] = User1data[0][11]
-#
-#             #
-#             # TestUser2
-#             #
-#
-#             User2data = getUserInfoFromDB(3, date)
-#
-#             #ws[f'A3'] = date
-#             ws[f'A5'] = 'TestUser1'
-#             ws[f'B5'] = User2data[0][0]
-#             ws[f'C5'] = User2data[0][1]
-#             ws[f'D5'] = User2data[0][2]
-#             ws[f'E5'] = User2data[0][3]
-#             ws[f'F5'] = User2data[0][4]
-#             ws[f'G5'] = User2data[0][5]
-#             ws[f'H5'] = User2data[0][6]
-#             ws[f'I5'] = User2data[0][7]
-#             ws[f'J5'] = User2data[0][8]
-#             ws[f'K5'] = User2data[0][9]
-#             ws[f'L5'] = User2data[0][10]
-#             ws[f'M5'] = User2data[0][11]
-#
-#             #
-#             # TestUser3 massive query
-#             #
-#             User3data = getUserInfoFromDB(4, date)
-#
-#             #ws[f'A4'] = date
-#             ws[f'A6'] = 'TestUser1'
-#             ws[f'B6'] = User2data[0][0]
-#             ws[f'C6'] = User2data[0][1]
-#             ws[f'D6'] = User2data[0][2]
-#             ws[f'E6'] = User2data[0][3]
-#             ws[f'F6'] = User2data[0][4]
-#             ws[f'G6'] = User2data[0][5]
-#             ws[f'H6'] = User2data[0][6]
-#             ws[f'I6'] = User2data[0][7]
-#             ws[f'J6'] = User2data[0][8]
-#             ws[f'K6'] = User2data[0][9]
-#             ws[f'L6'] = User2data[0][10]
-#             ws[f'M6'] = User2data[0][11]
-#             #
-#             # Сумма по всем пользователям за дату
-#             #
-#             UserAlldatafordate = getDataTableForDate(date)
-#             #ws[f'A5'] = date
-#             ws[f'A7'] = 'TestUser1'
-#             ws[f'B7'] = UserAlldatafordate[0][0]
-#             ws[f'C7'] = UserAlldatafordate[0][1]
-#             ws[f'D7'] = UserAlldatafordate[0][2]
-#             ws[f'E7'] = UserAlldatafordate[0][3]
-#             ws[f'F7'] = UserAlldatafordate[0][4]
-#             ws[f'G7'] = UserAlldatafordate[0][5]
-#             ws[f'H7'] = UserAlldatafordate[0][6]
-#             ws[f'I7'] = UserAlldatafordate[0][7]
-#             ws[f'J7'] = UserAlldatafordate[0][8]
-#             ws[f'K7'] = UserAlldatafordate[0][9]
-#             ws[f'L7'] = UserAlldatafordate[0][10]
-#             ws[f'M7'] = UserAlldatafordate[0][11]
-#             #
-#             # Сумма по всем пользователям за всё время
-#             #
-#             UserAlldata = getDataTableForAllTime(date)
-#             #ws[f'A6'] = date
-#             ws[f'A8'] = 'TestUser1'
-#             ws[f'B8'] = UserAlldata[0][0]
-#             ws[f'C8'] = UserAlldata[0][1]
-#             ws[f'D8'] = UserAlldata[0][2]
-#             ws[f'E8'] = UserAlldata[0][3]
-#             ws[f'F8'] = UserAlldata[0][4]
-#             ws[f'G8'] = UserAlldata[0][5]
-#             ws[f'H8'] = UserAlldata[0][6]
-#             ws[f'I8'] = UserAlldata[0][7]
-#             ws[f'J8'] = UserAlldata[0][8]
-#             ws[f'K8'] = UserAlldata[0][9]
-#             ws[f'L8'] = UserAlldata[0][10]
-#             ws[f'M8'] = UserAlldata[0][11]
-#         except:
-#             pass
-#         bytes_io = BytesIO()
-#         wb.save(bytes_io)
-#         bytes_io.seek(0)
-#         return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xslx'))
-#     else:
-#         return redirect('home')
 
 ###File download realization
 @login_required(login_url='')
@@ -2036,13 +1922,12 @@ def table2_data(request):
             redirect_url = f'/success_table2/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            #WORK IN PROGRESS
-            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            Userdata = getContaunerUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
             return render(request, 'table2_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'ContainerTrain': Userdata[0][0],
-                'ContainerAuto': Userdata[0][1],
-                'ContainerAutoQty': Userdata[0][2],
+                'ContainerTrain': NanCheck(Userdata[0][0]),
+                'ContainerAuto': NanCheck(Userdata[0][1]),
+                'ContainerAutoQty': NanCheck(Userdata[0][2]),
             })
         except:
             return render(request, 'table2_data.html', {
@@ -2068,11 +1953,13 @@ def success_table2(request):
         ContainerAuto[0] = NanCheck(ContainerAuto[0])
         ContainerAutoQty[0] = NanCheck(ContainerAutoQty[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DailyMonitoringUserContainers.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+        DataItem = (DailyMonitoringUserContainers.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                db_userid = request.user.id)
+        .update(
                 db_container_train=int(ContainerTrain[0]),
                 db_container_auto=int(ContainerAuto[0]),
                 db_container_auto_qty=int(ContainerAutoQty[0])
-            )
+        ))
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
             DailyMonitoringUserContainers.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
@@ -2141,13 +2028,12 @@ def table3_data(request):
             redirect_url = f'/success_table3/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            #WORK IN PROGRESS
-            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
-            print(123321)
+            Userdata = getWagonsUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            print(Userdata)
             return render(request, 'table3_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'Wagons': Userdata[0][0],
-                'WagonsOut': Userdata[0][1],
+                'Wagons': NanCheck(Userdata[0][0]),
+                'WagonsOut': NanCheck(Userdata[0][1]),
             })
         except:
             return render(request, 'table3_data.html', {
@@ -2242,13 +2128,11 @@ def table4_data(request):
             redirect_url = f'/success_table4/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            #WORK IN PROGRESS
-            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
-            print(123321)
+            Userdata = getWagonsUserInfoFromDBFE(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
             return render(request, 'table4_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'Wagons_FE': Userdata[0][0],
-                'WagonsOut_FE': Userdata[0][1],
+                'Wagons_FE': NanCheck(Userdata[0][0]),
+                'WagonsOut_FE': NanCheck(Userdata[0][1]),
             })
         except:
             return render(request, 'table4_data.html', {
@@ -2378,19 +2262,17 @@ def table5_data(request):
             redirect_url = f'/success_table5/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            #WORK IN PROGRESS
-            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
-            print(123321)
+            Userdata = getTransportUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
             return render(request, 'table5_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'FittingPlatformOut': Userdata[0][0],
-                'SemiwagonOut': Userdata[0][1],
-                'AutoOut': Userdata[0][0],
-                'SeaOut': Userdata[0][1],
-                'FittingPlatformIn': Userdata[0][0],
-                'SemiwagonIn': Userdata[0][1],
-                'AutoIn': Userdata[0][0],
-                'SeaIn': Userdata[0][1],
+                'FittingPlatformOut': NanCheck(Userdata[0][0]),
+                'SemiwagonOut': NanCheck(Userdata[0][1]),
+                'AutoOut': NanCheck(Userdata[0][2]),
+                'SeaOut': NanCheck(Userdata[0][3]),
+                'FittingPlatformIn': NanCheck(Userdata[0][4]),
+                'SemiwagonIn': NanCheck(Userdata[0][5]),
+                'AutoIn': NanCheck(Userdata[0][6]),
+                'SeaIn': NanCheck(Userdata[0][7]),
             })
         except:
             return render(request, 'table5_data.html', {
@@ -2564,14 +2446,14 @@ def table6_data(request):
             print(123321)
             return render(request, 'table6_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
-                'FittingPlatformOut': Userdata[0][0],
-                'SemiwagonOut': Userdata[0][1],
-                'AutoOut': Userdata[0][0],
-                'FittingPlatformIn': Userdata[0][0],
-                'SemiwagonIn': Userdata[0][1],
-                'AutoIn': Userdata[0][0],
-                'FactLoad': Userdata[0][1],
-                'Reload': Userdata[0][1],
+                'FittingPlatformOut': (Userdata[0][0]),
+                'SemiwagonOut': NanCheck(Userdata[0][1]),
+                'AutoOut': NanCheck(Userdata[0][2]),
+                'FittingPlatformIn': NanCheck(Userdata[0][4]),
+                'SemiwagonIn': NanCheck(Userdata[0][5]),
+                'AutoIn': NanCheck(Userdata[0][6]),
+                'FactLoad': NanCheck(Userdata[0][8]),
+                'Reload': NanCheck(Userdata[0][9]),
             })
         except:
             return render(request, 'table6_data.html', {
