@@ -22,12 +22,19 @@ from .database_requests_table1 import (getDataTableForAllTime,
                                 getNormsWarehouseQty,
                                 getNormsWarehouseAllQty,
                                 getReidUserInfoFromDB,
-                                getReidAllInfoFromDB)
+                                getReidAllInfoFromDB,
+                                getMaxWarehouseAllQtyNotST,
+                                getNormsWarehouseAllQtyNotST)
 
 from .database_requests_table2 import (getContaunerUserInfoFromDB,
                                        getContaunerInfoFromDBAll)
-from .database_requests_table3_4 import getWagonsUserInfoFromDB, getWagonsInfoFromDBAll, getWagonsUserInfoFromDBFE, \
-    getWagonsInfoFromDBAllFE
+from .database_requests_table3_4 import (getWagonsUserInfoFromDB,
+                                         getWagonsInfoFromDBAll,
+                                         getWagonsUserInfoFromDBFE,
+                                         getWagonsInfoFromDBAllFE)
+from .database_requests_table5 import (getTransportUserInfoFromDB,
+                                       getTransportInfoFromDBAll,
+                                       getTransportInfoFromDBNotSTAll)
 from .models import (DailyMonitoringUserData,
                      ConstantUserData,
                      DailyMonitoringUserContainers,
@@ -496,50 +503,228 @@ def NanCheck(i):
 @login_required(login_url='')
 def download(request):
     if request.user.id == 1:
-        wb = openpyxl.load_workbook('./WS1_s.xlsx')
+        wb = openpyxl.load_workbook('./WS2_s.xlsx')
         ws = wb.get_sheet_by_name('Шаблон1')
         params = request.session.get('parameters', {})
         date = params.get('date1')
         try:
-            #admin_id = 2
             #
             # TestUser1
             #
-            User1data = getUserInfoFromDB(2, date)
+            # table 1
+            Tranzit1 = getTranzitUserInfoFromDB(2, date)
+            User1data = getUserInfoFromDBDataset(2, date)
+            MaxWarehouseQty1User = getMaxWarehouseQty(2)[0][0]
+            NormsWarehouseQty1User = getNormsWarehouseQty(2)[0][0]
+            AllQty1User = AllQtyCalculator(User1data, Tranzit1)
+            Reid_info1 = getReidUserInfoFromDB(2, date)
+            # table 2
+            ContainerData1 = getContaunerUserInfoFromDB(2, date)
+            ContainerDataNow1 = getContaunerUserInfoFromDB(2,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData1 = getWagonsUserInfoFromDB(2, date)
+            # table4
+            WagonsDataFE1 = getWagonsUserInfoFromDBFE(2, date)
+            # table5
+            TransportUserInfo1 = getTransportUserInfoFromDB(2, date)
+
             #
             # TestUser2
             #
-            User2data = getUserInfoFromDB(3, date)
-            #
-            # TestUser3 massive query
-            #
-            User3data = getUserInfoFromDB(4, date)
-            #
-            # Сумма по всем пользователям за дату
-            #
-            #
-            # Сумма по всем пользователям за всё время
-            #
-            UserAllDataOlder = getDataTableForAllTime((dt.datetime.strptime(date, '%Y-%m-%d')-DAYDELTA).strftime('%Y-%m-%d'))
-            UserAlldata = getDataTableForAllTime(date)
+            # table 1
+            Tranzit2 = getTranzitUserInfoFromDB(3, date)
+            User2data = getUserInfoFromDBDataset(3, date)
+            MaxWarehouseQty2User = getMaxWarehouseQty(3)[0][0]
+            NormsWarehouseQty2User = getNormsWarehouseQty(3)[0][0]
+            AllQty2User = AllQtyCalculator(User2data, Tranzit2)
+            Reid_info2 = getReidUserInfoFromDB(3, date)
 
-            ws['E9'] = (UserAlldata[0][0]-UserAlldata[0][1]+UserAlldata[0][2]-UserAlldata[0][3]+UserAlldata[0][4]-UserAlldata[0][5])
-            ws['Q22'] = UserAlldata[0][0]
-            ws['R22'] = UserAlldata[0][1]
-            ws['S22'] = UserAlldata[0][2]
-            ws['T22'] = UserAlldata[0][3]
-            ws['U22'] = UserAlldata[0][4]
-            ws['V22'] = UserAlldata[0][5]
-            ws['W22'] = UserAlldata[0][6]
-            ws['X22'] = UserAlldata[0][7]
-            ws['Y22'] = UserAlldata[0][8]
-            ws['Z22'] = UserAlldata[0][9]
-            ws['AA22'] = UserAlldata[0][10]
-            ws['AB22'] = UserAlldata[0][11]
-            ws['C33'] = UserAlldata[0][8]
-            ws['D33'] = UserAlldata[0][9]
-            ws['F33'] = UserAlldata[0][10]
-            ws['G33'] = UserAlldata[0][11]
+            # table 2
+            ContainerData2 = getContaunerUserInfoFromDB(3, date)
+            ContainerDataNow2 = getContaunerUserInfoFromDB(3,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData2 = getWagonsUserInfoFromDB(3, date)
+            # table4
+            WagonsDataFE2 = getWagonsUserInfoFromDBFE(3, date)
+            # table5
+            TransportUserInfo2 = getTransportUserInfoFromDB(3, date)
+
+
+            #
+            # 3 user
+            #
+
+            # table 1
+            Tranzit3 = getTranzitUserInfoFromDB(4, date)
+            User3data = getUserInfoFromDBDataset(4, date)
+            MaxWarehouseQty3User = getMaxWarehouseQty(4)[0][0]
+            NormsWarehouseQty3User = getNormsWarehouseQty(4)[0][0]
+            AllQty3User = AllQtyCalculator(User3data, Tranzit3)
+            Reid_info3 = getReidUserInfoFromDB(4, date)
+
+            # table 2
+            ContainerData3 = getContaunerUserInfoFromDB(4, date)
+            ContainerDataNow3 = getContaunerUserInfoFromDB(4,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData3 = getWagonsUserInfoFromDB(4, date)
+            # table4
+            WagonsDataFE3 = getWagonsUserInfoFromDBFE(4, date)
+            # table5
+            TransportUserInfo3 = getTransportUserInfoFromDB(4, date)
+
+
+            #
+            # 4 user
+            #
+
+            # table 1
+            Tranzit4 = getTranzitUserInfoFromDB(5, date)
+            User4data = getUserInfoFromDBDataset(5, date)
+            MaxWarehouseQty4User = getMaxWarehouseQty(5)[0][0]
+            NormsWarehouseQty4User = getNormsWarehouseQty(5)[0][0]
+            AllQty4User = AllQtyCalculator(User4data, Tranzit4)
+
+            Reid_info4 = getReidUserInfoFromDB(5, date)
+
+            # table 2
+            ContainerData4 = getContaunerUserInfoFromDB(5, date)
+            ContainerDataNow4 = getContaunerUserInfoFromDB(5,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData4 = getWagonsUserInfoFromDB(5, date)
+            # table4
+            WagonsDataFE4 = getWagonsUserInfoFromDBFE(5, date)
+            # table5
+            TransportUserInfo4 = getTransportUserInfoFromDB(5, date)
+
+
+            #
+            # 5 user
+            #
+
+            # table 1
+            Tranzit5 = getTranzitUserInfoFromDB(6, date)
+            User5data = getUserInfoFromDBDataset(6, date)
+            MaxWarehouseQty5User = getMaxWarehouseQty(6)[0][0]
+            NormsWarehouseQty5User = getNormsWarehouseQty(6)[0][0]
+            AllQty5User = AllQtyCalculator(User5data, Tranzit5)
+
+            Reid_info5 = getReidUserInfoFromDB(6, date)
+
+            # table 2
+            ContainerData5 = getContaunerUserInfoFromDB(6, date)
+            ContainerDataNow5 = getContaunerUserInfoFromDB(6,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData5 = getWagonsUserInfoFromDB(6, date)
+            # table4
+            WagonsDataFE5 = getWagonsUserInfoFromDBFE(6, date)
+            # table5
+            TransportUserInfo5 = getTransportUserInfoFromDB(6, date)
+
+            #
+            # 6 user
+            #
+
+            # table 1
+            Tranzit6 = getTranzitUserInfoFromDB(7, date)
+            User6data = getUserInfoFromDBDataset(7, date)
+            MaxWarehouseQty6User = getMaxWarehouseQty(7)[0][0]
+            NormsWarehouseQty6User = getNormsWarehouseQty(7)[0][0]
+            AllQty6User = AllQtyCalculator(User6data, Tranzit6)
+            Reid_info6 = getReidUserInfoFromDB(7, date)
+
+            # table 2
+            ContainerData6 = getContaunerUserInfoFromDB(7, date)
+            ContainerDataNow6 = getContaunerUserInfoFromDB(7,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData6 = getWagonsUserInfoFromDB(7, date)
+            # table4
+            WagonsDataFE6 = getWagonsUserInfoFromDBFE(7, date)
+            # table5
+            TransportUserInfo6 = getTransportUserInfoFromDB(7, date)
+
+
+            #
+            # 7 user
+            #
+
+            # table 1
+            Tranzit7 = getTranzitUserInfoFromDB(8, date)
+            User7data = getUserInfoFromDBDataset(8, date)
+            MaxWarehouseQty7User = getMaxWarehouseQty(8)[0][0]
+            NormsWarehouseQty7User = getNormsWarehouseQty(8)[0][0]
+            AllQty7User = AllQtyCalculator(User7data, Tranzit7)
+
+            Reid_info7 = getReidUserInfoFromDB(8, date)
+
+            # table 2
+            ContainerData7 = getContaunerUserInfoFromDB(8, date)
+            ContainerDataNow7 = getContaunerUserInfoFromDB(8,
+                                                           (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+                                                               '%Y-%m-%d'))
+            # table3
+            WagonsData7 = getWagonsUserInfoFromDB(8, date)
+            # table4
+            WagonsDataFE7 = getWagonsUserInfoFromDBFE(8, date)
+            # table5
+            TransportUserInfo7 = getTransportUserInfoFromDB(8, date)
+
+
+
+            #####
+            #######6 table##### 2 table in dataset
+            #####
+
+            # 8 user
+
+            TransportUserInfo8 = getTransportUserInfoFromDB(9, date)
+
+
+            # 9 user
+
+            TransportUserInfo9 = getTransportUserInfoFromDB(10, date)
+
+
+            # 10 user
+
+            TransportUserInfo10 = getTransportUserInfoFromDB(11, date)
+
+
+            # 11 user
+
+            TransportUserInfo11 = getTransportUserInfoFromDB(12, date)
+
+
+            # 12 user
+
+            TransportUserInfo12 = getTransportUserInfoFromDB(13, date)
+
+
+            # 13 user
+
+            TransportUserInfo13 = getTransportUserInfoFromDB(14, date)
+
+
+            # 14 user
+
+            TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
+
+
+            for i in range(8,14):
+                ws[f'C{i}'] = getMaxWarehouseQty(i-6)[0][0]
+                print(getMaxWarehouseQty(i-6)[0][0])
+
         except:
             pass
         bytes_io = BytesIO()
@@ -575,6 +760,21 @@ def dataset(request):
         WagonsData1 = getWagonsUserInfoFromDB(2,date)
                 #table4
         WagonsDataFE1 = getWagonsUserInfoFromDBFE(2,date)
+                #table5
+        TransportUserInfo1 = getTransportUserInfoFromDB(2,date)
+        TransportUserInfo1InPercent = TransportPercent((NanCheck(TransportUserInfo1[0][4])
+                                                        + NanCheck(TransportUserInfo1[0][5])
+                                                        + NanCheck(TransportUserInfo1[0][6])
+                                                        + NanCheck(TransportUserInfo1[0][7])),
+                                                          2400,
+                                                          2)
+        TransportUserInfo1OutPercent = TransportPercent((NanCheck(TransportUserInfo1[0][0])
+                                                        + NanCheck(TransportUserInfo1[0][1])
+                                                        + NanCheck(TransportUserInfo1[0][2])
+                                                        + NanCheck(TransportUserInfo1[0][3])),
+                                                          2400,
+                                                          2)
+        TransportCalculated1 = TransportCalculator(TransportUserInfo1)
 
         #
         # TestUser2
@@ -596,10 +796,218 @@ def dataset(request):
         WagonsData2 = getWagonsUserInfoFromDB(3,date)
                 #table4
         WagonsDataFE2 = getWagonsUserInfoFromDBFE(3,date)
+                #table5
+        TransportUserInfo2 = getTransportUserInfoFromDB(3,date)
+        TransportUserInfo2InPercent = TransportPercent((NanCheck(TransportUserInfo2[0][4])
+                                                        + NanCheck(TransportUserInfo2[0][5])
+                                                        + NanCheck(TransportUserInfo2[0][6])
+                                                        + NanCheck(TransportUserInfo2[0][7])),
+                                                          2860,
+                                                          2)
+        TransportUserInfo2OutPercent = TransportPercent((NanCheck(TransportUserInfo2[0][0])
+                                                        + NanCheck(TransportUserInfo2[0][1])
+                                                        + NanCheck(TransportUserInfo2[0][2])
+                                                        + NanCheck(TransportUserInfo2[0][3])),
+                                                          2860,
+                                                          2)
+        TransportCalculated2 = TransportCalculator(TransportUserInfo2)
+
 
         #
-        # AllUsers
+        # 3 user
         #
+
+                #table 1
+        Tranzit3 = getTranzitUserInfoFromDB(4,date)
+        User3data = getUserInfoFromDBDataset(4, date)
+        MaxWarehouseQty3User = getMaxWarehouseQty(4)[0][0]
+        NormsWarehouseQty3User = getNormsWarehouseQty(4)[0][0]
+        AllQty3User = AllQtyCalculator(User3data,Tranzit3)
+        AllQtyPercent3User = AllQtyPercent(AllQty3User,MaxWarehouseQty3User,0)
+        Reid_info3 = getReidUserInfoFromDB(4,date)
+        ReidAllUser3 = ReidAllStr(Reid_info3)
+        PortAllUser3 = PortAllStr(Reid_info3)
+                #table 2
+        ContainerData3 = getContaunerUserInfoFromDB(4,date)
+        ContainerDataNow3 = getContaunerUserInfoFromDB(4,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+                #table3
+        WagonsData3 = getWagonsUserInfoFromDB(4,date)
+                #table4
+        WagonsDataFE3 = getWagonsUserInfoFromDBFE(4,date)
+                #table5
+        TransportUserInfo3 = getTransportUserInfoFromDB(4,date)
+        TransportUserInfo3InPercent = TransportPercent((NanCheck(TransportUserInfo3[0][4])
+                                                        + NanCheck(TransportUserInfo3[0][5])
+                                                        + NanCheck(TransportUserInfo3[0][6])
+                                                        + NanCheck(TransportUserInfo3[0][7])),
+                                                          800,
+                                                          2)
+        TransportUserInfo3OutPercent = TransportPercent((NanCheck(TransportUserInfo3[0][0])
+                                                        + NanCheck(TransportUserInfo3[0][1])
+                                                        + NanCheck(TransportUserInfo3[0][2])
+                                                        + NanCheck(TransportUserInfo3[0][3])),
+                                                          800,
+                                                          2)
+        TransportCalculated3 = TransportCalculator(TransportUserInfo3)
+
+        #
+        # 4 user
+        #
+
+        # table 1
+        Tranzit4 = getTranzitUserInfoFromDB(5, date)
+        User4data = getUserInfoFromDBDataset(5, date)
+        MaxWarehouseQty4User = getMaxWarehouseQty(5)[0][0]
+        NormsWarehouseQty4User = getNormsWarehouseQty(5)[0][0]
+        AllQty4User = AllQtyCalculator(User4data, Tranzit4)
+        AllQtyPercent4User = AllQtyPercent(AllQty4User, MaxWarehouseQty4User, 0)
+        Reid_info4 = getReidUserInfoFromDB(5, date)
+        ReidAllUser4 = ReidAllStr(Reid_info4)
+        PortAllUser4 = PortAllStr(Reid_info4)
+        # table 2
+        ContainerData4 = getContaunerUserInfoFromDB(5, date)
+        ContainerDataNow4 = getContaunerUserInfoFromDB(5, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+            '%Y-%m-%d'))
+        # table3
+        WagonsData4 = getWagonsUserInfoFromDB(5, date)
+        # table4
+        WagonsDataFE4 = getWagonsUserInfoFromDBFE(5, date)
+        # table5
+        TransportUserInfo4 = getTransportUserInfoFromDB(5, date)
+        TransportUserInfo4InPercent = TransportPercent((NanCheck(TransportUserInfo4[0][4])
+                                                        + NanCheck(TransportUserInfo4[0][5])
+                                                        + NanCheck(TransportUserInfo4[0][6])
+                                                        + NanCheck(TransportUserInfo4[0][7])),
+                                                       380,
+                                                       2)
+        TransportUserInfo4OutPercent = TransportPercent((NanCheck(TransportUserInfo4[0][0])
+                                                         + NanCheck(TransportUserInfo4[0][1])
+                                                         + NanCheck(TransportUserInfo4[0][2])
+                                                         + NanCheck(TransportUserInfo4[0][3])),
+                                                        380,
+                                                        2)
+        TransportCalculated4 = TransportCalculator(TransportUserInfo4)
+
+        #
+        # 5 user
+        #
+
+        # table 1
+        Tranzit5 = getTranzitUserInfoFromDB(6, date)
+        User5data = getUserInfoFromDBDataset(6, date)
+        MaxWarehouseQty5User = getMaxWarehouseQty(6)[0][0]
+        NormsWarehouseQty5User = getNormsWarehouseQty(6)[0][0]
+        AllQty5User = AllQtyCalculator(User5data, Tranzit5)
+        AllQtyPercent5User = AllQtyPercent(AllQty5User, MaxWarehouseQty5User, 0)
+        Reid_info5 = getReidUserInfoFromDB(6, date)
+        ReidAllUser5 = ReidAllStr(Reid_info5)
+        PortAllUser5 = PortAllStr(Reid_info5)
+        # table 2
+        ContainerData5 = getContaunerUserInfoFromDB(6, date)
+        ContainerDataNow5 = getContaunerUserInfoFromDB(6, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+            '%Y-%m-%d'))
+        # table3
+        WagonsData5 = getWagonsUserInfoFromDB(6, date)
+        # table4
+        WagonsDataFE5 = getWagonsUserInfoFromDBFE(6, date)
+        # table5
+        TransportUserInfo5 = getTransportUserInfoFromDB(6, date)
+        TransportUserInfo5InPercent = TransportPercent((NanCheck(TransportUserInfo5[0][4])
+                                                        + NanCheck(TransportUserInfo5[0][5])
+                                                        + NanCheck(TransportUserInfo5[0][6])
+                                                        + NanCheck(TransportUserInfo5[0][7])),
+                                                       580,
+                                                       2)
+        TransportUserInfo5OutPercent = TransportPercent((NanCheck(TransportUserInfo5[0][0])
+                                                         + NanCheck(TransportUserInfo5[0][1])
+                                                         + NanCheck(TransportUserInfo5[0][2])
+                                                         + NanCheck(TransportUserInfo5[0][3])),
+                                                        580,
+                                                        2)
+        TransportCalculated5 = TransportCalculator(TransportUserInfo5)
+
+        #
+        # 6 user
+        #
+
+        # table 1
+        Tranzit6 = getTranzitUserInfoFromDB(7, date)
+        User6data = getUserInfoFromDBDataset(7, date)
+        MaxWarehouseQty6User = getMaxWarehouseQty(7)[0][0]
+        NormsWarehouseQty6User = getNormsWarehouseQty(7)[0][0]
+        AllQty6User = AllQtyCalculator(User6data, Tranzit6)
+        AllQtyPercent6User = AllQtyPercent(AllQty6User, MaxWarehouseQty6User, 0)
+        Reid_info6 = getReidUserInfoFromDB(7, date)
+        ReidAllUser6 = ReidAllStr(Reid_info6)
+        PortAllUser6 = PortAllStr(Reid_info6)
+        # table 2
+        ContainerData6 = getContaunerUserInfoFromDB(7, date)
+        ContainerDataNow6 = getContaunerUserInfoFromDB(7, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+            '%Y-%m-%d'))
+        # table3
+        WagonsData6 = getWagonsUserInfoFromDB(7, date)
+        # table4
+        WagonsDataFE6 = getWagonsUserInfoFromDBFE(7, date)
+        # table5
+        TransportUserInfo6 = getTransportUserInfoFromDB(7, date)
+        TransportUserInfo6InPercent = TransportPercent((NanCheck(TransportUserInfo6[0][4])
+                                                        + NanCheck(TransportUserInfo6[0][5])
+                                                        + NanCheck(TransportUserInfo6[0][6])
+                                                        + NanCheck(TransportUserInfo6[0][7])),
+                                                       100,
+                                                       2)
+        TransportUserInfo6OutPercent = TransportPercent((NanCheck(TransportUserInfo6[0][0])
+                                                         + NanCheck(TransportUserInfo6[0][1])
+                                                         + NanCheck(TransportUserInfo6[0][2])
+                                                         + NanCheck(TransportUserInfo6[0][3])),
+                                                        100,
+                                                        2)
+        TransportCalculated6 = TransportCalculator(TransportUserInfo6)
+
+
+        #
+        # 7 user
+        #
+
+        # table 1
+        Tranzit7 = getTranzitUserInfoFromDB(8, date)
+        User7data = getUserInfoFromDBDataset(8, date)
+        MaxWarehouseQty7User = getMaxWarehouseQty(8)[0][0]
+        NormsWarehouseQty7User = getNormsWarehouseQty(8)[0][0]
+        AllQty7User = AllQtyCalculator(User7data, Tranzit7)
+        AllQtyPercent7User = AllQtyPercent(AllQty7User, MaxWarehouseQty7User, 0)
+        Reid_info7 = getReidUserInfoFromDB(8, date)
+        ReidAllUser7 = ReidAllStr(Reid_info7)
+        PortAllUser7 = PortAllStr(Reid_info7)
+        # table 2
+        ContainerData7 = getContaunerUserInfoFromDB(8, date)
+        ContainerDataNow7 = getContaunerUserInfoFromDB(8, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
+            '%Y-%m-%d'))
+        # table3
+        WagonsData7 = getWagonsUserInfoFromDB(8, date)
+        # table4
+        WagonsDataFE7 = getWagonsUserInfoFromDBFE(8, date)
+        # table5
+        TransportUserInfo7 = getTransportUserInfoFromDB(8, date)
+        TransportUserInfo7InPercent = TransportPercent((NanCheck(TransportUserInfo7[0][4])
+                                                        + NanCheck(TransportUserInfo7[0][5])
+                                                        + NanCheck(TransportUserInfo7[0][6])
+                                                        + NanCheck(TransportUserInfo7[0][7])),
+                                                       0,
+                                                       2)
+        TransportUserInfo7OutPercent = TransportPercent((NanCheck(TransportUserInfo7[0][0])
+                                                         + NanCheck(TransportUserInfo7[0][1])
+                                                         + NanCheck(TransportUserInfo7[0][2])
+                                                         + NanCheck(TransportUserInfo7[0][3])),
+                                                        0,
+                                                        2)
+        TransportCalculated7 = TransportCalculator(TransportUserInfo7)
+
+
+        ###########
+        # AllUsers#
+        ###########
+
             #table 1
         UserAlldata = getDataTableForAllTime(date)
         TranzitAll = getAllTranzitUserInfoFromDB(date)
@@ -617,6 +1025,95 @@ def dataset(request):
         WagonDataAll = getWagonsInfoFromDBAll(date)
             # table4
         WagonDataAllFE = getWagonsInfoFromDBAllFE(date)
+                #table5
+        TransportUserInfoAll = getTransportInfoFromDBAll(date)
+        TransportUserInfoAllInPercent = TransportPercent((NanCheck(TransportUserInfoAll[0][4])
+                                                        + NanCheck(TransportUserInfoAll[0][5])
+                                                        + NanCheck(TransportUserInfoAll[0][6])
+                                                        + NanCheck(TransportUserInfoAll[0][7])),
+                                                          7120,
+                                                          2)
+        TransportUserInfoAllOutPercent = TransportPercent((NanCheck(TransportUserInfoAll[0][0])
+                                                        + NanCheck(TransportUserInfoAll[0][1])
+                                                        + NanCheck(TransportUserInfoAll[0][2])
+                                                        + NanCheck(TransportUserInfoAll[0][3])),
+                                                          7120,
+                                                          2)
+        TransportCalculatedAll = TransportCalculator(TransportUserInfoAll)
+
+
+
+        #####
+        #######6 table##### 2 table in dataset
+        #####
+
+        # 8 user
+
+        TransportUserInfo8 = getTransportUserInfoFromDB(9, date)
+        TransportUserInfo8Percent = TransportPercent(NanCheck(TransportUserInfo8[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(9)[0][0]),
+                                                       2)
+        TransportCalculated8 = TransportCalculator(TransportUserInfo8)
+
+        # 9 user
+
+        TransportUserInfo9 = getTransportUserInfoFromDB(10, date)
+        TransportUserInfo9Percent = TransportPercent(NanCheck(TransportUserInfo9[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(10)[0][0]),
+                                                       2)
+        TransportCalculated9 = TransportCalculator(TransportUserInfo9)
+
+        # 10 user
+
+        TransportUserInfo10 = getTransportUserInfoFromDB(11, date)
+        TransportUserInfo10Percent = TransportPercent(NanCheck(TransportUserInfo10[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(11)[0][0]),
+                                                       2)
+        TransportCalculated10 = TransportCalculator(TransportUserInfo10)
+
+        # 11 user
+
+        TransportUserInfo11 = getTransportUserInfoFromDB(12, date)
+        TransportUserInfo11Percent = TransportPercent(NanCheck(TransportUserInfo11[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(12)[0][0]),
+                                                       2)
+        TransportCalculated11 = TransportCalculator(TransportUserInfo11)
+
+        # 12 user
+
+        TransportUserInfo12 = getTransportUserInfoFromDB(13, date)
+        TransportUserInfo12Percent = TransportPercent(NanCheck(TransportUserInfo12[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(13)[0][0]),
+                                                       2)
+        TransportCalculated12 = TransportCalculator(TransportUserInfo12)
+
+        # 13 user
+
+        TransportUserInfo13 = getTransportUserInfoFromDB(14, date)
+        TransportUserInfo13Percent = TransportPercent(NanCheck(TransportUserInfo13[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(14)[0][0]),
+                                                       2)
+        TransportCalculated13 = TransportCalculator(TransportUserInfo13)
+
+        # 14 user
+
+        TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
+        TransportUserInfo14Percent = TransportPercent(NanCheck(TransportUserInfo14[0][8]),
+                                                       NanCheck(getMaxWarehouseQty(15)[0][0]),
+                                                       2)
+        TransportCalculated14 = TransportCalculator(TransportUserInfo14)
+
+
+        #
+        #All not stevedor users
+        #
+
+        TransportUserInfoNotSTAll = getTransportInfoFromDBNotSTAll(date)
+        print(TransportUserInfoNotSTAll)
+        TransportUserInfoAllPercent = TransportPercent(NanCheck(TransportUserInfoNotSTAll[0][8]),
+                                                          NanCheck(getMaxWarehouseAllQtyNotST()[0][0]),
+                                                          2)
+        TransportCalculatedAllNotST = TransportCalculator(TransportUserInfoNotSTAll)
 
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
@@ -626,10 +1123,11 @@ def dataset(request):
                                                     'User1data' : User1data[0],
                                                     'User2data': User2data[0],
                                                     'UserAlldata': UserAlldata[0],
-            # 1 table dataset
+
+                            # 1 User
                                                     'AllQtyPercent1User': AllQtyPercent1User,
                                                     'AllQty1User' :AllQty1User,
-                                                    'MaxWarehouseQty2User': MaxWarehouseQty2User,
+                                                    'MaxWarehouseQty1User': MaxWarehouseQty1User,
                                                     'NormsWarehouseQty1User' : NormsWarehouseQty1User,
                                                     'ContainerData1': NanCheck(ContainerData1[0][0]),
                                                     'ContainerDataNow1_0': NanCheck(ContainerDataNow1[0][0]),
@@ -639,10 +1137,27 @@ def dataset(request):
                                                     'WagonsDataQty1': NanCheck(WagonsData1[0][0])* 3.5,
                                                     'WagonsDataFE1': NanCheck(WagonsDataFE1[0][0]),
                                                     'WagonsDataQtyFE1': NanCheck(WagonsDataFE1[0][0]) * 3.5,
+                                                    'TransportUserInfo1In' : NanCheck(TransportUserInfo1[0][4])
+                                                                                      + NanCheck(TransportUserInfo1[0][5])
+                                                                                      + NanCheck(TransportUserInfo1[0][6])
+                                                                                      + NanCheck(TransportUserInfo1[0][7]),
+                                                    'TransportUserInfo1InPercent' : TransportUserInfo1InPercent,
+                                                    'TransportUserInfo1Out': NanCheck(TransportUserInfo1[0][0])
+                                                                                     + NanCheck(TransportUserInfo1[0][1])
+                                                                                     + NanCheck(TransportUserInfo1[0][2])
+                                                                                     + NanCheck(TransportUserInfo1[0][3]),
+                                                    'TransportUserInfo1OutPercent': TransportUserInfo1OutPercent,
+                                                    'TransportCalculated1':TransportCalculated1,
+                                                    'AutoTransportIn1': NanCheck(TransportUserInfo1[0][6]),
+                                                    'AutoTransportOut1': NanCheck(TransportUserInfo1[0][2]),
+                                                    'AutoTransportCalculated1': AutoCalculator(TransportUserInfo1),
 
+
+
+                            # 2 user
                                                     'AllQtyPercent2User': AllQtyPercent2User,
                                                     'AllQty2User': AllQty2User,
-                                                    'MaxWarehouseQty1User': MaxWarehouseQty1User,
+                                                    'MaxWarehouseQty2User': MaxWarehouseQty2User,
                                                     'NormsWarehouseQty2User': NormsWarehouseQty2User,
                                                     'ContainerData2': NanCheck(ContainerData2[0][0]),
                                                     'ContainerDataNow2_0': NanCheck(ContainerDataNow2[0][0]),
@@ -652,7 +1167,168 @@ def dataset(request):
                                                     'WagonsDataQty2': NanCheck(WagonsData2[0][0])* 3.5,
                                                     'WagonsDataFE2': NanCheck(WagonsDataFE2[0][0]),
                                                     'WagonsDataQtyFE2': NanCheck(WagonsDataFE2[0][0]) * 3.5,
+                                                    'TransportUserInfo2In': NanCheck(TransportUserInfo2[0][4])
+                                                                                     + NanCheck(TransportUserInfo2[0][5])
+                                                                                     + NanCheck(TransportUserInfo2[0][6])
+                                                                                     + NanCheck(TransportUserInfo2[0][7]),
+                                                    'TransportUserInfo2InPercent': TransportUserInfo2InPercent,
+                                                    'TransportUserInfo2Out': NanCheck(TransportUserInfo2[0][0])
+                                                                                     + NanCheck(TransportUserInfo2[0][1])
+                                                                                     + NanCheck(TransportUserInfo2[0][2])
+                                                                                     + NanCheck(TransportUserInfo2[0][3]),
+                                                    'TransportUserInfo2OutPercent': TransportUserInfo2OutPercent,
+                                                    'TransportCalculated2':TransportCalculated2,
+                                                    'AutoTransportIn2': NanCheck(TransportUserInfo2[0][6]),
+                                                    'AutoTransportOut2': NanCheck(TransportUserInfo2[0][2]),
+                                                    'AutoTransportCalculated2': AutoCalculator(TransportUserInfo2),
 
+                            #3 user
+
+
+                                                    'AllQtyPercent3User': AllQtyPercent3User,
+                                                    'AllQty3User': AllQty3User,
+                                                    'MaxWarehouseQty3User': MaxWarehouseQty3User,
+                                                    'NormsWarehouseQty3User': NormsWarehouseQty3User,
+                                                    'ContainerData3': NanCheck(ContainerData3[0][0]),
+                                                    'ContainerDataNow3_0': NanCheck(ContainerDataNow3[0][0]),
+                                                    'ContainerDataNow3_1': NanCheck(ContainerDataNow3[0][1]),
+                                                    'ContainerDataNow3_2': NanCheck(ContainerDataNow3[0][2]),
+                                                    'WagonsData3': NanCheck(WagonsData3[0][0]),
+                                                    'WagonsDataQty3': NanCheck(WagonsData3[0][0]) * 3.5,
+                                                    'WagonsDataFE3': NanCheck(WagonsDataFE3[0][0]),
+                                                    'WagonsDataQtyFE3': NanCheck(WagonsDataFE3[0][0]) * 3.5,
+                                                    'TransportUserInfo3In': NanCheck(TransportUserInfo3[0][4])
+                                                                            + NanCheck(TransportUserInfo3[0][5])
+                                                                            + NanCheck(TransportUserInfo3[0][6])
+                                                                            + NanCheck(TransportUserInfo3[0][7]),
+                                                    'TransportUserInfo3InPercent': TransportUserInfo3InPercent,
+                                                    'TransportUserInfo3Out': NanCheck(TransportUserInfo3[0][0])
+                                                                             + NanCheck(TransportUserInfo3[0][1])
+                                                                             + NanCheck(TransportUserInfo3[0][2])
+                                                                             + NanCheck(TransportUserInfo3[0][3]),
+                                                    'TransportUserInfo3OutPercent': TransportUserInfo3OutPercent,
+                                                    'TransportCalculated3': TransportCalculated3,
+                                                    'AutoTransportIn3': NanCheck(TransportUserInfo3[0][6]),
+                                                    'AutoTransportOut3': NanCheck(TransportUserInfo3[0][2]),
+                                                    'AutoTransportCalculated3': AutoCalculator(TransportUserInfo3),
+
+                            # 4 user
+
+                                                    'AllQtyPercent4User': AllQtyPercent4User,
+                                                    'AllQty4User': AllQty4User,
+                                                    'MaxWarehouseQty4User': MaxWarehouseQty4User,
+                                                    'NormsWarehouseQty4User': NormsWarehouseQty4User,
+                                                    'ContainerData4': NanCheck(ContainerData4[0][0]),
+                                                    'ContainerDataNow4_0': NanCheck(ContainerDataNow4[0][0]),
+                                                    'ContainerDataNow4_1': NanCheck(ContainerDataNow4[0][1]),
+                                                    'ContainerDataNow4_2': NanCheck(ContainerDataNow4[0][2]),
+                                                    'WagonsData4': NanCheck(WagonsData4[0][0]),
+                                                    'WagonsDataQty4': NanCheck(WagonsData4[0][0]) * 3.5,
+                                                    'WagonsDataFE4': NanCheck(WagonsDataFE4[0][0]),
+                                                    'WagonsDataQtyFE4': NanCheck(WagonsDataFE4[0][0]) * 3.5,
+                                                    'TransportUserInfo4In': NanCheck(TransportUserInfo4[0][4])
+                                                                            + NanCheck(TransportUserInfo4[0][5])
+                                                                            + NanCheck(TransportUserInfo4[0][6])
+                                                                            + NanCheck(TransportUserInfo4[0][7]),
+                                                    'TransportUserInfo4InPercent': TransportUserInfo4InPercent,
+                                                    'TransportUserInfo4Out': NanCheck(TransportUserInfo4[0][0])
+                                                                             + NanCheck(TransportUserInfo4[0][1])
+                                                                             + NanCheck(TransportUserInfo4[0][2])
+                                                                             + NanCheck(TransportUserInfo4[0][3]),
+                                                    'TransportUserInfo4OutPercent': TransportUserInfo4OutPercent,
+                                                    'TransportCalculated4': TransportCalculated4,
+                                                    'AutoTransportIn4': NanCheck(TransportUserInfo4[0][6]),
+                                                    'AutoTransportOut4': NanCheck(TransportUserInfo4[0][2]),
+                                                    'AutoTransportCalculated4': AutoCalculator(TransportUserInfo4),
+
+                            # 5 user
+
+                                                    'AllQtyPercent5User': AllQtyPercent5User,
+                                                    'AllQty5User': AllQty5User,
+                                                    'MaxWarehouseQty5User': MaxWarehouseQty5User,
+                                                    'NormsWarehouseQty5User': NormsWarehouseQty5User,
+                                                    'ContainerData5': NanCheck(ContainerData5[0][0]),
+                                                    'ContainerDataNow5_0': NanCheck(ContainerDataNow5[0][0]),
+                                                    'ContainerDataNow5_1': NanCheck(ContainerDataNow5[0][1]),
+                                                    'ContainerDataNow5_2': NanCheck(ContainerDataNow5[0][2]),
+                                                    'WagonsData5': NanCheck(WagonsData5[0][0]),
+                                                    'WagonsDataQty5': NanCheck(WagonsData5[0][0]) * 3.5,
+                                                    'WagonsDataFE5': NanCheck(WagonsDataFE5[0][0]),
+                                                    'WagonsDataQtyFE5': NanCheck(WagonsDataFE5[0][0]) * 3.5,
+                                                    'TransportUserInfo5In': NanCheck(TransportUserInfo5[0][4])
+                                                                            + NanCheck(TransportUserInfo5[0][5])
+                                                                            + NanCheck(TransportUserInfo5[0][6])
+                                                                            + NanCheck(TransportUserInfo5[0][7]),
+                                                    'TransportUserInfo5InPercent': TransportUserInfo5InPercent,
+                                                    'TransportUserInfo5Out': NanCheck(TransportUserInfo5[0][0])
+                                                                             + NanCheck(TransportUserInfo5[0][1])
+                                                                             + NanCheck(TransportUserInfo5[0][2])
+                                                                             + NanCheck(TransportUserInfo5[0][3]),
+                                                    'TransportUserInfo5OutPercent': TransportUserInfo5OutPercent,
+                                                    'TransportCalculated5': TransportCalculated5,
+                                                    'AutoTransportIn5': NanCheck(TransportUserInfo5[0][6]),
+                                                    'AutoTransportOut5': NanCheck(TransportUserInfo5[0][2]),
+                                                    'AutoTransportCalculated5': AutoCalculator(TransportUserInfo5),
+
+                            # 6 user
+
+                                                    'AllQtyPercent6User': AllQtyPercent6User,
+                                                    'AllQty6User': AllQty6User,
+                                                    'MaxWarehouseQty6User': MaxWarehouseQty6User,
+                                                    'NormsWarehouseQty6User': NormsWarehouseQty6User,
+                                                    'ContainerData6': NanCheck(ContainerData6[0][0]),
+                                                    'ContainerDataNow6_0': NanCheck(ContainerDataNow6[0][0]),
+                                                    'ContainerDataNow6_1': NanCheck(ContainerDataNow6[0][1]),
+                                                    'ContainerDataNow6_2': NanCheck(ContainerDataNow6[0][2]),
+                                                    'WagonsData6': NanCheck(WagonsData6[0][0]),
+                                                    'WagonsDataQty6': NanCheck(WagonsData6[0][0]) * 3.5,
+                                                    'WagonsDataFE6': NanCheck(WagonsDataFE6[0][0]),
+                                                    'WagonsDataQtyFE6': NanCheck(WagonsDataFE6[0][0]) * 3.5,
+                                                    'TransportUserInfo6In': NanCheck(TransportUserInfo6[0][4])
+                                                                            + NanCheck(TransportUserInfo6[0][5])
+                                                                            + NanCheck(TransportUserInfo6[0][6])
+                                                                            + NanCheck(TransportUserInfo6[0][7]),
+                                                    'TransportUserInfo6InPercent': TransportUserInfo6InPercent,
+                                                    'TransportUserInfo6Out': NanCheck(TransportUserInfo6[0][0])
+                                                                             + NanCheck(TransportUserInfo6[0][1])
+                                                                             + NanCheck(TransportUserInfo6[0][2])
+                                                                             + NanCheck(TransportUserInfo6[0][3]),
+                                                    'TransportUserInfo6OutPercent': TransportUserInfo6OutPercent,
+                                                    'TransportCalculated6': TransportCalculated6,
+                                                    'AutoTransportIn6': NanCheck(TransportUserInfo6[0][6]),
+                                                    'AutoTransportOut6': NanCheck(TransportUserInfo6[0][2]),
+                                                    'AutoTransportCalculated6': AutoCalculator(TransportUserInfo6),
+
+                                # 7 user
+
+                                                    'AllQtyPercent7User': AllQtyPercent7User,
+                                                    'AllQty7User': AllQty7User,
+                                                    'MaxWarehouseQty7User': MaxWarehouseQty7User,
+                                                    'NormsWarehouseQty7User': NormsWarehouseQty7User,
+                                                    'ContainerData7': NanCheck(ContainerData7[0][0]),
+                                                    'ContainerDataNow7_0': NanCheck(ContainerDataNow7[0][0]),
+                                                    'ContainerDataNow7_1': NanCheck(ContainerDataNow7[0][1]),
+                                                    'ContainerDataNow7_2': NanCheck(ContainerDataNow7[0][2]),
+                                                    'WagonsData7': NanCheck(WagonsData7[0][0]),
+                                                    'WagonsDataQty7': NanCheck(WagonsData7[0][0]) * 3.5,
+                                                    'WagonsDataFE7': NanCheck(WagonsDataFE7[0][0]),
+                                                    'WagonsDataQtyFE7': NanCheck(WagonsDataFE7[0][0]) * 3.5,
+                                                    'TransportUserInfo7In': NanCheck(TransportUserInfo7[0][4])
+                                                                            + NanCheck(TransportUserInfo7[0][5])
+                                                                            + NanCheck(TransportUserInfo7[0][6])
+                                                                            + NanCheck(TransportUserInfo7[0][7]),
+                                                    'TransportUserInfo7InPercent': TransportUserInfo7InPercent,
+                                                    'TransportUserInfo7Out': NanCheck(TransportUserInfo7[0][0])
+                                                                             + NanCheck(TransportUserInfo7[0][1])
+                                                                             + NanCheck(TransportUserInfo7[0][2])
+                                                                             + NanCheck(TransportUserInfo7[0][3]),
+                                                    'TransportUserInfo7OutPercent': TransportUserInfo7OutPercent,
+                                                    'TransportCalculated7': TransportCalculated7,
+                                                    'AutoTransportIn7': NanCheck(TransportUserInfo7[0][6]),
+                                                    'AutoTransportOut7': NanCheck(TransportUserInfo7[0][2]),
+                                                    'AutoTransportCalculated7': AutoCalculator(TransportUserInfo7),
+
+            #alluser
                                                     'AllQtyAll' :AllQtyAll,
                                                     'AllQtyPercent1All' : AllQtyPercent1All,
                                                     'MaxWarehouseQtyAll':MaxWarehouseQtyAll,
@@ -665,11 +1341,25 @@ def dataset(request):
                                                     'WagonsDataQtyAll': NanCheck(WagonDataAll[0][0])* 3.5,
                                                     'WagonsDataAllFE': NanCheck(WagonDataAllFE[0][0]),
                                                     'WagonsDataQtyAllFE': NanCheck(WagonDataAllFE[0][0]) * 3.5,
-
-
+                                                    'TransportUserInfoAll': NanCheck(TransportUserInfoAll[0][4])
+                                                                                     + NanCheck(TransportUserInfoAll[0][5])
+                                                                                     + NanCheck(TransportUserInfoAll[0][6])
+                                                                                     + NanCheck(TransportUserInfoAll[0][7]),
+                                                    'TransportUserInfoAllInPercent': TransportUserInfoAllInPercent,
+                                                    'TransportUserInfoAllOut': NanCheck(TransportUserInfoAll[0][0])
+                                                                                     + NanCheck(TransportUserInfoAll[0][1])
+                                                                                     + NanCheck(TransportUserInfoAll[0][2])
+                                                                                     + NanCheck(TransportUserInfoAll[0][3]),
+                                                    'TransportUserInfoAllOutPercent': TransportUserInfoAllOutPercent,
+                                                    'TransportCalculatedAll':TransportCalculatedAll,
+                                                    'AutoTransportInAll': NanCheck(TransportUserInfoAll[0][6]),
+                                                    'AutoTransportOutAll': NanCheck(TransportUserInfoAll[0][2]),
+                                                    'AutoTransportCalculatedAll': AutoCalculator(TransportUserInfoAll),
 
             # 3 table dataset
 
+
+                        # 1 user
                                                     'UnloadReidlin1User': NanCheck(Reid_info1[0][0]),
                                                     'UnloadReidtramp1User': NanCheck(Reid_info1[0][1]),
                                                     'UnloadReidSum1User' : (NanCheck(Reid_info1[0][0])+NanCheck(Reid_info1[0][1])),
@@ -685,7 +1375,7 @@ def dataset(request):
                                                     'LoadingPortSum1User': (NanCheck(Reid_info1[0][6])+NanCheck(Reid_info1[0][7])),
                                                     'PortAllUser1':PortAllUser1,
 
-
+                    # 2 user
                                                     'UnloadReidlin2User': NanCheck(Reid_info2[0][0]),
                                                     'UnloadReidtramp2User': NanCheck(Reid_info2[0][1]),
                                                     'UnloadReidSum2User': (NanCheck(Reid_info2[0][0]) + NanCheck(Reid_info2[0][1])),
@@ -701,7 +1391,87 @@ def dataset(request):
                                                     'LoadingPortSum2User': (NanCheck(Reid_info2[0][6]) + NanCheck(Reid_info2[0][7])),
                                                     'PortAllUser2': PortAllUser2,
 
+                    # 3 user
+                                                    'UnloadReidlin3User': NanCheck(Reid_info3[0][0]),
+                                                    'UnloadReidtramp3User': NanCheck(Reid_info3[0][1]),
+                                                    'UnloadReidSum3User': (NanCheck(Reid_info3[0][0]) + NanCheck(Reid_info3[0][1])),
+                                                    'LoadingReidLin3User': NanCheck(Reid_info3[0][2]),
+                                                    'LoadingReidTramp3User': NanCheck(Reid_info3[0][3]),
+                                                    'LoadingReidSum3User': (NanCheck(Reid_info3[0][2]) + NanCheck(Reid_info3[0][3])),
+                                                    'ReidAllUser3': ReidAllUser3,
+                                                    'UnloadPortlin3User': NanCheck(Reid_info3[0][4]),
+                                                    'UnloadPorttramp3User': NanCheck(Reid_info3[0][5]),
+                                                    'UnloadPortSum3User': (NanCheck(Reid_info3[0][4]) + NanCheck(Reid_info3[0][5])),
+                                                    'LoadingPortLin3User': NanCheck(Reid_info3[0][6]),
+                                                    'LoadingPortTramp3User': NanCheck(Reid_info3[0][7]),
+                                                    'LoadingPortSum3User': (NanCheck(Reid_info3[0][6]) + NanCheck(Reid_info3[0][7])),
+                                                    'PortAllUser3': PortAllUser3,
 
+                    # 4 user
+                                                    'UnloadReidlin4User': NanCheck(Reid_info4[0][0]),
+                                                    'UnloadReidtramp4User': NanCheck(Reid_info4[0][1]),
+                                                    'UnloadReidSum4User': (NanCheck(Reid_info4[0][0]) + NanCheck(Reid_info4[0][1])),
+                                                    'LoadingReidLin4User': NanCheck(Reid_info4[0][2]),
+                                                    'LoadingReidTramp4User': NanCheck(Reid_info4[0][3]),
+                                                    'LoadingReidSum4User': (NanCheck(Reid_info4[0][2]) + NanCheck(Reid_info4[0][3])),
+                                                    'ReidAllUser4': ReidAllUser4,
+                                                    'UnloadPortlin4User': NanCheck(Reid_info4[0][4]),
+                                                    'UnloadPorttramp4User': NanCheck(Reid_info4[0][5]),
+                                                    'UnloadPortSum4User': (NanCheck(Reid_info4[0][4]) + NanCheck(Reid_info4[0][5])),
+                                                    'LoadingPortLin4User': NanCheck(Reid_info4[0][6]),
+                                                    'LoadingPortTramp4User': NanCheck(Reid_info4[0][7]),
+                                                    'LoadingPortSum4User': (NanCheck(Reid_info4[0][6]) + NanCheck(Reid_info4[0][7])),
+                                                    'PortAllUser4': PortAllUser4,
+
+                    # 5 user
+                                                    'UnloadReidlin5User': NanCheck(Reid_info5[0][0]),
+                                                    'UnloadReidtramp5User': NanCheck(Reid_info5[0][1]),
+                                                    'UnloadReidSum5User': (NanCheck(Reid_info5[0][0]) + NanCheck(Reid_info5[0][1])),
+                                                    'LoadingReidLin5User': NanCheck(Reid_info5[0][2]),
+                                                    'LoadingReidTramp5User': NanCheck(Reid_info5[0][3]),
+                                                    'LoadingReidSum5User': (NanCheck(Reid_info5[0][2]) + NanCheck(Reid_info5[0][3])),
+                                                    'ReidAllUser5': ReidAllUser5,
+                                                    'UnloadPortlin5User': NanCheck(Reid_info5[0][4]),
+                                                    'UnloadPorttramp5User': NanCheck(Reid_info5[0][5]),
+                                                    'UnloadPortSum5User': (NanCheck(Reid_info5[0][4]) + NanCheck(Reid_info5[0][5])),
+                                                    'LoadingPortLin5User': NanCheck(Reid_info5[0][6]),
+                                                    'LoadingPortTramp5User': NanCheck(Reid_info5[0][7]),
+                                                    'LoadingPortSum5User': (NanCheck(Reid_info5[0][6]) + NanCheck(Reid_info5[0][7])),
+                                                    'PortAllUser5': PortAllUser5,
+
+                    # 6 user
+                                                    'UnloadReidlin6User': NanCheck(Reid_info6[0][0]),
+                                                    'UnloadReidtramp6User': NanCheck(Reid_info6[0][1]),
+                                                    'UnloadReidSum6User': (NanCheck(Reid_info6[0][0]) + NanCheck(Reid_info6[0][1])),
+                                                    'LoadingReidLin6User': NanCheck(Reid_info6[0][2]),
+                                                    'LoadingReidTramp6User': NanCheck(Reid_info6[0][3]),
+                                                    'LoadingReidSum6User': (NanCheck(Reid_info6[0][2]) + NanCheck(Reid_info6[0][3])),
+                                                    'ReidAllUser6': ReidAllUser6,
+                                                    'UnloadPortlin6User': NanCheck(Reid_info6[0][4]),
+                                                    'UnloadPorttramp6User': NanCheck(Reid_info6[0][5]),
+                                                    'UnloadPortSum6User': (NanCheck(Reid_info6[0][4]) + NanCheck(Reid_info6[0][5])),
+                                                    'LoadingPortLin6User': NanCheck(Reid_info6[0][6]),
+                                                    'LoadingPortTramp6User': NanCheck(Reid_info6[0][7]),
+                                                    'LoadingPortSum6User': (NanCheck(Reid_info6[0][6]) + NanCheck(Reid_info6[0][7])),
+                                                    'PortAllUser6': PortAllUser6,
+
+                    # 6 user
+                                                    'UnloadReidlin7User': NanCheck(Reid_info7[0][0]),
+                                                    'UnloadReidtramp7User': NanCheck(Reid_info7[0][1]),
+                                                    'UnloadReidSum7User': (NanCheck(Reid_info7[0][0]) + NanCheck(Reid_info7[0][1])),
+                                                    'LoadingReidLin7User': NanCheck(Reid_info7[0][2]),
+                                                    'LoadingReidTramp7User': NanCheck(Reid_info7[0][3]),
+                                                    'LoadingReidSum7User': (NanCheck(Reid_info7[0][2]) + NanCheck(Reid_info7[0][3])),
+                                                    'ReidAllUser7': ReidAllUser7,
+                                                    'UnloadPortlin7User': NanCheck(Reid_info7[0][4]),
+                                                    'UnloadPorttramp7User': NanCheck(Reid_info7[0][5]),
+                                                    'UnloadPortSum7User': (NanCheck(Reid_info7[0][4]) + NanCheck(Reid_info7[0][5])),
+                                                    'LoadingPortLin7User': NanCheck(Reid_info7[0][6]),
+                                                    'LoadingPortTramp7User': NanCheck(Reid_info7[0][7]),
+                                                    'LoadingPortSum7User': (NanCheck(Reid_info7[0][6]) + NanCheck(Reid_info7[0][7])),
+                                                    'PortAllUser7': PortAllUser7,
+
+                    # alluser
                                                     'UnloadReidlinAllUser': NanCheck(Reid_infoAll[0][0]),
                                                     'UnloadReidtrampAllUser': NanCheck(Reid_infoAll[0][1]),
                                                     'UnloadReidSumAllUser': (NanCheck(Reid_infoAll[0][0]) + NanCheck(Reid_infoAll[0][1])),
@@ -717,11 +1487,101 @@ def dataset(request):
                                                     'LoadingPortSumAllUser': (NanCheck(Reid_infoAll[0][6]) + NanCheck(Reid_infoAll[0][7])),
                                                     'PortAllAll': PortAllAll,
 
+                    #6 table (2 in dataset)
 
+                                                    'MaxWarehouseQty8User': NanCheck(getMaxWarehouseQty(9)[0][0]),
+                                                    'MaxWarehouseQty9User': NanCheck(getMaxWarehouseQty(10)[0][0]),
+                                                    'MaxWarehouseQty10User': NanCheck(getMaxWarehouseQty(11)[0][0]),
+                                                    'MaxWarehouseQty11User': NanCheck(getMaxWarehouseQty(12)[0][0]),
+                                                    'MaxWarehouseQty12User': NanCheck(getMaxWarehouseQty(13)[0][0]),
+                                                    'MaxWarehouseQty13User': NanCheck(getMaxWarehouseQty(14)[0][0]),
+                                                    'MaxWarehouseQty14User': NanCheck(getMaxWarehouseQty(15)[0][0]),
+                                                    'MaxWarehouseQtyAllNotST': NanCheck(getMaxWarehouseAllQtyNotST()[0][0]),
+
+                                                    'FactLoad8User' : NanCheck(TransportUserInfo8[0][8]),
+                                                    'FactLoad9User': NanCheck(TransportUserInfo9[0][8]),
+                                                    'FactLoad10User': NanCheck(TransportUserInfo10[0][8]),
+                                                    'FactLoad11User': NanCheck(TransportUserInfo11[0][8]),
+                                                    'FactLoad12User': NanCheck(TransportUserInfo12[0][8]),
+                                                    'FactLoad13User': NanCheck(TransportUserInfo13[0][8]),
+                                                    'FactLoad14User': NanCheck(TransportUserInfo14[0][8]),
+                                                    'FactLoadAllNotST': NanCheck(TransportUserInfoNotSTAll[0][8]),
+
+
+                                                    'Percent8User': TransportUserInfo8Percent,
+                                                    'Percent9User': TransportUserInfo9Percent,
+                                                    'Percent10User': TransportUserInfo10Percent,
+                                                    'Percent11User': TransportUserInfo11Percent,
+                                                    'Percent12User': TransportUserInfo12Percent,
+                                                    'Percent13User': TransportUserInfo13Percent,
+                                                    'Percent14User': TransportUserInfo14Percent,
+                                                    'PercentAllNotST': TransportUserInfoAllPercent,
+
+
+                                                    'TransportQty8UserIn':  NanCheck(TransportUserInfo8[0][4])+
+                                                                            NanCheck(TransportUserInfo8[0][5])+
+                                                                            NanCheck(TransportUserInfo8[0][6]),
+                                                    'TransportQty9UserIn':  NanCheck(TransportUserInfo9[0][4])+
+                                                                            NanCheck(TransportUserInfo9[0][5])+
+                                                                            NanCheck(TransportUserInfo9[0][6]),
+                                                    'TransportQty10UserIn': NanCheck(TransportUserInfo10[0][4])+
+                                                                            NanCheck(TransportUserInfo10[0][5])+
+                                                                            NanCheck(TransportUserInfo10[0][6]),
+                                                    'TransportQty11UserIn': NanCheck(TransportUserInfo11[0][4])+
+                                                                            NanCheck(TransportUserInfo11[0][5])+
+                                                                            NanCheck(TransportUserInfo11[0][6]),
+                                                    'TransportQty12UserIn': NanCheck(TransportUserInfo12[0][4])+
+                                                                            NanCheck(TransportUserInfo12[0][5])+
+                                                                            NanCheck(TransportUserInfo12[0][6]),
+                                                    'TransportQty13UserIn': NanCheck(TransportUserInfo13[0][4])+
+                                                                            NanCheck(TransportUserInfo13[0][5])+
+                                                                            NanCheck(TransportUserInfo13[0][6]),
+                                                    'TransportQty14UserIn': NanCheck(TransportUserInfo14[0][4])+
+                                                                            NanCheck(TransportUserInfo14[0][5])+
+                                                                            NanCheck(TransportUserInfo14[0][6]),
+                                                    'TransportQtyAllIn': NanCheck(TransportUserInfoNotSTAll[0][4]) +
+                                                                            NanCheck(TransportUserInfoNotSTAll[0][5]) +
+                                                                            NanCheck(TransportUserInfoNotSTAll[0][6]),
+
+
+                                                    'TransportQty8UserOut': NanCheck(TransportUserInfo8[0][0]) +
+                                                                           NanCheck(TransportUserInfo8[0][1]) +
+                                                                           NanCheck(TransportUserInfo8[0][2]),
+                                                    'TransportQty9UserOut': NanCheck(TransportUserInfo9[0][0]) +
+                                                                           NanCheck(TransportUserInfo9[0][1]) +
+                                                                           NanCheck(TransportUserInfo9[0][2]),
+                                                    'TransportQty10UserOut': NanCheck(TransportUserInfo10[0][0]) +
+                                                                            NanCheck(TransportUserInfo10[0][1]) +
+                                                                            NanCheck(TransportUserInfo10[0][2]),
+                                                    'TransportQty11UserOut': NanCheck(TransportUserInfo11[0][0]) +
+                                                                            NanCheck(TransportUserInfo11[0][1]) +
+                                                                            NanCheck(TransportUserInfo11[0][2]),
+                                                    'TransportQty12UserOut': NanCheck(TransportUserInfo12[0][0]) +
+                                                                            NanCheck(TransportUserInfo12[0][1]) +
+                                                                            NanCheck(TransportUserInfo12[0][2]),
+                                                    'TransportQty13UserOut': NanCheck(TransportUserInfo13[0][0]) +
+                                                                            NanCheck(TransportUserInfo13[0][1]) +
+                                                                            NanCheck(TransportUserInfo13[0][2]),
+                                                    'TransportQty14UserOut': NanCheck(TransportUserInfo14[0][0]) +
+                                                                            NanCheck(TransportUserInfo14[0][1]) +
+                                                                            NanCheck(TransportUserInfo14[0][2]),
+                                                    'TransportQtyAllOut': NanCheck(TransportUserInfoNotSTAll[0][0]) +
+                                                                         NanCheck(TransportUserInfoNotSTAll[0][1]) +
+                                                                         NanCheck(TransportUserInfoNotSTAll[0][2]),
+
+                                                    'TransportCalculated8': TransportCalculated8,
+                                                    'TransportCalculated9': TransportCalculated9,
+                                                    'TransportCalculated10': TransportCalculated10,
+                                                    'TransportCalculated11': TransportCalculated11,
+                                                    'TransportCalculated12': TransportCalculated12,
+                                                    'TransportCalculated13': TransportCalculated13,
+                                                    'TransportCalculated14': TransportCalculated14,
+                                                    'TransportCalculatedAllNotST': TransportCalculatedAllNotST,
 
                                                     'user': request.user})
     else:
         return redirect('home')
+
 
 @login_required(login_url='')
 def datepick_admin(request):
@@ -743,8 +1603,15 @@ def set_border(ws, cell_range):
 
 def AllQtyPercent(top,bot,signs):
     # For persents with signs after , 0 if no signs
-    if (top != None and bot != None):
+    if (top != None and bot != None and bot!= 0):
         return int(round((top/bot*100),signs))
+    else:
+        return 0
+
+def TransportPercent(top,bot,signs):
+    # For persents with signs after , 0 if no signs
+    if (top != None and bot != None and bot!=0):
+        return round(((top/bot-1)*100),signs)
     else:
         return 0
 
@@ -762,6 +1629,29 @@ def AllQtyCalculator(UserInfo,TranzitInfo):
         return 0
 
 
+def TransportCalculator(TransportInfo):
+    if ((NanCheck(TransportInfo[0][4])
+        +NanCheck(TransportInfo[0][5])
+         +NanCheck(TransportInfo[0][6])
+         +NanCheck(TransportInfo[0][7])) > (NanCheck(TransportInfo[0][0])
+        +NanCheck(TransportInfo[0][1])
+         +NanCheck(TransportInfo[0][2])
+         +NanCheck(TransportInfo[0][3]))):
+        result = f'+{(NanCheck(TransportInfo[0][4])+ NanCheck(TransportInfo[0][5])+ NanCheck(TransportInfo[0][6])+ NanCheck(TransportInfo[0][7]))- NanCheck(TransportInfo[0][0])- NanCheck(TransportInfo[0][1])- NanCheck(TransportInfo[0][2])- NanCheck(TransportInfo[0][3])}'
+    else:
+        result = (NanCheck(TransportInfo[0][4])
+        +NanCheck(TransportInfo[0][5])
+        +NanCheck(TransportInfo[0][6])
+        +NanCheck(TransportInfo[0][7])
+        -NanCheck(TransportInfo[0][0])
+        - NanCheck(TransportInfo[0][1])
+        - NanCheck(TransportInfo[0][2])
+        - NanCheck(TransportInfo[0][3]))
+    return result
+
+
+
+
 def ReidAllStr(Reid_info):
     if ((NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1])) > (NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))):
         return f'+{(NanCheck(Reid_info[0][0])+NanCheck(Reid_info[0][1]))-(NanCheck(Reid_info[0][2])+NanCheck(Reid_info[0][3]))}'
@@ -774,6 +1664,11 @@ def PortAllStr(Reid_info):
     else:
         return (NanCheck(Reid_info[0][6])+NanCheck(Reid_info[0][7]))-(NanCheck(Reid_info[0][4])+NanCheck(Reid_info[0][5]))
 
+def AutoCalculator(TransportInfo):
+    if NanCheck(TransportInfo[0][6])>NanCheck(TransportInfo[0][2]):
+        return f'+{NanCheck(TransportInfo[0][6]) - NanCheck(TransportInfo[0][2])}'
+    else:
+        return (NanCheck(TransportInfo[0][6])- NanCheck(TransportInfo[0][2]))
 @login_required(login_url='')
 def table1_upload(request):
     if request.method == 'POST':
@@ -1324,4 +2219,185 @@ def success_table5(request):
                                                 'SemiwagonIn': SemiwagonIn[0],
                                                 'AutoIn': AutoIn[0],
                                                 'SeaIn': SeaIn[0],
+                                                'user': request.user})
+
+
+@login_required(login_url='')
+def table6_upload(request):
+    if request.method == 'POST':
+        return redirect('table6_data')
+    return render(request, 'table6_upload.html')
+
+@login_required(login_url='')
+def table6_data(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # WORK IN PROGRESS
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        FittingPlatformOut = params.get('FittingPlatformOut')
+        SemiwagonOut = params.get('SemiwagonOut')
+        AutoOut = params.get('AutoOut')
+        FittingPlatformIn = params.get('FittingPlatformIn')
+        SemiwagonIn = params.get('SemiwagonIn')
+        AutoIn = params.get('AutoIn')
+        FactLoad = params.get('FactLoad')
+        Reload = params.get('Reload')
+        if request.method == 'POST':
+            date2 = [[request.POST['date2']]]
+            FittingPlatformOut = [request.POST['FittingPlatformOut']]
+            SemiwagonOut = [request.POST['SemiwagonOut']]
+            AutoOut = [request.POST['AutoOut']]
+            FittingPlatformIn = [request.POST['FittingPlatformIn']]
+            SemiwagonIn = [request.POST['SemiwagonIn']]
+            AutoIn = [request.POST['AutoIn']]
+            FactLoad = [request.POST['FactLoad']]
+            Reload = [request.POST['Reload']]
+            request.session['parameters'] = {
+                'date2' : date2,
+                'FittingPlatformOut': FittingPlatformOut,
+                'SemiwagonOut': SemiwagonOut,
+                'AutoOut': AutoOut,
+                'FittingPlatformIn': FittingPlatformIn,
+                'SemiwagonIn': SemiwagonIn,
+                'AutoIn': AutoIn,
+                'FactLoad': FactLoad,
+                'Reload': Reload,
+            }
+            redirect_url = f'/success_table5/?session_id={session_id}'
+            return redirect(redirect_url)
+        return render(request, 'table6_data.html', {
+                                                        'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                                                        'FittingPlatformOut': FittingPlatformOut[0],
+                                                        'SemiwagonOut': SemiwagonOut[0],
+                                                        'AutoOut': AutoOut[0],
+                                                        'FittingPlatformIn': FittingPlatformIn[0],
+                                                        'SemiwagonIn': SemiwagonIn[0],
+                                                        'AutoIn': AutoIn[0],
+                                                        'FactLoad': FactLoad[0],
+                                                        'Reload': Reload[0],
+        })
+    else:
+        if request.method == 'POST':
+            date2 = [request.POST['date2']],
+            FittingPlatformOut = [request.POST['FittingPlatformOut']]
+            SemiwagonOut = [request.POST['SemiwagonOut']]
+            AutoOut = [request.POST['AutoOut']]
+            FittingPlatformIn = [request.POST['FittingPlatformIn']]
+            SemiwagonIn = [request.POST['SemiwagonIn']]
+            AutoIn = [request.POST['AutoIn']]
+            FactLoad = [request.POST['FactLoad']]
+            Reload = [request.POST['Reload']]
+            request.session['parameters'] = {
+                'date2': date2,
+                'FittingPlatformOut': FittingPlatformOut,
+                'SemiwagonOut': SemiwagonOut,
+                'AutoOut': AutoOut,
+                'FittingPlatformIn': FittingPlatformIn,
+                'SemiwagonIn': SemiwagonIn,
+                'AutoIn': AutoIn,
+                'FactLoad': FactLoad,
+                'Reload': Reload,
+            }
+            # Сохраните сессию, чтобы сгенерировать сессионный ключ
+            request.session.save()
+
+            # Получить текущий session ID
+            session_id = request.session.session_key
+            # Создайте URL-адрес перенаправления с этим session ID
+            redirect_url = f'/success_table6/?session_id={session_id}'
+            return redirect(redirect_url)
+        try:
+            #WORK IN PROGRESS
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            print(123321)
+            return render(request, 'table6_data.html', {
+                'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'FittingPlatformOut': Userdata[0][0],
+                'SemiwagonOut': Userdata[0][1],
+                'AutoOut': Userdata[0][0],
+                'FittingPlatformIn': Userdata[0][0],
+                'SemiwagonIn': Userdata[0][1],
+                'AutoIn': Userdata[0][0],
+                'FactLoad': Userdata[0][1],
+                'Reload': Userdata[0][1],
+            })
+        except:
+            return render(request, 'table6_data.html', {
+                'date2': (dt.datetime.now()).strftime('%Y-%m-%d'),
+                'FittingPlatformOut': 0,
+                'SemiwagonOut': 0,
+                'AutoOut': 0,
+                'FittingPlatformIn': 0,
+                'SemiwagonIn': 0,
+                'AutoIn': 0,
+                'FactLoad': 0,
+                'Reload': 0,
+            })
+
+
+@login_required(login_url='')
+def success_table6(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        # Используйте session_id, чтобы вручную загрузить сеанс
+        request.session = SessionStore(session_key=session_id)
+        params = request.session.get('parameters',{})
+        date2 = params.get('date2')
+        FittingPlatformOut = params.get('FittingPlatformOut')
+        SemiwagonOut = params.get('SemiwagonOut')
+        AutoOut = params.get('AutoOut')
+        FittingPlatformIn = params.get('FittingPlatformIn')
+        SemiwagonIn = params.get('SemiwagonIn')
+        AutoIn = params.get('AutoIn')
+        FactLoad = params.get('FactLoad')
+        Reload = params.get('Reload')
+        FittingPlatformOut[0] = NanCheck(FittingPlatformOut[0])
+        SemiwagonOut[0] = NanCheck(SemiwagonOut[0])
+        AutoOut[0] = NanCheck(AutoOut[0])
+        FittingPlatformIn[0] = NanCheck(FittingPlatformIn[0])
+        SemiwagonIn[0] = NanCheck(SemiwagonIn[0])
+        AutoIn[0] = NanCheck(AutoIn[0])
+        FactLoad[0] = NanCheck(FactLoad[0])
+        Reload[0] = NanCheck(Reload[0])
+        # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
+        DataItem = DailyMonitoringUserTransport.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+                db_fittingplatform_out=int(FittingPlatformOut[0]),
+                db_semiwagon_out=int(SemiwagonOut[0]),
+                db_auto_out=int(AutoOut[0]),
+                db_sea_out=0,
+                db_fittingplatform_in=int(FittingPlatformIn[0]),
+                db_semiwagon_in=int(SemiwagonIn[0]),
+                db_auto_in=int(AutoIn[0]),
+                db_sea_in=0,
+                db_factload=int(FactLoad[0]),
+                db_reload=int(Reload[0])
+            )
+        # Запись новых данных, если ID пользователя и дата не совпадают.
+        if DataItem == 0:
+            DailyMonitoringUserTransport.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                          db_userid = request.user.id,
+                                        db_fittingplatform_out=int(FittingPlatformOut[0]),
+                                        db_semiwagon_out=int(SemiwagonOut[0]),
+                                        db_auto_out=int(AutoOut[0]),
+                                        db_sea_out=0,
+                                        db_fittingplatform_in=int(FittingPlatformIn[0]),
+                                        db_semiwagon_in=int(SemiwagonIn[0]),
+                                        db_auto_in=int(AutoIn[0]),
+                                        db_sea_in=0,
+                                        db_factload=int(FactLoad[0]),
+                                        db_reload=int(Reload[0])
+                                        )
+
+        return render(request, 'success_table6.html', {
+                                                'date2': date2[0][0],
+                                                'FittingPlatformOut': FittingPlatformOut[0],
+                                                'SemiwagonOut': SemiwagonOut[0],
+                                                'AutoOut': AutoOut[0],
+                                                'FittingPlatformIn': FittingPlatformIn[0],
+                                                'SemiwagonIn': SemiwagonIn[0],
+                                                'AutoIn': AutoIn[0],
+                                                'FactLoad': FactLoad[0],
+                                                'Reload': Reload[0],
                                                 'user': request.user})
