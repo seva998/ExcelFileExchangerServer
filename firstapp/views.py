@@ -503,7 +503,7 @@ def NanCheck(i):
 @login_required(login_url='')
 def download(request):
     if request.user.id == 1:
-        wb = openpyxl.load_workbook('./WS2_s.xlsx')
+        wb = openpyxl.load_workbook('./WS3_s.xlsx')
         ws = wb.get_sheet_by_name('Шаблон1')
         params = request.session.get('parameters', {})
         date = params.get('date1')
@@ -721,10 +721,23 @@ def download(request):
             TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
 
 
-            for i in range(8,14):
+            for i in range(8,15):
                 ws[f'C{i}'] = getMaxWarehouseQty(i-6)[0][0]
-                print(getMaxWarehouseQty(i-6)[0][0])
-
+                ws[f'D{i}'] = getNormsWarehouseQty(i-6)[0][0]
+            ws['E8'] = AllQty1User
+            ws['E9'] = AllQty2User
+            ws['E10'] = AllQty3User
+            ws['E11'] = AllQty4User
+            ws['E12'] = AllQty5User
+            ws['E13'] = AllQty6User
+            ws['E14'] = AllQty7User
+            ws['G8'] = NanCheck(ContainerData1[0][0])
+            ws['G9'] = NanCheck(ContainerData2[0][0])
+            ws['G10'] = NanCheck(ContainerData3[0][0])
+            ws['G11'] = NanCheck(ContainerData4[0][0])
+            ws['G12'] = NanCheck(ContainerData5[0][0])
+            ws['G13'] = NanCheck(ContainerData6[0][0])
+            ws['G14'] = NanCheck(ContainerData7[0][0])
         except:
             pass
         bytes_io = BytesIO()
