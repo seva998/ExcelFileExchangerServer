@@ -45,7 +45,8 @@ from .utils import (AllQtyPercent,
                     PortAllStr,
                     AutoCalculator,
                     is_stevedor,
-                    NanCheck)
+                    NanCheck,
+                    connection)
 
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
@@ -236,7 +237,9 @@ def table1_data(request):
             redirect_url = f'/success_table1/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            conn = connection()
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'),conn)
+            conn.close()
             return render(request, 'table1_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ImportIn' : NanCheck(Userdata[0][0]),
@@ -389,50 +392,51 @@ def download(request):
         params = request.session.get('parameters', {})
         date = params.get('date1')
         try:
+            conn = connection()
             #
             # TestUser1
             #
             # table 1
-            Tranzit1 = getTranzitUserInfoFromDB(2, date)
-            User1data = getUserInfoFromDBDataset(2, date)
-            MaxWarehouseQty1User = getMaxWarehouseQty(2)[0][0]
-            NormsWarehouseQty1User = getNormsWarehouseQty(2)[0][0]
+            Tranzit1 = getTranzitUserInfoFromDB(2, date,conn)
+            User1data = getUserInfoFromDBDataset(2, date,conn)
+            MaxWarehouseQty1User = getMaxWarehouseQty(2,conn)[0][0]
+            NormsWarehouseQty1User = getNormsWarehouseQty(2,conn)[0][0]
             AllQty1User = AllQtyCalculator(User1data, Tranzit1)
-            Reid_info1 = getReidUserInfoFromDB(2, date)
+            Reid_info1 = getReidUserInfoFromDB(2, date,conn)
             # table 2
-            ContainerData1 = getContaunerUserInfoFromDB(2, date)
+            ContainerData1 = getContaunerUserInfoFromDB(2, date,conn)
             ContainerDataNow1 = getContaunerUserInfoFromDB(2,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData1 = getWagonsUserInfoFromDB(2, date)
+            WagonsData1 = getWagonsUserInfoFromDB(2, date,conn)
             # table4
-            WagonsDataFE1 = getWagonsUserInfoFromDBFE(2, date)
+            WagonsDataFE1 = getWagonsUserInfoFromDBFE(2, date,conn)
             # table5
-            TransportUserInfo1 = getTransportUserInfoFromDB(2, date)
+            TransportUserInfo1 = getTransportUserInfoFromDB(2, date, conn)
 
             #
             # TestUser2
             #
             # table 1
-            Tranzit2 = getTranzitUserInfoFromDB(3, date)
-            User2data = getUserInfoFromDBDataset(3, date)
-            MaxWarehouseQty2User = getMaxWarehouseQty(3)[0][0]
-            NormsWarehouseQty2User = getNormsWarehouseQty(3)[0][0]
+            Tranzit2 = getTranzitUserInfoFromDB(3, date,conn)
+            User2data = getUserInfoFromDBDataset(3, date,conn)
+            MaxWarehouseQty2User = getMaxWarehouseQty(3,conn)[0][0]
+            NormsWarehouseQty2User = getNormsWarehouseQty(3,conn)[0][0]
             AllQty2User = AllQtyCalculator(User2data, Tranzit2)
-            Reid_info2 = getReidUserInfoFromDB(3, date)
+            Reid_info2 = getReidUserInfoFromDB(3, date,conn)
 
             # table 2
-            ContainerData2 = getContaunerUserInfoFromDB(3, date)
+            ContainerData2 = getContaunerUserInfoFromDB(3, date,conn)
             ContainerDataNow2 = getContaunerUserInfoFromDB(3,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData2 = getWagonsUserInfoFromDB(3, date)
+            WagonsData2 = getWagonsUserInfoFromDB(3, date,conn)
             # table4
-            WagonsDataFE2 = getWagonsUserInfoFromDBFE(3, date)
+            WagonsDataFE2 = getWagonsUserInfoFromDBFE(3, date,conn)
             # table5
-            TransportUserInfo2 = getTransportUserInfoFromDB(3, date)
+            TransportUserInfo2 = getTransportUserInfoFromDB(3, date, conn)
 
 
             #
@@ -440,24 +444,24 @@ def download(request):
             #
 
             # table 1
-            Tranzit3 = getTranzitUserInfoFromDB(4, date)
-            User3data = getUserInfoFromDBDataset(4, date)
-            MaxWarehouseQty3User = getMaxWarehouseQty(4)[0][0]
-            NormsWarehouseQty3User = getNormsWarehouseQty(4)[0][0]
+            Tranzit3 = getTranzitUserInfoFromDB(4, date,conn)
+            User3data = getUserInfoFromDBDataset(4, date,conn)
+            MaxWarehouseQty3User = getMaxWarehouseQty(4,conn)[0][0]
+            NormsWarehouseQty3User = getNormsWarehouseQty(4,conn)[0][0]
             AllQty3User = AllQtyCalculator(User3data, Tranzit3)
-            Reid_info3 = getReidUserInfoFromDB(4, date)
+            Reid_info3 = getReidUserInfoFromDB(4, date,conn)
 
             # table 2
-            ContainerData3 = getContaunerUserInfoFromDB(4, date)
+            ContainerData3 = getContaunerUserInfoFromDB(4, date,conn)
             ContainerDataNow3 = getContaunerUserInfoFromDB(4,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData3 = getWagonsUserInfoFromDB(4, date)
+            WagonsData3 = getWagonsUserInfoFromDB(4, date,conn)
             # table4
-            WagonsDataFE3 = getWagonsUserInfoFromDBFE(4, date)
+            WagonsDataFE3 = getWagonsUserInfoFromDBFE(4, date,conn)
             # table5
-            TransportUserInfo3 = getTransportUserInfoFromDB(4, date)
+            TransportUserInfo3 = getTransportUserInfoFromDB(4, date, conn)
 
 
             #
@@ -465,25 +469,25 @@ def download(request):
             #
 
             # table 1
-            Tranzit4 = getTranzitUserInfoFromDB(5, date)
-            User4data = getUserInfoFromDBDataset(5, date)
-            MaxWarehouseQty4User = getMaxWarehouseQty(5)[0][0]
-            NormsWarehouseQty4User = getNormsWarehouseQty(5)[0][0]
+            Tranzit4 = getTranzitUserInfoFromDB(5, date,conn)
+            User4data = getUserInfoFromDBDataset(5, date,conn)
+            MaxWarehouseQty4User = getMaxWarehouseQty(5,conn)[0][0]
+            NormsWarehouseQty4User = getNormsWarehouseQty(5,conn)[0][0]
             AllQty4User = AllQtyCalculator(User4data, Tranzit4)
 
-            Reid_info4 = getReidUserInfoFromDB(5, date)
+            Reid_info4 = getReidUserInfoFromDB(5, date,conn)
 
             # table 2
-            ContainerData4 = getContaunerUserInfoFromDB(5, date)
+            ContainerData4 = getContaunerUserInfoFromDB(5, date,conn)
             ContainerDataNow4 = getContaunerUserInfoFromDB(5,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData4 = getWagonsUserInfoFromDB(5, date)
+            WagonsData4 = getWagonsUserInfoFromDB(5, date,conn)
             # table4
-            WagonsDataFE4 = getWagonsUserInfoFromDBFE(5, date)
+            WagonsDataFE4 = getWagonsUserInfoFromDBFE(5, date,conn)
             # table5
-            TransportUserInfo4 = getTransportUserInfoFromDB(5, date)
+            TransportUserInfo4 = getTransportUserInfoFromDB(5, date, conn)
 
 
             #
@@ -491,49 +495,49 @@ def download(request):
             #
 
             # table 1
-            Tranzit5 = getTranzitUserInfoFromDB(6, date)
-            User5data = getUserInfoFromDBDataset(6, date)
-            MaxWarehouseQty5User = getMaxWarehouseQty(6)[0][0]
-            NormsWarehouseQty5User = getNormsWarehouseQty(6)[0][0]
+            Tranzit5 = getTranzitUserInfoFromDB(6, date,conn)
+            User5data = getUserInfoFromDBDataset(6, date,conn)
+            MaxWarehouseQty5User = getMaxWarehouseQty(6,conn)[0][0]
+            NormsWarehouseQty5User = getNormsWarehouseQty(6,conn)[0][0]
             AllQty5User = AllQtyCalculator(User5data, Tranzit5)
 
-            Reid_info5 = getReidUserInfoFromDB(6, date)
+            Reid_info5 = getReidUserInfoFromDB(6, date,conn)
 
             # table 2
-            ContainerData5 = getContaunerUserInfoFromDB(6, date)
+            ContainerData5 = getContaunerUserInfoFromDB(6, date,conn)
             ContainerDataNow5 = getContaunerUserInfoFromDB(6,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData5 = getWagonsUserInfoFromDB(6, date)
+            WagonsData5 = getWagonsUserInfoFromDB(6, date,conn)
             # table4
-            WagonsDataFE5 = getWagonsUserInfoFromDBFE(6, date)
+            WagonsDataFE5 = getWagonsUserInfoFromDBFE(6, date,conn)
             # table5
-            TransportUserInfo5 = getTransportUserInfoFromDB(6, date)
+            TransportUserInfo5 = getTransportUserInfoFromDB(6, date,conn)
 
             #
             # 6 user
             #
 
             # table 1
-            Tranzit6 = getTranzitUserInfoFromDB(7, date)
-            User6data = getUserInfoFromDBDataset(7, date)
-            MaxWarehouseQty6User = getMaxWarehouseQty(7)[0][0]
-            NormsWarehouseQty6User = getNormsWarehouseQty(7)[0][0]
+            Tranzit6 = getTranzitUserInfoFromDB(7, date,conn)
+            User6data = getUserInfoFromDBDataset(7, date,conn)
+            MaxWarehouseQty6User = getMaxWarehouseQty(7,conn)[0][0]
+            NormsWarehouseQty6User = getNormsWarehouseQty(7,conn)[0][0]
             AllQty6User = AllQtyCalculator(User6data, Tranzit6)
-            Reid_info6 = getReidUserInfoFromDB(7, date)
+            Reid_info6 = getReidUserInfoFromDB(7, date,conn)
 
             # table 2
-            ContainerData6 = getContaunerUserInfoFromDB(7, date)
+            ContainerData6 = getContaunerUserInfoFromDB(7, date,conn)
             ContainerDataNow6 = getContaunerUserInfoFromDB(7,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData6 = getWagonsUserInfoFromDB(7, date)
+            WagonsData6 = getWagonsUserInfoFromDB(7, date,conn)
             # table4
-            WagonsDataFE6 = getWagonsUserInfoFromDBFE(7, date)
+            WagonsDataFE6 = getWagonsUserInfoFromDBFE(7, date,conn)
             # table5
-            TransportUserInfo6 = getTransportUserInfoFromDB(7, date)
+            TransportUserInfo6 = getTransportUserInfoFromDB(7, date,conn)
 
 
             #
@@ -541,25 +545,25 @@ def download(request):
             #
 
             # table 1
-            Tranzit7 = getTranzitUserInfoFromDB(8, date)
-            User7data = getUserInfoFromDBDataset(8, date)
-            MaxWarehouseQty7User = getMaxWarehouseQty(8)[0][0]
-            NormsWarehouseQty7User = getNormsWarehouseQty(8)[0][0]
+            Tranzit7 = getTranzitUserInfoFromDB(8, date,conn)
+            User7data = getUserInfoFromDBDataset(8, date,conn)
+            MaxWarehouseQty7User = getMaxWarehouseQty(8,conn)[0][0]
+            NormsWarehouseQty7User = getNormsWarehouseQty(8,conn)[0][0]
             AllQty7User = AllQtyCalculator(User7data, Tranzit7)
 
-            Reid_info7 = getReidUserInfoFromDB(8, date)
+            Reid_info7 = getReidUserInfoFromDB(8, date,conn)
 
             # table 2
-            ContainerData7 = getContaunerUserInfoFromDB(8, date)
+            ContainerData7 = getContaunerUserInfoFromDB(8, date,conn)
             ContainerDataNow7 = getContaunerUserInfoFromDB(8,
                                                            (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-                                                               '%Y-%m-%d'))
+                                                               '%Y-%m-%d'),conn)
             # table3
-            WagonsData7 = getWagonsUserInfoFromDB(8, date)
+            WagonsData7 = getWagonsUserInfoFromDB(8, date,conn)
             # table4
-            WagonsDataFE7 = getWagonsUserInfoFromDBFE(8, date)
+            WagonsDataFE7 = getWagonsUserInfoFromDBFE(8, date,conn)
             # table5
-            TransportUserInfo7 = getTransportUserInfoFromDB(8, date)
+            TransportUserInfo7 = getTransportUserInfoFromDB(8, date,conn)
 
 
 
@@ -569,45 +573,45 @@ def download(request):
 
             # 8 user
 
-            TransportUserInfo8 = getTransportUserInfoFromDB(9, date)
+            TransportUserInfo8 = getTransportUserInfoFromDB(9, date,conn)
 
 
             # 9 user
 
-            TransportUserInfo9 = getTransportUserInfoFromDB(10, date)
+            TransportUserInfo9 = getTransportUserInfoFromDB(10, date,conn)
 
 
             # 10 user
 
-            TransportUserInfo10 = getTransportUserInfoFromDB(11, date)
+            TransportUserInfo10 = getTransportUserInfoFromDB(11, date,conn)
 
 
             # 11 user
 
-            TransportUserInfo11 = getTransportUserInfoFromDB(12, date)
+            TransportUserInfo11 = getTransportUserInfoFromDB(12, date,conn)
 
 
             # 12 user
 
-            TransportUserInfo12 = getTransportUserInfoFromDB(13, date)
+            TransportUserInfo12 = getTransportUserInfoFromDB(13, date,conn)
 
 
             # 13 user
 
-            TransportUserInfo13 = getTransportUserInfoFromDB(14, date)
+            TransportUserInfo13 = getTransportUserInfoFromDB(14, date,conn)
 
 
             # 14 user
 
-            TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
+            TransportUserInfo14 = getTransportUserInfoFromDB(15, date,conn)
 
             # date
 
             ws['L4'] = (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%d.%m.%Y')
 
             for i in range(8,15):
-                ws[f'C{i}'] = getMaxWarehouseQty(i-6)[0][0]  #Полная проектная емкость складов (100%)
-                ws[f'D{i}'] = getNormsWarehouseQty(i-6)[0][0] #Емкость технологического накопления контейнеров (90%)
+                ws[f'C{i}'] = getMaxWarehouseQty(i-6,conn)[0][0]  #Полная проектная емкость складов (100%)
+                ws[f'D{i}'] = getNormsWarehouseQty(i-6,conn)[0][0] #Емкость технологического накопления контейнеров (90%)
 
                 #Факт, контейнеры
 
@@ -666,7 +670,7 @@ def download(request):
 
             #####2 table
             for i in range(20,27):
-                ws[f'C{i}'] = getMaxWarehouseQty(i-11)[0][0]  #Максимальная емкость складов
+                ws[f'C{i}'] = getMaxWarehouseQty(i-11,conn)[0][0]  #Максимальная емкость складов
 
             #Факт загрузки экспортно-импортных контейнеров на начало текущей даты
             ws['D20'] = NanCheck(TransportUserInfo8[0][8])
@@ -856,6 +860,7 @@ def download(request):
             ws['E73'] = NanCheck(ContainerDataNow5[0][2])
             ws['E74'] = NanCheck(ContainerDataNow6[0][2])
             ws['E75'] = NanCheck(ContainerDataNow7[0][2])
+            conn.close()
         except:
             pass
         bytes_io = BytesIO()
@@ -868,6 +873,7 @@ def download(request):
 @login_required(login_url='')
 def dataset(request):
     if request.user.id == 1:
+        conn = connection()
         params = request.session.get('parameters', {})
         date = params.get('date1')
         # try:
@@ -875,24 +881,24 @@ def dataset(request):
             # TestUser1
             #
                 #table 1
-        Tranzit1 = getTranzitUserInfoFromDB(2,date)
-        User1data = getUserInfoFromDBDataset(2, date)
-        MaxWarehouseQty1User = getMaxWarehouseQty(2)[0][0]
-        NormsWarehouseQty1User = getNormsWarehouseQty(2)[0][0]
+        Tranzit1 = getTranzitUserInfoFromDB(2,date,conn)
+        User1data = getUserInfoFromDBDataset(2, date,conn)
+        MaxWarehouseQty1User = getMaxWarehouseQty(2,conn)[0][0]
+        NormsWarehouseQty1User = getNormsWarehouseQty(2,conn)[0][0]
         AllQty1User = AllQtyCalculator(User1data, Tranzit1)
         AllQtyPercent1User = AllQtyPercent(AllQty1User, MaxWarehouseQty1User, 0)
-        Reid_info1 = getReidUserInfoFromDB(2,date)
+        Reid_info1 = getReidUserInfoFromDB(2,date,conn)
         ReidAllUser1 = ReidAllStr(Reid_info1)
         PortAllUser1 = PortAllStr(Reid_info1)
                 #table 2
-        ContainerData1 = getContaunerUserInfoFromDB(2,date)
-        ContainerDataNow1 = getContaunerUserInfoFromDB(2, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        ContainerData1 = getContaunerUserInfoFromDB(2,date,conn)
+        ContainerDataNow1 = getContaunerUserInfoFromDB(2, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'),conn)
                 #table3
-        WagonsData1 = getWagonsUserInfoFromDB(2,date)
+        WagonsData1 = getWagonsUserInfoFromDB(2,date,conn)
                 #table4
-        WagonsDataFE1 = getWagonsUserInfoFromDBFE(2,date)
+        WagonsDataFE1 = getWagonsUserInfoFromDBFE(2,date,conn)
                 #table5
-        TransportUserInfo1 = getTransportUserInfoFromDB(2,date)
+        TransportUserInfo1 = getTransportUserInfoFromDB(2,date,conn)
         TransportUserInfo1InPercent = TransportPercent((NanCheck(TransportUserInfo1[0][4])
                                                         + NanCheck(TransportUserInfo1[0][5])
                                                         + NanCheck(TransportUserInfo1[0][6])
@@ -911,24 +917,24 @@ def dataset(request):
         # TestUser2
         #
                 #table 1
-        Tranzit2 = getTranzitUserInfoFromDB(3,date)
-        User2data = getUserInfoFromDBDataset(3, date)
-        MaxWarehouseQty2User = getMaxWarehouseQty(3)[0][0]
-        NormsWarehouseQty2User = getNormsWarehouseQty(3)[0][0]
+        Tranzit2 = getTranzitUserInfoFromDB(3,date,conn)
+        User2data = getUserInfoFromDBDataset(3, date,conn)
+        MaxWarehouseQty2User = getMaxWarehouseQty(3,conn)[0][0]
+        NormsWarehouseQty2User = getNormsWarehouseQty(3,conn)[0][0]
         AllQty2User = AllQtyCalculator(User2data, Tranzit2)
         AllQtyPercent2User = AllQtyPercent(AllQty2User, MaxWarehouseQty2User, 0)
-        Reid_info2 = getReidUserInfoFromDB(3,date)
+        Reid_info2 = getReidUserInfoFromDB(3,date,conn)
         ReidAllUser2 = ReidAllStr(Reid_info2)
         PortAllUser2 = PortAllStr(Reid_info2)
                 #table 2
-        ContainerData2 = getContaunerUserInfoFromDB(3,date)
-        ContainerDataNow2 = getContaunerUserInfoFromDB(3,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        ContainerData2 = getContaunerUserInfoFromDB(3,date,conn)
+        ContainerDataNow2 = getContaunerUserInfoFromDB(3,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'),conn)
                 #table3
-        WagonsData2 = getWagonsUserInfoFromDB(3,date)
+        WagonsData2 = getWagonsUserInfoFromDB(3,date,conn)
                 #table4
-        WagonsDataFE2 = getWagonsUserInfoFromDBFE(3,date)
+        WagonsDataFE2 = getWagonsUserInfoFromDBFE(3,date,conn)
                 #table5
-        TransportUserInfo2 = getTransportUserInfoFromDB(3,date)
+        TransportUserInfo2 = getTransportUserInfoFromDB(3,date,conn)
         TransportUserInfo2InPercent = TransportPercent((NanCheck(TransportUserInfo2[0][4])
                                                         + NanCheck(TransportUserInfo2[0][5])
                                                         + NanCheck(TransportUserInfo2[0][6])
@@ -949,24 +955,24 @@ def dataset(request):
         #
 
                 #table 1
-        Tranzit3 = getTranzitUserInfoFromDB(4,date)
-        User3data = getUserInfoFromDBDataset(4, date)
-        MaxWarehouseQty3User = getMaxWarehouseQty(4)[0][0]
-        NormsWarehouseQty3User = getNormsWarehouseQty(4)[0][0]
+        Tranzit3 = getTranzitUserInfoFromDB(4,date,conn)
+        User3data = getUserInfoFromDBDataset(4, date,conn)
+        MaxWarehouseQty3User = getMaxWarehouseQty(4,conn)[0][0]
+        NormsWarehouseQty3User = getNormsWarehouseQty(4,conn)[0][0]
         AllQty3User = AllQtyCalculator(User3data, Tranzit3)
         AllQtyPercent3User = AllQtyPercent(AllQty3User, MaxWarehouseQty3User, 0)
-        Reid_info3 = getReidUserInfoFromDB(4,date)
+        Reid_info3 = getReidUserInfoFromDB(4,date,conn)
         ReidAllUser3 = ReidAllStr(Reid_info3)
         PortAllUser3 = PortAllStr(Reid_info3)
                 #table 2
-        ContainerData3 = getContaunerUserInfoFromDB(4,date)
-        ContainerDataNow3 = getContaunerUserInfoFromDB(4,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        ContainerData3 = getContaunerUserInfoFromDB(4,date,conn)
+        ContainerDataNow3 = getContaunerUserInfoFromDB(4,(dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'),conn)
                 #table3
-        WagonsData3 = getWagonsUserInfoFromDB(4,date)
+        WagonsData3 = getWagonsUserInfoFromDB(4,date,conn)
                 #table4
-        WagonsDataFE3 = getWagonsUserInfoFromDBFE(4,date)
+        WagonsDataFE3 = getWagonsUserInfoFromDBFE(4,date,conn)
                 #table5
-        TransportUserInfo3 = getTransportUserInfoFromDB(4,date)
+        TransportUserInfo3 = getTransportUserInfoFromDB(4,date,conn)
         TransportUserInfo3InPercent = TransportPercent((NanCheck(TransportUserInfo3[0][4])
                                                         + NanCheck(TransportUserInfo3[0][5])
                                                         + NanCheck(TransportUserInfo3[0][6])
@@ -986,25 +992,25 @@ def dataset(request):
         #
 
         # table 1
-        Tranzit4 = getTranzitUserInfoFromDB(5, date)
-        User4data = getUserInfoFromDBDataset(5, date)
-        MaxWarehouseQty4User = getMaxWarehouseQty(5)[0][0]
-        NormsWarehouseQty4User = getNormsWarehouseQty(5)[0][0]
+        Tranzit4 = getTranzitUserInfoFromDB(5, date,conn)
+        User4data = getUserInfoFromDBDataset(5, date,conn)
+        MaxWarehouseQty4User = getMaxWarehouseQty(5,conn)[0][0]
+        NormsWarehouseQty4User = getNormsWarehouseQty(5,conn)[0][0]
         AllQty4User = AllQtyCalculator(User4data, Tranzit4)
         AllQtyPercent4User = AllQtyPercent(AllQty4User, MaxWarehouseQty4User, 0)
-        Reid_info4 = getReidUserInfoFromDB(5, date)
+        Reid_info4 = getReidUserInfoFromDB(5, date,conn)
         ReidAllUser4 = ReidAllStr(Reid_info4)
         PortAllUser4 = PortAllStr(Reid_info4)
         # table 2
-        ContainerData4 = getContaunerUserInfoFromDB(5, date)
+        ContainerData4 = getContaunerUserInfoFromDB(5, date,conn)
         ContainerDataNow4 = getContaunerUserInfoFromDB(5, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-            '%Y-%m-%d'))
+            '%Y-%m-%d'),conn)
         # table3
-        WagonsData4 = getWagonsUserInfoFromDB(5, date)
+        WagonsData4 = getWagonsUserInfoFromDB(5, date,conn)
         # table4
-        WagonsDataFE4 = getWagonsUserInfoFromDBFE(5, date)
+        WagonsDataFE4 = getWagonsUserInfoFromDBFE(5, date,conn)
         # table5
-        TransportUserInfo4 = getTransportUserInfoFromDB(5, date)
+        TransportUserInfo4 = getTransportUserInfoFromDB(5, date,conn)
         TransportUserInfo4InPercent = TransportPercent((NanCheck(TransportUserInfo4[0][4])
                                                         + NanCheck(TransportUserInfo4[0][5])
                                                         + NanCheck(TransportUserInfo4[0][6])
@@ -1024,25 +1030,25 @@ def dataset(request):
         #
 
         # table 1
-        Tranzit5 = getTranzitUserInfoFromDB(6, date)
-        User5data = getUserInfoFromDBDataset(6, date)
-        MaxWarehouseQty5User = getMaxWarehouseQty(6)[0][0]
-        NormsWarehouseQty5User = getNormsWarehouseQty(6)[0][0]
+        Tranzit5 = getTranzitUserInfoFromDB(6, date,conn)
+        User5data = getUserInfoFromDBDataset(6, date,conn)
+        MaxWarehouseQty5User = getMaxWarehouseQty(6,conn)[0][0]
+        NormsWarehouseQty5User = getNormsWarehouseQty(6,conn)[0][0]
         AllQty5User = AllQtyCalculator(User5data, Tranzit5)
         AllQtyPercent5User = AllQtyPercent(AllQty5User, MaxWarehouseQty5User, 0)
-        Reid_info5 = getReidUserInfoFromDB(6, date)
+        Reid_info5 = getReidUserInfoFromDB(6, date,conn)
         ReidAllUser5 = ReidAllStr(Reid_info5)
         PortAllUser5 = PortAllStr(Reid_info5)
         # table 2
-        ContainerData5 = getContaunerUserInfoFromDB(6, date)
+        ContainerData5 = getContaunerUserInfoFromDB(6, date,conn)
         ContainerDataNow5 = getContaunerUserInfoFromDB(6, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-            '%Y-%m-%d'))
+            '%Y-%m-%d'),conn)
         # table3
-        WagonsData5 = getWagonsUserInfoFromDB(6, date)
+        WagonsData5 = getWagonsUserInfoFromDB(6, date,conn)
         # table4
-        WagonsDataFE5 = getWagonsUserInfoFromDBFE(6, date)
+        WagonsDataFE5 = getWagonsUserInfoFromDBFE(6, date,conn)
         # table5
-        TransportUserInfo5 = getTransportUserInfoFromDB(6, date)
+        TransportUserInfo5 = getTransportUserInfoFromDB(6, date,conn)
         TransportUserInfo5InPercent = TransportPercent((NanCheck(TransportUserInfo5[0][4])
                                                         + NanCheck(TransportUserInfo5[0][5])
                                                         + NanCheck(TransportUserInfo5[0][6])
@@ -1062,25 +1068,25 @@ def dataset(request):
         #
 
         # table 1
-        Tranzit6 = getTranzitUserInfoFromDB(7, date)
-        User6data = getUserInfoFromDBDataset(7, date)
-        MaxWarehouseQty6User = getMaxWarehouseQty(7)[0][0]
-        NormsWarehouseQty6User = getNormsWarehouseQty(7)[0][0]
+        Tranzit6 = getTranzitUserInfoFromDB(7, date,conn)
+        User6data = getUserInfoFromDBDataset(7, date,conn)
+        MaxWarehouseQty6User = getMaxWarehouseQty(7,conn)[0][0]
+        NormsWarehouseQty6User = getNormsWarehouseQty(7,conn)[0][0]
         AllQty6User = AllQtyCalculator(User6data, Tranzit6)
         AllQtyPercent6User = AllQtyPercent(AllQty6User, MaxWarehouseQty6User, 0)
-        Reid_info6 = getReidUserInfoFromDB(7, date)
+        Reid_info6 = getReidUserInfoFromDB(7, date,conn)
         ReidAllUser6 = ReidAllStr(Reid_info6)
         PortAllUser6 = PortAllStr(Reid_info6)
         # table 2
-        ContainerData6 = getContaunerUserInfoFromDB(7, date)
+        ContainerData6 = getContaunerUserInfoFromDB(7, date,conn)
         ContainerDataNow6 = getContaunerUserInfoFromDB(7, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-            '%Y-%m-%d'))
+            '%Y-%m-%d'),conn)
         # table3
-        WagonsData6 = getWagonsUserInfoFromDB(7, date)
+        WagonsData6 = getWagonsUserInfoFromDB(7, date,conn)
         # table4
-        WagonsDataFE6 = getWagonsUserInfoFromDBFE(7, date)
+        WagonsDataFE6 = getWagonsUserInfoFromDBFE(7, date,conn)
         # table5
-        TransportUserInfo6 = getTransportUserInfoFromDB(7, date)
+        TransportUserInfo6 = getTransportUserInfoFromDB(7, date,conn)
         TransportUserInfo6InPercent = TransportPercent((NanCheck(TransportUserInfo6[0][4])
                                                         + NanCheck(TransportUserInfo6[0][5])
                                                         + NanCheck(TransportUserInfo6[0][6])
@@ -1101,25 +1107,25 @@ def dataset(request):
         #
 
         # table 1
-        Tranzit7 = getTranzitUserInfoFromDB(8, date)
-        User7data = getUserInfoFromDBDataset(8, date)
-        MaxWarehouseQty7User = getMaxWarehouseQty(8)[0][0]
-        NormsWarehouseQty7User = getNormsWarehouseQty(8)[0][0]
+        Tranzit7 = getTranzitUserInfoFromDB(8, date,conn)
+        User7data = getUserInfoFromDBDataset(8, date,conn)
+        MaxWarehouseQty7User = getMaxWarehouseQty(8,conn)[0][0]
+        NormsWarehouseQty7User = getNormsWarehouseQty(8,conn)[0][0]
         AllQty7User = AllQtyCalculator(User7data, Tranzit7)
         AllQtyPercent7User = AllQtyPercent(AllQty7User, MaxWarehouseQty7User, 0)
-        Reid_info7 = getReidUserInfoFromDB(8, date)
+        Reid_info7 = getReidUserInfoFromDB(8, date,conn)
         ReidAllUser7 = ReidAllStr(Reid_info7)
         PortAllUser7 = PortAllStr(Reid_info7)
         # table 2
-        ContainerData7 = getContaunerUserInfoFromDB(8, date)
+        ContainerData7 = getContaunerUserInfoFromDB(8, date,conn)
         ContainerDataNow7 = getContaunerUserInfoFromDB(8, (dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime(
-            '%Y-%m-%d'))
+            '%Y-%m-%d'),conn)
         # table3
-        WagonsData7 = getWagonsUserInfoFromDB(8, date)
+        WagonsData7 = getWagonsUserInfoFromDB(8, date,conn)
         # table4
-        WagonsDataFE7 = getWagonsUserInfoFromDBFE(8, date)
+        WagonsDataFE7 = getWagonsUserInfoFromDBFE(8, date,conn)
         # table5
-        TransportUserInfo7 = getTransportUserInfoFromDB(8, date)
+        TransportUserInfo7 = getTransportUserInfoFromDB(8, date,conn)
         TransportUserInfo7InPercent = TransportPercent((NanCheck(TransportUserInfo7[0][4])
                                                         + NanCheck(TransportUserInfo7[0][5])
                                                         + NanCheck(TransportUserInfo7[0][6])
@@ -1140,24 +1146,24 @@ def dataset(request):
         ###########
 
             #table 1
-        UserAlldata = getDataTableForAllTime(date)
-        TranzitAll = getAllTranzitUserInfoFromDB(date)
-        MaxWarehouseQtyAll = getMaxWarehouseAllQty()[0][0]
-        NormsWarehouseQtyAll = getNormsWarehouseAllQty()[0][0]
+        UserAlldata = getDataTableForAllTime(date,conn)
+        TranzitAll = getAllTranzitUserInfoFromDB(date,conn)
+        MaxWarehouseQtyAll = getMaxWarehouseAllQty(conn)[0][0]
+        NormsWarehouseQtyAll = getNormsWarehouseAllQty(conn)[0][0]
         AllQtyAll = AllQtyCalculator(UserAlldata, TranzitAll)
         AllQtyPercent1All = AllQtyPercent(AllQtyAll, MaxWarehouseQtyAll, 0)
-        Reid_infoAll = getReidAllInfoFromDB(date)
+        Reid_infoAll = getReidAllInfoFromDB(date,conn)
         ReidAllAll = ReidAllStr(Reid_infoAll)
         PortAllAll = PortAllStr(Reid_infoAll)
             #table 2
-        ContainerDataAll = getContaunerInfoFromDBAll(date)
-        ContainerDataAllNow = getContaunerInfoFromDBAll((dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'))
+        ContainerDataAll = getContaunerInfoFromDBAll(date,conn)
+        ContainerDataAllNow = getContaunerInfoFromDBAll((dt.datetime.strptime(date, '%Y-%m-%d') + DAYDELTA).strftime('%Y-%m-%d'),conn)
             # table3
-        WagonDataAll = getWagonsInfoFromDBAll(date)
+        WagonDataAll = getWagonsInfoFromDBAll(date,conn)
             # table4
-        WagonDataAllFE = getWagonsInfoFromDBAllFE(date)
+        WagonDataAllFE = getWagonsInfoFromDBAllFE(date,conn)
                 #table5
-        TransportUserInfoAll = getTransportInfoFromDBAll(date)
+        TransportUserInfoAll = getTransportInfoFromDBAll(date,conn)
         TransportUserInfoAllInPercent = TransportPercent((NanCheck(TransportUserInfoAll[0][4])
                                                           + NanCheck(TransportUserInfoAll[0][5])
                                                           + NanCheck(TransportUserInfoAll[0][6])
@@ -1180,72 +1186,79 @@ def dataset(request):
 
         # 8 user
 
-        TransportUserInfo8 = getTransportUserInfoFromDB(9, date)
+        TransportUserInfo8 = getTransportUserInfoFromDB(9, date,conn)
         TransportUserInfo8Percent = TransportPercent(NanCheck(TransportUserInfo8[0][8]),
-                                                     NanCheck(getMaxWarehouseQty(9)[0][0]),
+                                                     NanCheck(getMaxWarehouseQty(9,conn)[0][0]),
                                                      2)
         TransportCalculated8 = TransportCalculator(TransportUserInfo8)
 
         # 9 user
 
-        TransportUserInfo9 = getTransportUserInfoFromDB(10, date)
+        TransportUserInfo9 = getTransportUserInfoFromDB(10, date,conn)
         TransportUserInfo9Percent = TransportPercent(NanCheck(TransportUserInfo9[0][8]),
-                                                     NanCheck(getMaxWarehouseQty(10)[0][0]),
+                                                     NanCheck(getMaxWarehouseQty(10,conn)[0][0]),
                                                      2)
         TransportCalculated9 = TransportCalculator(TransportUserInfo9)
 
         # 10 user
 
-        TransportUserInfo10 = getTransportUserInfoFromDB(11, date)
+        TransportUserInfo10 = getTransportUserInfoFromDB(11, date,conn)
         TransportUserInfo10Percent = TransportPercent(NanCheck(TransportUserInfo10[0][8]),
-                                                      NanCheck(getMaxWarehouseQty(11)[0][0]),
+                                                      NanCheck(getMaxWarehouseQty(11,conn)[0][0]),
                                                       2)
         TransportCalculated10 = TransportCalculator(TransportUserInfo10)
 
         # 11 user
 
-        TransportUserInfo11 = getTransportUserInfoFromDB(12, date)
+        TransportUserInfo11 = getTransportUserInfoFromDB(12, date,conn)
         TransportUserInfo11Percent = TransportPercent(NanCheck(TransportUserInfo11[0][8]),
-                                                      NanCheck(getMaxWarehouseQty(12)[0][0]),
+                                                      NanCheck(getMaxWarehouseQty(12,conn)[0][0]),
                                                       2)
         TransportCalculated11 = TransportCalculator(TransportUserInfo11)
 
         # 12 user
 
-        TransportUserInfo12 = getTransportUserInfoFromDB(13, date)
+        TransportUserInfo12 = getTransportUserInfoFromDB(13, date,conn)
         TransportUserInfo12Percent = TransportPercent(NanCheck(TransportUserInfo12[0][8]),
-                                                      NanCheck(getMaxWarehouseQty(13)[0][0]),
+                                                      NanCheck(getMaxWarehouseQty(13,conn)[0][0]),
                                                       2)
         TransportCalculated12 = TransportCalculator(TransportUserInfo12)
 
         # 13 user
 
-        TransportUserInfo13 = getTransportUserInfoFromDB(14, date)
+        TransportUserInfo13 = getTransportUserInfoFromDB(14, date,conn)
         TransportUserInfo13Percent = TransportPercent(NanCheck(TransportUserInfo13[0][8]),
-                                                      NanCheck(getMaxWarehouseQty(14)[0][0]),
+                                                      NanCheck(getMaxWarehouseQty(14,conn)[0][0]),
                                                       2)
         TransportCalculated13 = TransportCalculator(TransportUserInfo13)
 
         # 14 user
 
-        TransportUserInfo14 = getTransportUserInfoFromDB(15, date)
+        TransportUserInfo14 = getTransportUserInfoFromDB(15, date,conn)
         TransportUserInfo14Percent = TransportPercent(NanCheck(TransportUserInfo14[0][8]),
-                                                      NanCheck(getMaxWarehouseQty(15)[0][0]),
+                                                      NanCheck(getMaxWarehouseQty(15,conn)[0][0]),
                                                       2)
         TransportCalculated14 = TransportCalculator(TransportUserInfo14)
 
-
+        MaxWarehouseQty8User = NanCheck(getMaxWarehouseQty(9, conn)[0][0])
+        MaxWarehouseQty9User = NanCheck(getMaxWarehouseQty(10, conn)[0][0])
+        MaxWarehouseQty10User = NanCheck(getMaxWarehouseQty(11, conn)[0][0])
+        MaxWarehouseQty11User = NanCheck(getMaxWarehouseQty(12, conn)[0][0])
+        MaxWarehouseQty12User = NanCheck(getMaxWarehouseQty(13, conn)[0][0])
+        MaxWarehouseQty13User = NanCheck(getMaxWarehouseQty(14, conn)[0][0])
+        MaxWarehouseQty14User = NanCheck(getMaxWarehouseQty(15, conn)[0][0])
+        MaxWarehouseQtyAllNotST = NanCheck(getMaxWarehouseAllQtyNotST(conn)[0][0])
         #
         #All not stevedor users
         #
 
-        TransportUserInfoNotSTAll = getTransportInfoFromDBNotSTAll(date)
+        TransportUserInfoNotSTAll = getTransportInfoFromDBNotSTAll(date,conn)
         print(TransportUserInfoNotSTAll)
         TransportUserInfoAllPercent = TransportPercent(NanCheck(TransportUserInfoNotSTAll[0][8]),
-                                                       NanCheck(getMaxWarehouseAllQtyNotST()[0][0]),
+                                                       NanCheck(getMaxWarehouseAllQtyNotST(conn)[0][0]),
                                                        2)
         TransportCalculatedAllNotST = TransportCalculator(TransportUserInfoNotSTAll)
-
+        conn.close()
         # except:
         #     return render(request, 'error.html', {'ErrorText' : 'Ошибка отображения данных'})
         return render(request, 'dataset.html', {
@@ -1648,14 +1661,14 @@ def dataset(request):
 
                     #6 table (2 in dataset)
 
-                                                    'MaxWarehouseQty8User': NanCheck(getMaxWarehouseQty(9)[0][0]),
-                                                    'MaxWarehouseQty9User': NanCheck(getMaxWarehouseQty(10)[0][0]),
-                                                    'MaxWarehouseQty10User': NanCheck(getMaxWarehouseQty(11)[0][0]),
-                                                    'MaxWarehouseQty11User': NanCheck(getMaxWarehouseQty(12)[0][0]),
-                                                    'MaxWarehouseQty12User': NanCheck(getMaxWarehouseQty(13)[0][0]),
-                                                    'MaxWarehouseQty13User': NanCheck(getMaxWarehouseQty(14)[0][0]),
-                                                    'MaxWarehouseQty14User': NanCheck(getMaxWarehouseQty(15)[0][0]),
-                                                    'MaxWarehouseQtyAllNotST': NanCheck(getMaxWarehouseAllQtyNotST()[0][0]),
+                                                    'MaxWarehouseQty8User': MaxWarehouseQty8User,
+                                                    'MaxWarehouseQty9User': MaxWarehouseQty9User,
+                                                    'MaxWarehouseQty10User': MaxWarehouseQty10User,
+                                                    'MaxWarehouseQty11User': MaxWarehouseQty11User,
+                                                    'MaxWarehouseQty12User': MaxWarehouseQty12User,
+                                                    'MaxWarehouseQty13User': MaxWarehouseQty13User,
+                                                    'MaxWarehouseQty14User': MaxWarehouseQty14User,
+                                                    'MaxWarehouseQtyAllNotST': MaxWarehouseQtyAllNotST,
 
                                                     'FactLoad8User' : NanCheck(TransportUserInfo8[0][8]),
                                                     'FactLoad9User': NanCheck(TransportUserInfo9[0][8]),
@@ -1871,7 +1884,9 @@ def table2_data(request):
             redirect_url = f'/success_table2/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            Userdata = getContaunerUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            conn = connection()
+            Userdata = getContaunerUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'),conn)
+            conn.close()
             return render(request, 'table2_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'ContainerTrain': NanCheck(Userdata[0][0]),
@@ -1977,8 +1992,9 @@ def table3_data(request):
             redirect_url = f'/success_table3/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            Userdata = getWagonsUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
-            print(Userdata)
+            conn = connection()
+            Userdata = getWagonsUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'),conn)
+            conn.close()
             return render(request, 'table3_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'Wagons': NanCheck(Userdata[0][0]),
@@ -2077,7 +2093,9 @@ def table4_data(request):
             redirect_url = f'/success_table4/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            Userdata = getWagonsUserInfoFromDBFE(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            conn = connection()
+            Userdata = getWagonsUserInfoFromDBFE(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'),conn)
+            conn.close()
             return render(request, 'table4_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'Wagons_FE': NanCheck(Userdata[0][0]),
@@ -2211,7 +2229,9 @@ def table5_data(request):
             redirect_url = f'/success_table5/?session_id={session_id}'
             return redirect(redirect_url)
         try:
-            Userdata = getTransportUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
+            conn = connection()
+            Userdata = getTransportUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'),conn)
+            conn.close()
             return render(request, 'table5_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'FittingPlatformOut': NanCheck(Userdata[0][0]),
@@ -2391,8 +2411,9 @@ def table6_data(request):
             return redirect(redirect_url)
         try:
             #WORK IN PROGRESS
-            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'))
-            print(123321)
+            conn = connection()
+            Userdata = getUserInfoFromDB(request.user.id, (dt.datetime.now()).strftime('%Y-%m-%d'),conn)
+            conn.close()
             return render(request, 'table6_data.html', {
                 'date2' : (dt.datetime.now()).strftime('%Y-%m-%d'),
                 'FittingPlatformOut': (Userdata[0][0]),
