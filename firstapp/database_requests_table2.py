@@ -1,17 +1,11 @@
 import datetime as dt
-import psycopg2
-
-def connection():
-    s = '10.100.32.202'
-    d = 'postgres'
-    u = 'admin'
-    p = 'root'
-    conn = psycopg2.connect(host=s, user=u, password=p, database=d, port='6101')
-    return conn
 
 
-def getContaunerUserInfoFromDB(userid,date):
-    conn = connection()
+
+
+
+def getContaunerUserInfoFromDB(userid,date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -24,12 +18,12 @@ def getContaunerUserInfoFromDB(userid,date):
     result = cursor.fetchall()
     if result == []:
         result = [(0,0,0)]
-    conn.close()
+
     return result
 
 
-def getContaunerInfoFromDBAll(date):
-    conn = connection()
+def getContaunerInfoFromDBAll(date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -42,5 +36,5 @@ def getContaunerInfoFromDBAll(date):
     result = cursor.fetchall()
     if result == []:
         result = [(0,0,0)]
-    conn.close()
+    
     return result

@@ -1,4 +1,5 @@
 import openpyxl
+import psycopg2
 
 
 def set_border(ws, cell_range):
@@ -15,7 +16,13 @@ def AllQtyPercent(top,bot,signs):
     else:
         return 0
 
-
+def connection():
+    s = '10.100.32.202'
+    d = 'postgres'
+    u = 'admin'
+    p = 'root'
+    conn = psycopg2.connect(host=s, user=u, password=p, database=d, port='6101')
+    return conn
 def TransportPercent(top,bot,signs):
     # For persents with signs after , 0 if no signs
     if (top != None and bot != None and bot!=0):

@@ -1,17 +1,9 @@
 import datetime as dt
-import psycopg2
-
-def connection():
-    s = '10.100.32.202'
-    d = 'postgres'
-    u = 'admin'
-    p = 'root'
-    conn = psycopg2.connect(host=s, user=u, password=p, database=d, port='6101')
-    return conn
 
 
-def getWagonsUserInfoFromDB(userid,date):
-    conn = connection()
+
+
+def getWagonsUserInfoFromDB(userid,date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -23,12 +15,11 @@ def getWagonsUserInfoFromDB(userid,date):
     result = cursor.fetchall()
     if result == []:
         result = [(0,0)]
-    conn.close()
+    
     return result
 
 
-def getWagonsInfoFromDBAll(date):
-    conn = connection()
+def getWagonsInfoFromDBAll(date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -39,12 +30,11 @@ def getWagonsInfoFromDBAll(date):
     result = cursor.fetchall()
     if result == []:
         result = [(0)]
-    conn.close()
+    
     return result
 
 
-def getWagonsUserInfoFromDBFE(userid,date):
-    conn = connection()
+def getWagonsUserInfoFromDBFE(userid,date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -56,12 +46,12 @@ def getWagonsUserInfoFromDBFE(userid,date):
     result = cursor.fetchall()
     if result == []:
         result = [(0)]
-    conn.close()
+    
     return result
 
 
-def getWagonsInfoFromDBAllFE(date):
-    conn = connection()
+def getWagonsInfoFromDBAllFE(date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -72,5 +62,5 @@ def getWagonsInfoFromDBAllFE(date):
     result = cursor.fetchall()
     if result == []:
         result = [(0)]
-    conn.close()
+    
     return result

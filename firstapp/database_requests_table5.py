@@ -1,17 +1,8 @@
 import datetime as dt
-import psycopg2
-
-def connection():
-    s = '10.100.32.202'
-    d = 'postgres'
-    u = 'admin'
-    p = 'root'
-    conn = psycopg2.connect(host=s, user=u, password=p, database=d, port='6101')
-    return conn
 
 
-def getTransportUserInfoFromDB(userid,date):
-    conn = connection()
+
+def getTransportUserInfoFromDB(userid,date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -31,12 +22,11 @@ def getTransportUserInfoFromDB(userid,date):
     result = cursor.fetchall()
     if result == []:
         result = [(0,0,0,0,0,0,0,0,0,0)]
-    conn.close()
+    
     return result
 
 
-def getTransportInfoFromDBAll(date):
-    conn = connection()
+def getTransportInfoFromDBAll(date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -56,11 +46,10 @@ def getTransportInfoFromDBAll(date):
     result = cursor.fetchall()
     if result == []:
         result = [(0,0,0,0,0,0,0,0,0,0)]
-    conn.close()
+    
     return result
 
-def getTransportInfoFromDBNotSTAll(date):
-    conn = connection()
+def getTransportInfoFromDBNotSTAll(date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -80,5 +69,5 @@ def getTransportInfoFromDBNotSTAll(date):
     result = cursor.fetchall()
     if result == []:
         result = [(0,0,0,0,0,0,0,0,0,0)]
-    conn.close()
+    
     return result

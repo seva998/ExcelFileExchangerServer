@@ -1,19 +1,11 @@
 import datetime as dt
-import psycopg2
 
-def connection():
-    s = '10.100.32.202'
-    d = 'postgres'
-    u = 'admin'
-    p = 'root'
-    conn = psycopg2.connect(host=s, user=u, password=p, database=d, port='6101')
-    return conn
 
-def getDataTableForAllTime(date):
+def getDataTableForAllTime(date,conn):
     #
     # Сумма по всем пользователям за всё время
     #
-    conn = connection()
+
     cursor = conn.cursor()
     cursor.execute(f"SELECT SUM(db_importin) AS importinsum,"
                    f"SUM(db_importout) AS importoutsum,"
@@ -34,12 +26,11 @@ def getDataTableForAllTime(date):
                    f"FROM firstapp_dailymonitoringuserdata "
                    f"WHERE date <= '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
     result = cursor.fetchall()
-    conn.close()
     return result
 
 
-def getTranzitUserInfoFromDB(userid,date):
-    conn = connection()
+def getTranzitUserInfoFromDB(userid,date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -50,11 +41,10 @@ def getTranzitUserInfoFromDB(userid,date):
     User1data = cursor.fetchall()
     if User1data == []:
         User1data = [(0)]
-    conn.close()
     return User1data
 
-def getAllTranzitUserInfoFromDB(date):
-    conn = connection()
+def getAllTranzitUserInfoFromDB(date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -65,11 +55,11 @@ def getAllTranzitUserInfoFromDB(date):
     User1data = cursor.fetchall()
     if User1data == []:
         User1data = [(0)]
-    conn.close()
+    
     return User1data
 
-def getReidUserInfoFromDB(userid,date):
-    conn = connection()
+def getReidUserInfoFromDB(userid,date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -87,11 +77,11 @@ def getReidUserInfoFromDB(userid,date):
     User1data = cursor.fetchall()
     if User1data == []:
         User1data = [(0,0,0,0,0,0,0,0)]
-    conn.close()
+    
     return User1data
 
-def getReidAllInfoFromDB(date):
-    conn = connection()
+def getReidAllInfoFromDB(date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -109,12 +99,11 @@ def getReidAllInfoFromDB(date):
     User1data = cursor.fetchall()
     if User1data == []:
         User1data = [(0,0,0,0,0,0,0,0)]
-    conn.close()
+    
     return User1data
 
 
-def getUserInfoFromDB(userid,date):
-    conn = connection()
+def getUserInfoFromDB(userid,date,conn):
     cursor = conn.cursor()
     #
     # TestUser
@@ -140,11 +129,11 @@ def getUserInfoFromDB(userid,date):
     User1data = cursor.fetchall()
     if User1data == []:
         User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
-    conn.close()
+    
     return User1data
 
-def getUserInfoFromDBDataset(userid,date):
-    conn = connection()
+def getUserInfoFromDBDataset(userid,date,conn):
+
     cursor = conn.cursor()
     #
     # TestUser
@@ -170,12 +159,12 @@ def getUserInfoFromDBDataset(userid,date):
     User1data = cursor.fetchall()
     if User1data == []:
         User1data = [(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
-    conn.close()
+    
     return User1data
 
 
-def getDataTableForDate(date):
-    conn = connection()
+def getDataTableForDate(date,conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -199,11 +188,11 @@ def getDataTableForDate(date):
                    f"FROM firstapp_dailymonitoringuserdata "
                    f"WHERE date = '{dt.datetime.strptime(date, '%Y-%m-%d').strftime('%Y%m%d')}'", )
     result = cursor.fetchall()
-    conn.close()
+    
     return result
 
-def getMaxWarehouseQty(userid):
-    conn = connection()
+def getMaxWarehouseQty(userid,conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -212,11 +201,11 @@ def getMaxWarehouseQty(userid):
                    f"FROM firstapp_constantuserdata "
                    f"WHERE db_userid = {userid}")
     result = cursor.fetchall()
-    conn.close()
+    
     return result
 
-def getMaxWarehouseAllQty():
-    conn = connection()
+def getMaxWarehouseAllQty(conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -225,11 +214,11 @@ def getMaxWarehouseAllQty():
                    f"FROM firstapp_constantuserdata "
                    f"WHERE db_userid > 1  AND db_userid <= 8 ")
     result = cursor.fetchall()
-    conn.close()
+    
     return result
 
-def getNormsWarehouseQty(userid):
-    conn = connection()
+def getNormsWarehouseQty(userid,conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -238,11 +227,11 @@ def getNormsWarehouseQty(userid):
                    f"FROM firstapp_constantuserdata "
                    f"WHERE db_userid = {userid}")
     result = cursor.fetchall()
-    conn.close()
+    
     return result
 
-def getNormsWarehouseAllQty():
-    conn = connection()
+def getNormsWarehouseAllQty(conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -251,11 +240,11 @@ def getNormsWarehouseAllQty():
                    f"FROM firstapp_constantuserdata "
                    f"WHERE db_userid > 1  AND db_userid <= 8 ")
     result = cursor.fetchall()
-    conn.close()
+    
     return result
 
-def getMaxWarehouseAllQtyNotST():
-    conn = connection()
+def getMaxWarehouseAllQtyNotST(conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -264,11 +253,11 @@ def getMaxWarehouseAllQtyNotST():
                    f"FROM firstapp_constantuserdata "
                    f"WHERE db_userid > 8  AND db_userid <= 15 ")
     result = cursor.fetchall()
-    conn.close()
+    
     return result
 
-def getNormsWarehouseAllQtyNotST():
-    conn = connection()
+def getNormsWarehouseAllQtyNotST(conn):
+
     cursor = conn.cursor()
     #
     # Сумма по всем пользователям за дату
@@ -277,5 +266,5 @@ def getNormsWarehouseAllQtyNotST():
                    f"FROM firstapp_constantuserdata "
                    f"WHERE db_userid > 8  AND db_userid <= 15 ")
     result = cursor.fetchall()
-    conn.close()
+    
     return result
