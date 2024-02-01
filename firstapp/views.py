@@ -8,6 +8,7 @@ from django.contrib.sessions.backends.db import SessionStore
 import datetime as dt
 from io import BytesIO
 from django.http import FileResponse
+from django.db import transaction
 
 from .database_requests_table1 import (getDataTableForAllTime,
                                        getUserInfoFromDB,
@@ -67,6 +68,7 @@ def home(request):
     else:
         return render(request, 'admin.html')
 
+@transaction.atomic
 @login_required(login_url='')
 def register(request):
     if request.user.id == 1:
@@ -280,6 +282,7 @@ def table1_data(request):
                 'LoadingPortTramp': 0
             })
 
+@transaction.atomic
 @login_required(login_url='')
 def success_table1(request):
     session_id = request.GET.get('session_id')
@@ -1902,6 +1905,7 @@ def table2_data(request):
             })
 
 
+@transaction.atomic
 @login_required(login_url='')
 def success_table2(request):
     session_id = request.GET.get('session_id')
@@ -2008,6 +2012,7 @@ def table3_data(request):
             })
 
 
+@transaction.atomic
 @login_required(login_url='')
 def success_table3(request):
     session_id = request.GET.get('session_id')
@@ -2109,6 +2114,7 @@ def table4_data(request):
             })
 
 
+@transaction.atomic
 @login_required(login_url='')
 def success_table4(request):
     session_id = request.GET.get('session_id')
@@ -2257,6 +2263,7 @@ def table5_data(request):
             })
 
 
+@transaction.atomic
 @login_required(login_url='')
 def success_table5(request):
     session_id = request.GET.get('session_id')
@@ -2439,6 +2446,7 @@ def table6_data(request):
             })
 
 
+@transaction.atomic
 @login_required(login_url='')
 def success_table6(request):
     session_id = request.GET.get('session_id')
