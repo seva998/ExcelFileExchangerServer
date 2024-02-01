@@ -291,7 +291,7 @@ def success_table1(request):
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         date2 = params.get('date2')
-        print(date2)
+
         ImportIn = params.get('ImportIn')
         ImportOut = params.get('ImportOut')
         ExportIn = params.get('ExportIn')
@@ -1256,7 +1256,7 @@ def dataset(request):
         #
 
         TransportUserInfoNotSTAll = getTransportInfoFromDBNotSTAll(date,conn)
-        print(TransportUserInfoNotSTAll)
+
         TransportUserInfoAllPercent = TransportPercent(NanCheck(TransportUserInfoNotSTAll[0][8]),
                                                        NanCheck(getMaxWarehouseAllQtyNotST(conn)[0][0]),
                                                        2)
@@ -2021,7 +2021,6 @@ def success_table3(request):
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         date2 = params.get('date2')
-        print(date2)
         Wagons = params.get('Wagons')
         WagonsOut = params.get('WagonsOut')
         Wagons[0] = NanCheck(Wagons[0])
@@ -2123,7 +2122,6 @@ def success_table4(request):
         request.session = SessionStore(session_key=session_id)
         params = request.session.get('parameters',{})
         date2 = params.get('date2')
-        print(date2)
         Wagons_FE = params.get('Wagons_FE')
         WagonsOut_FE = params.get('WagonsOut_FE')
         Wagons_FE[0] = NanCheck(Wagons_FE[0])
