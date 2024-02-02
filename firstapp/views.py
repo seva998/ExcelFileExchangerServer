@@ -879,6 +879,7 @@ def dataset(request):
         conn = connection()
         params = request.session.get('parameters', {})
         date = params.get('date1')
+        print(date)
         # try:
             #
             # TestUser1
@@ -1765,7 +1766,7 @@ def datepick_admin(request):
             date1 = request.POST['date1']
             request.session['parameters'] = {'date1': ((dt.datetime.strptime(date1, '%Y-%m-%d') - DAYDELTA).strftime('%Y-%m-%d'))}
             return redirect(dataset)
-        return render(request, 'datepick_admin.html' , {'currentdate':(dt.datetime.now()-DAYDELTA).strftime('%Y-%m-%d')})
+        return render(request, 'datepick_admin.html' , {'currentdate':(dt.datetime.now()).strftime('%Y-%m-%d')})
     else:
         return redirect('home')
 
