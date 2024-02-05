@@ -402,8 +402,6 @@ def download(request):
             # table 1
             Tranzit1 = getTranzitUserInfoFromDB(2, date,conn)
             User1data = getUserInfoFromDBDataset(2, date,conn)
-            MaxWarehouseQty1User = getMaxWarehouseQty(2,conn)[0][0]
-            NormsWarehouseQty1User = getNormsWarehouseQty(2,conn)[0][0]
             AllQty1User = AllQtyCalculator(User1data, Tranzit1)
             Reid_info1 = getReidUserInfoFromDB(2, date,conn)
             # table 2
@@ -424,8 +422,6 @@ def download(request):
             # table 1
             Tranzit2 = getTranzitUserInfoFromDB(3, date,conn)
             User2data = getUserInfoFromDBDataset(3, date,conn)
-            MaxWarehouseQty2User = getMaxWarehouseQty(3,conn)[0][0]
-            NormsWarehouseQty2User = getNormsWarehouseQty(3,conn)[0][0]
             AllQty2User = AllQtyCalculator(User2data, Tranzit2)
             Reid_info2 = getReidUserInfoFromDB(3, date,conn)
 
@@ -449,8 +445,6 @@ def download(request):
             # table 1
             Tranzit3 = getTranzitUserInfoFromDB(4, date,conn)
             User3data = getUserInfoFromDBDataset(4, date,conn)
-            MaxWarehouseQty3User = getMaxWarehouseQty(4,conn)[0][0]
-            NormsWarehouseQty3User = getNormsWarehouseQty(4,conn)[0][0]
             AllQty3User = AllQtyCalculator(User3data, Tranzit3)
             Reid_info3 = getReidUserInfoFromDB(4, date,conn)
 
@@ -474,8 +468,6 @@ def download(request):
             # table 1
             Tranzit4 = getTranzitUserInfoFromDB(5, date,conn)
             User4data = getUserInfoFromDBDataset(5, date,conn)
-            MaxWarehouseQty4User = getMaxWarehouseQty(5,conn)[0][0]
-            NormsWarehouseQty4User = getNormsWarehouseQty(5,conn)[0][0]
             AllQty4User = AllQtyCalculator(User4data, Tranzit4)
 
             Reid_info4 = getReidUserInfoFromDB(5, date,conn)
@@ -500,8 +492,6 @@ def download(request):
             # table 1
             Tranzit5 = getTranzitUserInfoFromDB(6, date,conn)
             User5data = getUserInfoFromDBDataset(6, date,conn)
-            MaxWarehouseQty5User = getMaxWarehouseQty(6,conn)[0][0]
-            NormsWarehouseQty5User = getNormsWarehouseQty(6,conn)[0][0]
             AllQty5User = AllQtyCalculator(User5data, Tranzit5)
 
             Reid_info5 = getReidUserInfoFromDB(6, date,conn)
@@ -525,8 +515,6 @@ def download(request):
             # table 1
             Tranzit6 = getTranzitUserInfoFromDB(7, date,conn)
             User6data = getUserInfoFromDBDataset(7, date,conn)
-            MaxWarehouseQty6User = getMaxWarehouseQty(7,conn)[0][0]
-            NormsWarehouseQty6User = getNormsWarehouseQty(7,conn)[0][0]
             AllQty6User = AllQtyCalculator(User6data, Tranzit6)
             Reid_info6 = getReidUserInfoFromDB(7, date,conn)
 
@@ -550,8 +538,6 @@ def download(request):
             # table 1
             Tranzit7 = getTranzitUserInfoFromDB(8, date,conn)
             User7data = getUserInfoFromDBDataset(8, date,conn)
-            MaxWarehouseQty7User = getMaxWarehouseQty(8,conn)[0][0]
-            NormsWarehouseQty7User = getNormsWarehouseQty(8,conn)[0][0]
             AllQty7User = AllQtyCalculator(User7data, Tranzit7)
 
             Reid_info7 = getReidUserInfoFromDB(8, date,conn)
@@ -879,7 +865,6 @@ def dataset(request):
         conn = connection()
         params = request.session.get('parameters', {})
         date = params.get('date1')
-        print(date)
         # try:
             #
             # TestUser1
