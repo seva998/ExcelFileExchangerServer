@@ -855,7 +855,7 @@ def download(request):
         bytes_io = BytesIO()
         wb.save(bytes_io)
         bytes_io.seek(0)
-        return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xslx'))
+        return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xlsx'))
     else:
         return redirect('home')
 
