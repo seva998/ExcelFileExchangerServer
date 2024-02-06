@@ -1,5 +1,5 @@
-venv/
-config/__pycache__
+
 config/__pycache__/
 firstapp/__pycache__/
-firstapp/migrations/__pycache__/
+venv/
+.idea/
