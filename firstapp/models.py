@@ -72,4 +72,10 @@ class ConstantUserData(models.Model):
     db_max = models.IntegerField()
 
 
+class WarehouseQtyLog (models.Model):
+    db_userid = models.IntegerField()
+    date = models.DateField()
+    db_norms = models.IntegerField()
+    db_max = models.IntegerField()
+
 
