@@ -25,19 +25,23 @@ from .database_requests_table1 import (getDataTableForAllTime,
 
 from .database_requests_table2 import (getContaunerUserInfoFromDB,
                                        getContaunerInfoFromDBAll)
+
 from .database_requests_table3_4 import (getWagonsUserInfoFromDB,
                                          getWagonsInfoFromDBAll,
                                          getWagonsUserInfoFromDBFE,
                                          getWagonsInfoFromDBAllFE)
+
 from .database_requests_table5 import (getTransportUserInfoFromDB,
                                        getTransportInfoFromDBAll,
                                        getTransportInfoFromDBNotSTAll)
+
 from .models import (DailyMonitoringUserData,
                      ConstantUserData,
                      DailyMonitoringUserContainers,
                      DailyMonitoringUserWagons,
                      DailyMonitoringUserWagonsFE,
                      DailyMonitoringUserTransport)
+
 from .utils import (AllQtyPercent,
                     TransportPercent,
                     AllQtyCalculator,
@@ -82,7 +86,9 @@ def register(request):
                 # Создание нового пользователя
                 user = User.objects.create_user(username=username, password=password)
                 user.save()
-                ConstantUserData.objects.create(db_userid=user.id, db_norms=norms, db_max=max)
+                ConstantUserData.objects.create(db_userid=user.id,
+                                                db_norms=norms,
+                                                db_max=max)
                 return redirect('login')
             except:
                 return render(request, 'register.html')
@@ -97,7 +103,9 @@ def user_login(request):
         password = request.POST['password']
 
         # Проверка введенных данных
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request,
+                            username=username,
+                            password=password)
         if user is not None:
             login(request, user)
             return redirect('home')
@@ -325,7 +333,9 @@ def success_table1(request):
         LoadingPortLin[0] = NanCheck(LoadingPortLin[0])
         LoadingPortTramp[0] = NanCheck(LoadingPortTramp[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DailyMonitoringUserData.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+        DataItem = DailyMonitoringUserData.objects.filter(
+                date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                db_userid = request.user.id).update(
                 db_importin=int(ImportIn[0]),
                 db_importout=int(ImportOut[0]),
                 db_exportin=int(ExportIn[0]),
@@ -345,7 +355,8 @@ def success_table1(request):
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DailyMonitoringUserData.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+            DailyMonitoringUserData.objects.create(
+                date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
                                           db_userid = request.user.id,
                                           db_importin= int(ImportIn[0]),
                                           db_importout = int(ImportOut[0]),
@@ -855,7 +866,9 @@ def download(request):
         bytes_io = BytesIO()
         wb.save(bytes_io)
         bytes_io.seek(0)
-        return FileResponse(bytes_io, as_attachment=True, filename=(date+'.xlsx'))
+        return FileResponse(bytes_io,
+                            as_attachment=True,
+                            filename=(date+'.xlsx'))
     else:
         return redirect('home')
 
@@ -1907,7 +1920,8 @@ def success_table2(request):
         ContainerAuto[0] = NanCheck(ContainerAuto[0])
         ContainerAutoQty[0] = NanCheck(ContainerAutoQty[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = (DailyMonitoringUserContainers.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+        DataItem = (DailyMonitoringUserContainers.objects.filter(
+            date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
                 db_userid = request.user.id)
         .update(
                 db_container_train=int(ContainerTrain[0]),
@@ -1916,12 +1930,13 @@ def success_table2(request):
         ))
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DailyMonitoringUserContainers.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
-                                          db_userid = request.user.id,
-                                          db_container_train= int(ContainerTrain[0]),
-                                          db_container_auto = int(ContainerAuto[0]),
-                                          db_container_auto_qty = int(ContainerAutoQty[0])
-                                          )
+            DailyMonitoringUserContainers.objects.create(
+                                        date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                        db_userid = request.user.id,
+                                        db_container_train= int(ContainerTrain[0]),
+                                        db_container_auto = int(ContainerAuto[0]),
+                                        db_container_auto_qty = int(ContainerAutoQty[0])
+                                        )
 
         return render(request, 'success_table2.html', {
                                                 'date2': date2[0][0],
@@ -2012,17 +2027,20 @@ def success_table3(request):
         Wagons[0] = NanCheck(Wagons[0])
         WagonsOut[0] = NanCheck(WagonsOut[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DailyMonitoringUserWagons.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
-                db_wagons=int(Wagons[0]),
-                db_wagons_out=int(WagonsOut[0]),
+        DataItem = DailyMonitoringUserWagons.objects.filter(
+                date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                db_userid = request.user.id).update(
+                    db_wagons=int(Wagons[0]),
+                    db_wagons_out=int(WagonsOut[0]),
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DailyMonitoringUserWagons.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
-                                          db_userid = request.user.id,
-                                          db_wagons= int(Wagons[0]),
-                                          db_wagons_out = int(WagonsOut[0]),
-                                          )
+            DailyMonitoringUserWagons.objects.create(
+                                        date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                        db_userid = request.user.id,
+                                        db_wagons= int(Wagons[0]),
+                                        db_wagons_out = int(WagonsOut[0]),
+                                        )
 
         return render(request, 'success_table3.html', {
                                                 'date2': date2[0][0],
@@ -2113,13 +2131,16 @@ def success_table4(request):
         Wagons_FE[0] = NanCheck(Wagons_FE[0])
         WagonsOut_FE[0] = NanCheck(WagonsOut_FE[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DailyMonitoringUserWagonsFE.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+        DataItem = DailyMonitoringUserWagonsFE.objects.filter(
+            date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+            db_userid = request.user.id).update(
                 db_wagons_fe=int(Wagons_FE[0]),
                 db_wagons_out_fe=int(WagonsOut_FE[0]),
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DailyMonitoringUserWagonsFE.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+            DailyMonitoringUserWagonsFE.objects.create(
+                                          date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
                                           db_userid = request.user.id,
                                           db_wagons_fe= int(Wagons_FE[0]),
                                           db_wagons_out_fe = int(WagonsOut_FE[0]),
@@ -2273,7 +2294,9 @@ def success_table5(request):
         AutoIn[0] = NanCheck(AutoIn[0])
         SeaIn[0] = NanCheck(SeaIn[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DailyMonitoringUserTransport.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+        DataItem = DailyMonitoringUserTransport.objects.filter(
+            date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+            db_userid = request.user.id).update(
                 db_fittingplatform_out=int(FittingPlatformOut[0]),
                 db_semiwagon_out=int(SemiwagonOut[0]),
                 db_auto_out=int(AutoOut[0]),
@@ -2287,8 +2310,9 @@ def success_table5(request):
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DailyMonitoringUserTransport.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
-                                          db_userid = request.user.id,
+            DailyMonitoringUserTransport.objects.create(
+                                        date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                        db_userid = request.user.id,
                                         db_fittingplatform_out=int(FittingPlatformOut[0]),
                                         db_semiwagon_out=int(SemiwagonOut[0]),
                                         db_auto_out=int(AutoOut[0]),
@@ -2456,7 +2480,9 @@ def success_table6(request):
         FactLoad[0] = NanCheck(FactLoad[0])
         Reload[0] = NanCheck(Reload[0])
         # Перезапись данных за предыдущий день, при совпадении даты и ID пользователя.
-        DataItem = DailyMonitoringUserTransport.objects.filter(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'), db_userid = request.user.id).update(
+        DataItem = DailyMonitoringUserTransport.objects.filter(
+            date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+            db_userid = request.user.id).update(
                 db_fittingplatform_out=int(FittingPlatformOut[0]),
                 db_semiwagon_out=int(SemiwagonOut[0]),
                 db_auto_out=int(AutoOut[0]),
@@ -2470,8 +2496,9 @@ def success_table6(request):
             )
         # Запись новых данных, если ID пользователя и дата не совпадают.
         if DataItem == 0:
-            DailyMonitoringUserTransport.objects.create(date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
-                                          db_userid = request.user.id,
+            DailyMonitoringUserTransport.objects.create(
+                date = dt.datetime.strptime(date2[0][0], '%Y-%m-%d'),
+                                        db_userid = request.user.id,
                                         db_fittingplatform_out=int(FittingPlatformOut[0]),
                                         db_semiwagon_out=int(SemiwagonOut[0]),
                                         db_auto_out=int(AutoOut[0]),
