@@ -53,6 +53,7 @@ from .utils import (AllQtyPercent,
                     NanCheck,
                     connection)
 
+# 1 day in timedelta data format
 DAYDELTA = dt.timedelta(days=1,
                            seconds=0,
                            microseconds=0,
@@ -62,6 +63,7 @@ DAYDELTA = dt.timedelta(days=1,
                            weeks=0)
 
 
+# home page
 @login_required(login_url='')
 def home(request):
     if request.user.id != 1:
@@ -72,6 +74,7 @@ def home(request):
     else:
         return render(request, 'admin.html')
 
+# register page
 @transaction.atomic
 @login_required(login_url='')
 def register(request):
@@ -97,6 +100,7 @@ def register(request):
         return redirect('login')
     ####
 
+# login page
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -113,6 +117,7 @@ def user_login(request):
             return redirect('login')
     return render(request, 'login.html')
 
+# logout realization
 def user_logout(request):
     # Выход пользователя
     logout(request)
@@ -872,6 +877,7 @@ def download(request):
     else:
         return redirect('home')
 
+# show of dataset for datepick_admin-DAYDELTA date
 @login_required(login_url='')
 def dataset(request):
     if request.user.id == 1:
@@ -1756,7 +1762,7 @@ def dataset(request):
     else:
         return redirect('home')
 
-
+# datepick for use in dataset
 @login_required(login_url='')
 def datepick_admin(request):
     if request.user.id == 1:
