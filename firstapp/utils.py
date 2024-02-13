@@ -1,5 +1,6 @@
 import openpyxl
 import psycopg2
+### Recomended version of Python is 3.12, because psycopg2-binary is stable on this or higheir version.
 
 
 def set_border(ws, cell_range):

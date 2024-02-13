@@ -1,4 +1,5 @@
 # Файл views.py
+### Recomended version of Python is 3.12, because psycopg2-binary is stable on this or higheir version.
 import openpyxl
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
